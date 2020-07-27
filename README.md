@@ -28,7 +28,7 @@ plugins:
 
 ## Using the Plugin
 
-1. Add configuration options to your Serverless configuration, as below.
+- Add configuration options to your Serverless configuration, as below.
 ```yml
 custom:
   wso2apim:
@@ -40,7 +40,7 @@ custom:
     gatewayEnv: 'Production'  # Target Gateway Environment
 ```
 
-2. Add one or more API definitions to your Serverless configuration, as below.
+- Add one or more API definitions to your Serverless configuration, as below.
 
 ```yml
 apidefs:
@@ -66,13 +66,13 @@ apidefs:
         ...
 ```
 
-3. Run `sls deploy apidefs` to create-and-publish or update-and-republish API definitions in WSO2 API Manager.
+- Run `sls deploy apidefs` to create-and-publish or update-and-republish API definitions in WSO2 API Manager.
 
-4. Run `sls list apidefs` to view the status of API deployment on WSO2 API Manager.
+- Run `sls list apidefs` to view the status of API deployment on WSO2 API Manager.
 
-4. Run `sls remove apidefs` to delete API definitions from WSO2 API Manager when there are no active subscriptions made to those APIs.
+- Run `sls remove apidefs` to delete API definitions from WSO2 API Manager when there are no active subscriptions made to those APIs.
 
-5. Run `sls remove apidefs --force` (** USE WITH CAUTION **) to forcefully delete API definitions despite any active subscriptions. It will retire, deprecate and delete API definitions if they cannot be deleted normally.
+- Run `sls remove apidefs --force` (** USE WITH CAUTION **) to forcefully delete API definitions despite any active subscriptions. It will retire, deprecate and delete API definitions if they cannot be deleted normally.
 
 
 ## Limitations and Backlog items
