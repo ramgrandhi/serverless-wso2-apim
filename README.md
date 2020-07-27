@@ -4,75 +4,80 @@ serverless-wso2-apim
 
 Serverless Framework plugin to manage APIs in [WSO2 API Manager](https://wso2.com/api-management/).  
 
+![img](https://iili.io/duP1Zx.png)
+---
 
 ## Compatible with
-* serverless@^1
+* serverlessˆ1.75
 * [WSO2 API Manager 2.6.0](https://docs.wso2.com/display/AM260/)
 
 ## Features
-* Create, Update APIs in WSO2 API Manager using `sls deploy apidefs`
+* Create, Update API definitions using `sls deploy apidefs`
 * View API deployment status using `sls list apidefs`
-* Delete APIs in WSO2 API Manager using `sls remove apidefs`
+* Delete API definitions using `sls remove apidefs`
 * Automatically publish / re-publish APIs to WSO2 API Store when changes occur to API definitions
 
+---
+
 ## Install Plugin
-`yarn add -D serverless-wso2-apim`   
-OR   
+* `yarn add -D serverless-wso2-apim`   
+or   
 `npm install --save serverless-wso2-apim`  
 
-Then in `serverless.yml` add following entry to the plugins array:
-```yml
-plugins:
-  - serverless-wso2-apim
-```
+* Then in `serverless.yml` add following entry to the plugins array:
+  ```yml
+  plugins:
+    - serverless-wso2-apim
+  ```
 
 ## Using the Plugin
 
 - Add configuration options to your Serverless configuration, as below.
-```yml
-custom:
-  wso2apim:
-    host: 'wso2-apimanager.com' # WSO2 API Manager Host
-    port: 443 # WSO2 API Manager Port
-    versionSlug: 'v0.14'  # WSO2 API Manager's Management API version
-    user: 'user@tenant' # Username, with tenant symbol
-    pass: 'pass' # Password
-    gatewayEnv: 'Production'  # Target Gateway Environment
-```
+  ```yml
+  custom:
+    wso2apim:
+      host: 'wso2-apimanager.com' # WSO2 API Manager Host
+      port: 443 # WSO2 API Manager Port
+      versionSlug: 'v0.14'  # WSO2 API Manager's Management API version
+      user: 'user@tenant' # Username, with tenant symbol
+      pass: 'pass' # Password
+      gatewayEnv: 'Production'  # Target Gateway Environment
+  ```
 
 - Add one or more API definitions to your Serverless configuration, as below.
 
-```yml
-apidefs:
-  - myAwesomeAPI: # Identifier of your API definition
-    name: 'MyAwesomeAPI'  # Name of API that shows up in WSO2 API Console (CANNOT BE UPDATED LATER)
-    description: 'My Awesome API'
-    rootContext: '/myawesomeapi'  # Runtime context of API which will be appended to the base URL exposed by WSO2 API Gateway. Must be unique across the Gateway Environment. (CANNOT BE UPDATED LATER)
-    version: 'v1' # Version, which also forms a part of the API URL ultimately (CANNOT BE UPDATED LATER)
-    visibility: 'PUBLIC'  # Accessible from Public Internet, Visible to everyone
-    backend: 
-      http: # HTTP-based Backends
-        baseUrl: 'https://backend-host:port/123'  # Backend RESTful base URL
-    maxTps: 100 # Throttling, Transactions per second
-    tags:
-      - my-awesome-api
-      - awesomeness
-    swaggerSpec:  # Swagger specification in YML, currently supports 2.0
-      swagger: '2.0'
-      ...
-      info:
+  ```yml
+  apidefs:
+    - myAwesomeAPI: # Identifier of your API definition
+      name: 'MyAwesomeAPI'  # Name of API that shows up in WSO2 API Console (CANNOT BE UPDATED LATER)
+      description: 'My Awesome API'
+      rootContext: '/myawesomeapi'  # Runtime context of API which will be appended to the base URL exposed by WSO2 API Gateway. Must be unique across the Gateway Environment. (CANNOT BE UPDATED LATER)
+      version: 'v1' # Version, which also forms a part of the API URL ultimately (CANNOT BE UPDATED LATER)
+      visibility: 'PUBLIC'  # Accessible from Public Internet, Visible to everyone
+      backend: 
+        http: # HTTP-based Backends
+          baseUrl: 'https://backend-host:port/123'  # Backend RESTful base URL
+      maxTps: 100 # Throttling, Transactions per second
+      tags:
+        - my-awesome-api
+        - awesomeness
+      swaggerSpec:  # Swagger specification in YML, currently supports 2.0
+        swagger: '2.0'
         ...
-      paths:
-        ...
-```
+        info:
+          ...
+        paths:
+          ...
+  ```
 
-- Run `sls deploy apidefs` to create-and-publish or update-and-republish API definitions in WSO2 API Manager.
+- Run `sls deploy apidefs` to create-and-publish (or) update-and-republish API definitions in WSO2 API Manager.
 
 - Run `sls list apidefs` to view the status of API deployment on WSO2 API Manager.
 
 - Run `sls remove apidefs` to delete API definitions from WSO2 API Manager when there are no active subscriptions made to those APIs.
 
-- Run `sls remove apidefs --force` (** USE WITH CAUTION **) to forcefully delete API definitions despite any active subscriptions. It will retire, deprecate and delete API definitions if they cannot be deleted normally.
+- ** COMING SOON **   
+Run `sls remove apidefs --force` (** USE WITH CAUTION **) to forcefully delete API definitions despite any active subscriptions. It will retire, deprecate and delete API definitions if they cannot be deleted normally.
 
 
 ## Limitations and Backlog items

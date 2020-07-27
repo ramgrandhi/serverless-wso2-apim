@@ -1,5 +1,5 @@
 name: Publish to NPM
-on: [push, pull_request]
+on: [push]
 
 jobs:
   build:
@@ -11,6 +11,6 @@ jobs:
           node-version: 12
           registry-url: https://registry.npmjs.org/
       - run: yarn install
-      - run: npm publish --access public
+      - run: npm publish --access public --tag serverless --tag serverlss-plugin --tag wso2-apim --tag wso2-api-manager
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH_TOKEN}}
