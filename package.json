@@ -1,5 +1,5 @@
 {
-  "name": "@rgrandhi/serverless-wso2-apim",
+  "name": "serverless-wso2-apim",
   "version": "0.1.0",
   "description": "Serverless Framework plugin for WSO2 API Manager",
   "main": "index.js",
