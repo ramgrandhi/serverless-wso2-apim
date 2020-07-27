@@ -11,6 +11,10 @@
   },
   "author": "Ram Grandhi <ram.grandhi@icloud.com> (https://ramgrandhi.com)",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ramgrandhi/serverless-wso2-apim.git"
+  },
   "devDependencies": {
     "axios": "^0.19.2",
     "fs": "^0.0.1-security",
