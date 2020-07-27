@@ -1,0 +1,22 @@
+{
+  "name": "@rgrandhi/serverless-wso2-apim",
+  "version": "1.0.0",
+  "description": "Serverless Framework plugin for WSO2 API Manager",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://oy54ob@dev.azure.com/oy54ob/tryOutiDEAL/_git/serverless-wso2-apim"
+  },
+  "author": "Ram Grandhi",
+  "license": "",
+  "devDependencies": {
+    "axios": "^0.19.2",
+    "fs": "^0.0.1-security",
+    "https": "^1.0.0",
+    "qs": "^6.9.4",
+    "serverless": "^1.75.1",
+  }
+}
