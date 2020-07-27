@@ -9,7 +9,7 @@
   "publishConfig": {
     "registry":"https://registry.npmjs.org"
   },
-  "author": "Ram Grandhi",
+  "author": "Ram Grandhi <ram.grandhi@icloud.com> (https://ramgrandhi.com)",
   "license": "MIT",
   "devDependencies": {
     "axios": "^0.19.2",
