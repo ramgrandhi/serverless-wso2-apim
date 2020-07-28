@@ -42,6 +42,8 @@ or
 
 ## Using the Plugin
 
+- Make sure you have a Serverless project set up as described [here](https://www.serverless.com/framework/docs/getting-started/).  
+
 - Add configuration options to your Serverless configuration, as below.
   ```yml
   custom:
