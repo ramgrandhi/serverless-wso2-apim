@@ -1,6 +1,6 @@
 {
   "name": "serverless-wso2-apim",
-  "version": "0.1.7",
+  "version": "0.0.1-alpha.0",
   "description": "Serverless Framework plugin for WSO2 API Manager",
   "main": "index.js",
   "scripts": {
