@@ -14,7 +14,6 @@ class ServerlessPlugin {
     this.cache = {}
     this.cmd = this.serverless.pluginManager.cliCommands.join('|');
 
-
     //Retrieve tenantSuffix in case of multi-tenant setup
     if (this.wso2APIM.user.includes("@")) {
       this.cache.tenantSuffix = this.wso2APIM.user.split("@")[1];
@@ -92,7 +91,7 @@ class ServerlessPlugin {
 
   async generateToken() {
     try {
-      console.log("Generating temporary token..");
+      console.log("Generating temporary token..\n");
       const data = await wso2apim.generateToken(
         "https://" + this.wso2APIM.host + ":" + this.wso2APIM.port + "/oauth2/token",
         this.wso2APIM.user,
@@ -173,10 +172,11 @@ class ServerlessPlugin {
       // By calling listAPIDefs(), we are re-collecting the current deployment status in WSO2 API Manager
       await this.listAPIDefs();
 
+      // Create API definitions, if they do not exist
       for (const [i, api] of this.cache.deploymentStatus.entries()) {
         try {
           if (api.apiId !== undefined) {
-            console.log("Updating " + this.apiDefs[i].name + "(" + api.apiId + ")..");
+            console.log("Updating " + this.apiDefs[i].name + " (" + api.apiId + ")..");
             const data = await wso2apim.updateAPIDef(
               "https://" + this.wso2APIM.host + ":" + this.wso2APIM.port + "/api/am/publisher/" + this.wso2APIM.versionSlug + "/apis",
               this.wso2APIM.user,
@@ -201,20 +201,47 @@ class ServerlessPlugin {
           console.log(err);
         }
       }
+
+      // By calling listAPIDefs(), we are re-collecting the current deployment status in WSO2 API Manager
+      await this.listAPIDefs();
+      console.log("\n");
+
+      // Publish or Re-Publish API definitions, based on whether they are in CREATED or PUBLISHED states
+      for (const [i, api] of this.cache.deploymentStatus.entries()) {
+        try {
+          if (api.apiId !== undefined) {
+            if (api.apiStatus === 'CREATED') {
+              console.log("Publishing " + this.apiDefs[i].name + " (" + api.apiId + ")..");
+            }
+            else if (api.apiStatus === 'PUBLISHED') {
+              console.log("Re-publishing " + this.apiDefs[i].name + " (" + api.apiId + ")..");
+            }
+            const data = await wso2apim.publishAPIDef(
+              "https://" + this.wso2APIM.host + ":" + this.wso2APIM.port + "/api/am/publisher/" + this.wso2APIM.versionSlug + "/apis/change-lifecycle",
+              this.cache.accessToken,
+              api.apiId
+            );
+          }
+        }
+        catch (err) {
+          console.log(err);
+        }
+      }
     }
     catch (err) {
       console.log(err);
       throw new Error(err);
-    }
-    console.log("Deployment successful.", "\n", "Use `sls list apidefs` to view the deployment status.");
+    }    
+    console.log("\nDeployment successful.", "\n", "Use `sls list apidefs` to view the deployment status.");
   }
+
 
   async removeAPIDefs() {
     try {
       // By calling listAPIDefs(), we are re-collecting the current deployment status in WSO2 API Manager
       await this.listAPIDefs(); 
       for (let api of this.cache.deploymentStatus) {
-        if (api.apiId.length > 0) {
+        if (api.apiId !== undefined) {
           console.log("Deleting " + api.apiId + "..");
           const data = await wso2apim.removeAPIDef(
             "https://" + this.wso2APIM.host + ":" + this.wso2APIM.port + "/api/am/publisher/" + this.wso2APIM.versionSlug + "/apis",
@@ -223,7 +250,7 @@ class ServerlessPlugin {
           );
         }
       };
-      console.log("Removal successful.", "\n", "Use `sls list apidefs` to view the deployment status.");
+      console.log("\nRemoval successful.", "\n", "Use `sls list apidefs` to view the deployment status.");
     }
     catch(err) {
       console.log(err);

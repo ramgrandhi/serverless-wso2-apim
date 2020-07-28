@@ -173,33 +173,6 @@ function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
     return wso2ApiDefinition;
 };
 
-// Updates API definition
-async function updateAPIDef(url, user, accessToken, gatewayEnv, apiDef, apiId) {
-    url = url + "/" + apiId;
-    var data = constructAPIDef(user, gatewayEnv, apiDef, apiId);
-    var config = {
-        headers: {
-            'Authorization': 'Bearer ' + accessToken,
-            'Content-Type': 'application/json'
-        },
-        httpsAgent: new https.Agent({
-            rejectUnauthorized: false
-        })
-    };
-
-    return new Promise((resolve, reject) => {
-        axios.put(url, data, config)
-            .then((res) => {
-                resolve(res.data);
-            })
-            .catch((err) => {
-                reject(
-                    renderError(err)
-                );
-            });
-    });
-};
-
 
 // Creates API definition
 async function createAPIDef(url, user, accessToken, gatewayEnv, apiDef) {
@@ -232,6 +205,66 @@ async function createAPIDef(url, user, accessToken, gatewayEnv, apiDef) {
     });
 };
 
+
+// Publishes API definition
+async function publishAPIDef(url, accessToken, apiId) {
+    var data = {};
+    var config = {
+        headers: {
+            'Authorization': 'Bearer ' + accessToken
+        },
+        params: {
+            'apiId': apiId,
+            'action': 'Publish'
+        },
+        httpsAgent: new https.Agent({
+            rejectUnauthorized: false
+        })
+    };
+
+    return new Promise((resolve, reject) => {
+        axios.post(url, data, config)
+            .then((res) => {
+                resolve(res);
+            })
+            .catch((err) => {
+                reject(
+                    renderError(err)
+                );
+            });
+    });
+};
+
+
+// Updates API definition
+async function updateAPIDef(url, user, accessToken, gatewayEnv, apiDef, apiId) {
+    url = url + "/" + apiId;
+    var data = constructAPIDef(user, gatewayEnv, apiDef, apiId);
+    var config = {
+        headers: {
+            'Authorization': 'Bearer ' + accessToken,
+            'Content-Type': 'application/json'
+        },
+        httpsAgent: new https.Agent({
+            rejectUnauthorized: false
+        })
+    };
+
+    return new Promise((resolve, reject) => {
+        axios.put(url, data, config)
+            .then((res) => {
+                resolve(res.data);
+            })
+            .catch((err) => {
+                reject(
+                    renderError(err)
+                );
+            });
+    });
+};
+
+
+// Removes API definition (if possible)
 async function removeAPIDef(url, accessToken, apiId) {
     url = url + "/" + apiId;
     let config = {
@@ -246,7 +279,6 @@ async function removeAPIDef(url, accessToken, apiId) {
     return new Promise((resolve, reject) => {
         axios.delete(url, config)
             .then((res) => {
-                console.log(res.data);
                 resolve(res.data);
             })
             .catch((err) => {
@@ -263,6 +295,7 @@ module.exports = {
     generateToken,
     isAPIDeployed,
     createAPIDef,
+    publishAPIDef,
     updateAPIDef,
     removeAPIDef
 };

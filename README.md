@@ -2,9 +2,9 @@ serverless-wso2-apim
 ====================
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Serverless Framework plugin to manage APIs in [WSO2 API Manager](https://wso2.com/api-management/).  
+Serverless Framework plugin to manage APIs in [WSO2 API Manager](https://wso2.com/api-management/).
 
-![img](https://iili.io/duP1Zx.png)
+![img](./assets/serverless-wso2-apim.png)
 ---
 
 ## Compatible with
@@ -14,16 +14,16 @@ Serverless Framework plugin to manage APIs in [WSO2 API Manager](https://wso2.co
 ## Features
 * Create, Update API definitions using `sls deploy apidefs`
 
-  ![img](https://iili.io/dui9S9.png)
+  ![img](./assets/sls-deploy-apidefs.png)
 
 * View API deployment status using `sls list apidefs`
 
-  ![img](https://iili.io/duiKox.png)
-  ![img](https://iili.io/dui3tj.png)
+  ![img](./assets/sls-list-apidefs-1.png)
+  ![img](./assets/sls-list-apidefs-2.png)
 
 * Delete API definitions using `sls remove apidefs`
 
-  ![img](https://iili.io/duiJ9e.png)
+  ![img](./assets/sls-remove-apidefs.png)
 
 * Automatically publish / re-publish APIs to WSO2 API Store when changes occur to API definitions
 
