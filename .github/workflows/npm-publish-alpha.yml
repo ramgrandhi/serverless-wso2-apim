@@ -3,10 +3,9 @@ on:
   push:
     tags:
       - '*alpha*'
-    branches:
-      - develop
 jobs:
   build:
+    if: github.event.base_ref == 'ref/heads/develop'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
