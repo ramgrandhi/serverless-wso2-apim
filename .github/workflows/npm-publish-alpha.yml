@@ -13,6 +13,6 @@ jobs:
           node-version: 12
           registry-url: https://registry.npmjs.org/
       - run: yarn install
-      - run: npm publish --access public --tag latest
+      - run: npm publish --access public --tag alpha
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH_TOKEN}}

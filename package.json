@@ -1,10 +1,11 @@
 {
   "name": "serverless-wso2-apim",
-  "version": "0.0.2-alpha.1",
+  "version": "0.0.2-alpha.2",
   "description": "Serverless Framework plugin for WSO2 API Manager",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "release:develop": "release pre alpha"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
@@ -27,6 +28,7 @@
     "fs": "^0.0.1-security",
     "https": "^1.0.0",
     "qs": "^6.9.4",
+    "release": "^6.3.0",
     "serverless": "^1.75.1"
   }
 }
