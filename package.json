@@ -5,9 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "release:develop": "release pre alpha",
+    "release:alpha": "release pre alpha",
+    "release:patch": "release patch",
     "release:minor": "release minor",
-    "release:major": "release major"
+    "release:major": "release major" 
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"

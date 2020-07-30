@@ -98,8 +98,8 @@ Run `sls remove apidefs --force` (** USE WITH CAUTION **) to forcefully delete A
 * Does not support publishing API definitions to multiple Gateway environments.  
 * Does not support CORS configuration.
 
-## Help?
-* We're on #Slack.
+## Need Help?
+* Raise an issue [here](https://github.com/ramgrandhi/serverless-wso2-apim/issues/new)
 
 ## License
 [MIT](https://github.com/99xt/serverless-dynamodb-local/blob/v1/LICENSE)
