@@ -2,9 +2,9 @@ serverless-wso2-apim
 ====================
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Serverless Framework plugin to manage APIs in [WSO2 API Manager](https://wso2.com/api-management/).  
+Serverless Framework plugin to manage APIs in [WSO2 API Manager](https://wso2.com/api-management/).
 
-![img](https://iili.io/duP1Zx.png)
+![img](./assets/serverless-wso2-apim.png)
 ---
 
 ## Compatible with
@@ -12,24 +12,16 @@ Serverless Framework plugin to manage APIs in [WSO2 API Manager](https://wso2.co
 * [WSO2 API Manager 2.6.0](https://docs.wso2.com/display/AM260/)
 
 ## Features
-* Create, Update API definitions using `sls deploy apidefs`
-
-  ![img](https://iili.io/dui9S9.png)
-
-* View API deployment status using `sls list apidefs`
-
-  ![img](https://iili.io/duiKox.png)
-  ![img](https://iili.io/dui3tj.png)
-
-* Delete API definitions using `sls remove apidefs`
-
-  ![img](https://iili.io/duiJ9e.png)
-
-* Automatically publish / re-publish APIs to WSO2 API Store when changes occur to API definitions
+* Create or Update your API definitions (including backend certificates) seamlessly with one command - `sls deploy apidefs`.  
+* Manage your API definitions via `sls list apidefs` and `sls remove apidefs`.  
+* Management your backend certificates via `sls list certs` and `sls remove certs`.  
+* Automatically publish / re-publish APIs to WSO2 API Store when changes occur to your API definitions.  
 
 ---
 
 ## Install Plugin
+* Discover it on npmjs.com @ [here](https://www.npmjs.com/package/serverless-wso2-apim)
+
 * `yarn add -D serverless-wso2-apim`   
 or   
 `npm install --save serverless-wso2-apim`  
@@ -41,6 +33,8 @@ or
   ```
 
 ## Using the Plugin
+
+- Make sure you have a Serverless project set up as described [here](https://www.serverless.com/framework/docs/getting-started/).  
 
 - Add configuration options to your Serverless configuration, as below.
   ```yml
@@ -66,7 +60,8 @@ or
       visibility: 'PUBLIC'  # Accessible from Public Internet, Visible to everyone
       backend: 
         http: # HTTP-based Backends
-          baseUrl: 'https://backend-host:port/123'  # Backend RESTful base URL
+          baseUrl: 'https://backend:port/123'  # Backend RESTful base URL
+          publicCertChain: './certs/backend.cer'  # Optional, public certificate chain in PEM base64 format
       maxTps: 100 # Throttling, Transactions per second
       tags:
         - my-awesome-api
@@ -80,11 +75,16 @@ or
           ...
   ```
 
-- Run `sls deploy apidefs` to create-and-publish (or) update-and-republish API definitions in WSO2 API Manager.
+- Run `sls deploy apidefs` to create-and-publish (or) update-and-republish API definitions (and associated backend certificates, if mentioned) in WSO2 API Manager.
 
 - Run `sls list apidefs` to view the status of API deployment on WSO2 API Manager.
 
-- Run `sls remove apidefs` to delete API definitions from WSO2 API Manager when there are no active subscriptions made to those APIs.
+- Run `sls list certs` to view the status of backend certificate availability.
+
+- Run `sls remove apidefs` to delete API definitions when there are no active subscriptions made to those APIs.
+
+- Run `sls remove certs` to delete backend certificates when they are found.
+
 
 - ** COMING SOON **   
 Run `sls remove apidefs --force` (** USE WITH CAUTION **) to forcefully delete API definitions despite any active subscriptions. It will retire, deprecate and delete API definitions if they cannot be deleted normally.
@@ -94,13 +94,12 @@ Run `sls remove apidefs --force` (** USE WITH CAUTION **) to forcefully delete A
 * Limited to creation of RESTful APIs using Swagger 2.0 on WSO2 API Manager. 
 * Limited to WSO2 API Manager 2.6.0 which uses v0.14 as management API version. 
 * Does not support managing APIs which are already created in another manner without using this Plugin.
-* Does not support custom certificates for backend endpoints.
 * Does not work with Websocket-style APIs.  
 * Does not support publishing API definitions to multiple Gateway environments.  
 * Does not support CORS configuration.
 
 ## Help?
-* Raise an Issue 
+* We're on #Slack.
 
 ## License
 [MIT](https://github.com/99xt/serverless-dynamodb-local/blob/v1/LICENSE)

@@ -1,13 +1,16 @@
 {
   "name": "serverless-wso2-apim",
-  "version": "0.1.7",
+  "version": "0.0.2-alpha.5",
   "description": "Serverless Framework plugin for WSO2 API Manager",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "release:develop": "release pre alpha",
+    "release:minor": "release minor",
+    "release:major": "release major"
   },
   "publishConfig": {
-    "registry":"https://registry.npmjs.org"
+    "registry": "https://registry.npmjs.org"
   },
   "author": "Ram Grandhi <ram.grandhi@icloud.com> (https://ramgrandhi.com)",
   "license": "MIT",
@@ -23,9 +26,11 @@
   ],
   "devDependencies": {
     "axios": "^0.19.2",
+    "form-data": "^3.0.0",
     "fs": "^0.0.1-security",
     "https": "^1.0.0",
     "qs": "^6.9.4",
+    "release": "^6.3.0",
     "serverless": "^1.75.1"
   }
 }
