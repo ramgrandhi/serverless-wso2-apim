@@ -279,6 +279,37 @@ async function publishAPIDef(url, accessToken, apiId) {
     }  
 };
 
+
+// Retrieves invokable API endpoint
+async function listInvokableAPIUrl(url, accessToken, apiId) {
+    try {
+        url = url + "/" + apiId;
+        var config = {
+            headers: {
+                'Authorization': 'Bearer ' + accessToken
+            },
+            httpsAgent: new https.Agent({
+                rejectUnauthorized: false
+            })
+        };
+
+        return new Promise((resolve, reject) => {
+            axios.get(url, config)
+                .then((res) => {
+                    resolve(res.data);
+                })
+                .catch((err) => {
+                    utils.renderError(err);
+                    reject(err);
+                });
+        });
+    }
+    catch (err) {
+        utils.renderError(err);
+    }  
+};
+
+
 // Uploads backend certificate
 async function uploadCert(url, accessToken, certAlias, certFile, backendUrl) {
     try {
@@ -318,7 +349,7 @@ async function uploadCert(url, accessToken, certAlias, certFile, backendUrl) {
 // Updates API definition
 async function updateAPIDef(url, user, accessToken, gatewayEnv, apiDef, apiId) {
     try {
-        url = url + "/" + apiId;
+        url = "url + "/"" + apiId;
         var data = constructAPIDef(user, gatewayEnv, apiDef, apiId);
         var config = {
             headers: {
@@ -419,5 +450,6 @@ module.exports = {
     uploadCert,
     updateAPIDef,
     removeAPIDef,
-    removeCert
+    removeCert,
+    listInvokableAPIUrl,
 };
