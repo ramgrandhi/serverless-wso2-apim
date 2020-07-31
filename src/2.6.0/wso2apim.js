@@ -349,7 +349,7 @@ async function uploadCert(url, accessToken, certAlias, certFile, backendUrl) {
 // Updates API definition
 async function updateAPIDef(url, user, accessToken, gatewayEnv, apiDef, apiId) {
     try {
-        url = "url + "/"" + apiId;
+        url = url + "/" + apiId;
         var data = constructAPIDef(user, gatewayEnv, apiDef, apiId);
         var config = {
             headers: {

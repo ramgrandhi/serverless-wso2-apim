@@ -223,9 +223,9 @@ class ServerlessPlugin {
         });
 
         // Compare apples-to-apples (configured-to-deployed) and record deployment status
-        if (this.cache.deployedAPIs.some(deployedAPI => deployedAPI.apiClob === apiDefClob)) {
-          const apiStatus = this.cache.deployedAPIs.find(deployedAPI => deployedAPI.apiClob === apiDefClob).apiStatus;
-          const apiId = this.cache.deployedAPIs.find(deployedAPI => deployedAPI.apiClob === apiDefClob).apiId;
+        if (this.cache.deployedAPIs.some(deployedAPI => deployedAPI.apiClob == apiDefClob)) {
+          const apiStatus = this.cache.deployedAPIs.find(deployedAPI => deployedAPI.apiClob == apiDefClob).apiStatus;
+          const apiId = this.cache.deployedAPIs.find(deployedAPI => deployedAPI.apiClob == apiDefClob).apiId;
           var invokableAPIURL = null;
 
           // Check for PUBLISHED state, if PUBLISHED then retrieve Invokable API URL
@@ -247,6 +247,7 @@ class ServerlessPlugin {
             apiVersion: apiDef.version,
             apiContext: apiDef.rootContext,
             apiStatus: apiStatus,
+            apiId, apiId,
             invokableAPIURL: invokableAPIURL + " 🚀",
           });
         }
@@ -256,6 +257,7 @@ class ServerlessPlugin {
             apiVersion: apiDef.version,
             apiContext: apiDef.rootContext,
             apiStatus: "TO BE CREATED",
+            apiId: null,
             invokableAPIURL: "TO BE CREATED",
           })
         }
