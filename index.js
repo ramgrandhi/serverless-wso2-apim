@@ -223,13 +223,32 @@ class ServerlessPlugin {
         });
 
         // Compare apples-to-apples (configured-to-deployed) and record deployment status
-        if (this.cache.deployedAPIs.some(deployedAPI => deployedAPI.apiClob === apiDefClob)) {
+        if (this.cache.deployedAPIs.some(deployedAPI => deployedAPI.apiClob == apiDefClob)) {
+          const apiStatus = this.cache.deployedAPIs.find(deployedAPI => deployedAPI.apiClob == apiDefClob).apiStatus;
+          const apiId = this.cache.deployedAPIs.find(deployedAPI => deployedAPI.apiClob == apiDefClob).apiId;
+          var invokableAPIURL = null;
+
+          // Check for PUBLISHED state, if PUBLISHED then retrieve Invokable API URL
+          try {
+            if (apiStatus == 'PUBLISHED') {
+              const data = await wso2apim.listInvokableAPIUrl(
+                "https://" + this.wso2APIM.host + ":" + this.wso2APIM.port + "/api/am/store/" + this.wso2APIM.versionSlug + "/apis",
+                this.cache.accessToken,
+                apiId);
+              invokableAPIURL = data.endpointURLs.filter((Url) => { return Url.environmentName == this.wso2APIM.gatewayEnv })[0].environmentURLs.https; 
+            }
+          }
+          catch (err) {
+            this.serverless.cli.log("An error occurred while retrieving Invokable API URL for " + `${this.apiDefs[i].name}` + ", proceeding further.");
+          }
+
           this.cache.deploymentStatus.push({
             apiName: apiDef.name,
             apiVersion: apiDef.version,
             apiContext: apiDef.rootContext,
-            apiStatus: this.cache.deployedAPIs.find(deployedAPI => deployedAPI.apiClob === apiDefClob).apiStatus,
-            apiId: this.cache.deployedAPIs.find(deployedAPI => deployedAPI.apiClob === apiDefClob).apiId,
+            apiStatus: apiStatus,
+            apiId, apiId,
+            invokableAPIURL: invokableAPIURL + " 🚀",
           });
         }
         else {
@@ -238,6 +257,8 @@ class ServerlessPlugin {
             apiVersion: apiDef.version,
             apiContext: apiDef.rootContext,
             apiStatus: "TO BE CREATED",
+            apiId: null,
+            invokableAPIURL: "TO BE CREATED",
           })
         }
       }
