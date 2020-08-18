@@ -311,10 +311,10 @@ async function listInvokableAPIUrl(url, accessToken, apiId) {
 
 
 // Uploads backend certificate
-async function uploadCert(url, accessToken, certAlias, certFile, backendUrl) {
+async function uploadCert(url, accessToken, certAlias, cert, backendUrl) {
     try {
         var data = new FormData();
-        data.append('certificate', fs.createReadStream(certFile));
+        data.append('certificate', fs.createReadStream(cert))
         data.append('alias', certAlias);
         data.append('endpoint', backendUrl);
         var config = {
