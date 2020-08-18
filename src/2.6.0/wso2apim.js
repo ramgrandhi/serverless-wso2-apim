@@ -15,7 +15,6 @@ const qs = require('qs');
 const FormData = require('form-data');
 const path = require('path');
 const fs = require('fs');
-const swagger = require('swagger-client');
 const utils = require('../utils/utils');
 
 // Register a new client
