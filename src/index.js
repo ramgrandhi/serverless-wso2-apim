@@ -18,10 +18,6 @@ class Serverless_WSO2_APIM {
     this.apiDefs = this.wso2APIM.apidefs;
     this.cmd = this.serverless.pluginManager.cliCommands.join('|');
 
-    //Retrieve tenantSuffix in case of multi-tenant setup
-    if (this.wso2APIM.user.includes("@")) {
-      this.cache.tenantSuffix = this.wso2APIM.user.split("@")[1];
-    }
 
     this.hooks = {
       'after:deploy:deploy': this.deploy.bind(this),
@@ -47,14 +43,16 @@ class Serverless_WSO2_APIM {
     await this.registerClient();
     await this.generateToken();
     await this.uploadCerts();
-    // await this.createOrUpdateAPIDefs();
+    await this.createOrUpdateAPIDefs();
   }
   async info() {
+    await this.validateConfig();
     await this.registerClient();
     await this.generateToken();
     await this.listAPIDefs();
   }
   async remove() {
+    await this.validateConfig();
     await this.registerClient();
     await this.generateToken();
     await this.removeAPIDefs();
@@ -158,61 +156,73 @@ class Serverless_WSO2_APIM {
       console.table(this.cache.certAvailability);
     }
     catch (err) {
-      console.log(err);
-      
+      this.serverless.cli.log("Retrieving backend certificates.. NOT OK");
     }
   }
 
 
   async listAPIDefs() {
-    if (this.cmd === 'list|apidefs')
-      this.serverless.cli.log("Retrieving API Definitions..");
-    this.cache.deploymentStatus = [];
+    if (this.cmd === 'info')
+      this.serverless.cli.log(pluginNameSuffix + "Retrieving API Definitions..");
+
+    const wso2APIM = this.serverless.service.custom.wso2apim;
+    const apiDefs = wso2APIM.apidefs;
+
+    //Retrieve tenantSuffix in case of multi-tenant setup
+    if (this.wso2APIM.user.includes("@")) {
+      this.cache.tenantSuffix = this.wso2APIM.user.split("@")[1];
+    }
+    
+    this.cache.deploymentStatus = [];    
     // Loops thru each api definition found in serverless configuration
-    for (let apiDef of this.apiDefs) {
+    for (let apiDef of apiDefs) {
       try {
+        // Check if API is already deployed using the following combination:
+        // It takes the form of <APIName>|-|<Version>|-|<RootContext>
         var apiDefClob = apiDef.name + "|-|" + apiDef.version + "|-|" + apiDef.rootContext;
         const data = await wso2apim.isAPIDeployed(
-          "https://" + this.wso2APIM.host + ":" + this.wso2APIM.port + "/api/am/publisher/" + this.wso2APIM.versionSlug + "/apis",
+          "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/publisher/" + wso2APIM.versionSlug + "/apis",
           this.cache.accessToken,
           apiDef.name,
           apiDef.version,
           apiDef.rootContext
         );
-        console.log("--is api deployed?", data);
-
+        
+        // Loops thru all deployed api definitions returned from WSO2 API Manager (we need to find exact match out of 1:n results returned) 
         this.cache.deployedAPIs = [];
-        // Loops thru all deployed api definitions returned from WSO2 API Manager (we need to find exact match out of 1:n results returned)
-        data.list.forEach(async (deployedAPI) => {
-          // Remove /t/* suffix if exists
-          if (deployedAPI.context.startsWith("/t/")) {
-            deployedAPI.context = deployedAPI.context.split(this.cache.tenantSuffix)[1]
-          }
-          this.cache.deployedAPIs.push({
-            apiId: deployedAPI.id,
-            apiClob: deployedAPI.name + "|-|" + deployedAPI.version + "|-|" + deployedAPI.context,
-            apiStatus: deployedAPI.status
+        if (data.list.length > 0) {
+          data.list.forEach((deployedAPI) => {
+            // Remove /t/* suffix if exists
+            var deployedAPIContext = deployedAPI.context;
+            if (deployedAPIContext.startsWith("/t/")) {
+              deployedAPIContext = deployedAPIContext.split(this.cache.tenantSuffix)[1]
+            }
+            this.cache.deployedAPIs.push({
+              apiId: deployedAPI.id,
+              apiClob: deployedAPI.name + "|-|" + deployedAPI.version + "|-|" + deployedAPIContext,
+              apiStatus: deployedAPI.status
+            });
           });
-        });
+        }
 
-        // Compare apples-to-apples (configured-to-deployed) and record deployment status
+        // Compare apples-to-apples (configured-vs-deployed APIs) and record their deployment status
         if (this.cache.deployedAPIs.some(deployedAPI => deployedAPI.apiClob == apiDefClob)) {
           const apiStatus = this.cache.deployedAPIs.find(deployedAPI => deployedAPI.apiClob == apiDefClob).apiStatus;
           const apiId = this.cache.deployedAPIs.find(deployedAPI => deployedAPI.apiClob == apiDefClob).apiId;
           var invokableAPIURL = null;
 
-          // Check for PUBLISHED state, if PUBLISHED then retrieve Invokable API URL
+          // if API is PUBLISHED then retrieve invokable API URL
           try {
             if (apiStatus == 'PUBLISHED') {
               const data = await wso2apim.listInvokableAPIUrl(
-                "https://" + this.wso2APIM.host + ":" + this.wso2APIM.port + "/api/am/store/" + this.wso2APIM.versionSlug + "/apis",
+                "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/store/" + wso2APIM.versionSlug + "/apis",
                 this.cache.accessToken,
                 apiId);
-              invokableAPIURL = data.endpointURLs.filter((Url) => { return Url.environmentName == this.wso2APIM.gatewayEnv })[0].environmentURLs.https;
+              invokableAPIURL = data.endpointURLs.filter((Url) => { return Url.environmentName == wso2APIM.gatewayEnv })[0].environmentURLs.https;
             }
           }
           catch (err) {
-            this.serverless.cli.log("An error occurred while retrieving Invokable API URL for " + `${this.apiDefs[i].name}` + ", proceeding further.");
+            this.serverless.cli.log(pluginNameSuffix + "An error occurred while retrieving Invokable API URL, proceeding further.");
           }
 
           this.cache.deploymentStatus.push({
@@ -236,14 +246,16 @@ class Serverless_WSO2_APIM {
         }
       }
       catch (err) {
-        this.serverless.cli.log("Retrieving API Definitions.. NOT OK");
+        this.serverless.cli.log(pluginNameSuffix + "Retrieving API Definitions.. NOT OK");
         throw new Error(err);
       }
       this.cache.deployedAPIs = [];
     };
-    if (this.cmd === 'list|apidefs')
+
+    if (this.cmd === 'info') {
       this.serverless.cli.log("Retrieving API Definitions.. OK");
-    console.table(this.cache.deploymentStatus);
+      console.table(this.cache.deploymentStatus);
+    }
   }
 
   async detectAndSplitCerts(certChain) {
@@ -339,74 +351,84 @@ class Serverless_WSO2_APIM {
 
 
   async createOrUpdateAPIDefs() {
+    const wso2APIM = this.serverless.service.custom.wso2apim;
+    const apiDefs = wso2APIM.apidefs;    
+
+    //Retrieve tenantSuffix in case of multi-tenant setup
+    if (this.wso2APIM.user.includes("@")) {
+      this.cache.tenantSuffix = this.wso2APIM.user.split("@")[1];
+    }
+
     try {
-      // By calling listAPIDefs(), we are re-collecting the current deployment status in WSO2 API Manager
+      // By calling listAPIDefs(), we are re-collecting the current deployment status in WSO2 API Manager into this.cache.deploymentStatus
       await this.listAPIDefs();
 
+      // Loop thru this.cache.deploymentStatus array
       // Create API definitions, if they do not exist
+      // Update API definitions, if they exist
       for (const [i, api] of this.cache.deploymentStatus.entries()) {
         try {
+          //Update
           if (api.apiId !== undefined) {
-            this.serverless.cli.log("Updating " + this.apiDefs[i].name + " (" + api.apiId + ")..");
+            this.serverless.cli.log(pluginNameSuffix + "Updating " + api.apiName + " (" + api.apiId + ")..");
             const data = await wso2apim.updateAPIDef(
-              "https://" + this.wso2APIM.host + ":" + this.wso2APIM.port + "/api/am/publisher/" + this.wso2APIM.versionSlug + "/apis",
-              this.wso2APIM.user,
+              "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/publisher/" + wso2APIM.versionSlug + "/apis",
+              wso2APIM.user,
               this.cache.accessToken,
-              this.wso2APIM.gatewayEnv,
-              this.apiDefs[i],
+              wso2APIM.gatewayEnv,
+              apiDefs[i],
               api.apiId
             );
-            this.serverless.cli.log("Updating " + this.apiDefs[i].name + " (" + api.apiId + ").. OK");
+            this.serverless.cli.log(pluginNameSuffix + "Updating " + api.apiName + " (" + api.apiId + ").. OK");
           }
+          //Create
           else {
-            this.serverless.cli.log("Creating " + this.apiDefs[i].name + "..");
+            this.serverless.cli.log(pluginNameSuffix + "Creating " + api.apiName + "..");
             const data = await wso2apim.createAPIDef(
-              "https://" + this.wso2APIM.host + ":" + this.wso2APIM.port + "/api/am/publisher/" + this.wso2APIM.versionSlug + "/apis",
-              this.wso2APIM.user,
+              "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/publisher/" + wso2APIM.versionSlug + "/apis",
+              wso2APIM.user,
               this.cache.accessToken,
-              this.wso2APIM.gatewayEnv,
-              this.apiDefs[i]
+              wso2APIM.gatewayEnv,
+              apiDefs[i]
             );
-            this.serverless.cli.log("Creating " + this.apiDefs[i].name + ".. OK");
+            this.serverless.cli.log(pluginNameSuffix + "Creating " + api.apiName + ".. OK");
           }
         }
         catch (err) {
-          this.serverless.cli.log("Creating / Updating " + `${this.apiDefs[i].name}` + ".. NOT OK, proceeding further.");
+          this.serverless.cli.log("Creating / Updating " + `${apiDefs[i].name}` + ".. NOT OK, proceeding further.");
         }
       }
-
       // By calling listAPIDefs(), we are re-collecting the current deployment status in WSO2 API Manager
       await this.listAPIDefs();
-      console.log("--- after creating/updating, before publishing", this.cache.deploymentStatus);
 
       // Publish or Re-Publish API definitions, based on whether they are in CREATED or PUBLISHED states
       for (const [i, api] of this.cache.deploymentStatus.entries()) {
         try {
           if (api.apiId !== undefined) {
             if (api.apiStatus === 'CREATED') {
-              this.serverless.cli.log("Publishing " + this.apiDefs[i].name + " (" + api.apiId + ")..");
+              this.serverless.cli.log(pluginNameSuffix + "Publishing " + api.apiName + " (" + api.apiId + ")..");
             }
             else if (api.apiStatus === 'PUBLISHED') {
-              this.serverless.cli.log("Re-publishing " + this.apiDefs[i].name + " (" + api.apiId + ")..");
+              this.serverless.cli.log(pluginNameSuffix + "Re-publishing " + api.apiName + " (" + api.apiId + ")..");
             }
             const data = await wso2apim.publishAPIDef(
-              "https://" + this.wso2APIM.host + ":" + this.wso2APIM.port + "/api/am/publisher/" + this.wso2APIM.versionSlug + "/apis/change-lifecycle",
+              "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/publisher/" + wso2APIM.versionSlug + "/apis/change-lifecycle",
               this.cache.accessToken,
               api.apiId
             );
-            this.serverless.cli.log("Publishing / Re-publishing " + this.apiDefs[i].name + " (" + api.apiId + ").. OK");
+            this.serverless.cli.log(pluginNameSuffix + "Publishing / Re-publishing " + api.apiName + " (" + api.apiId + ").. OK");
           }
         }
         catch (err) {
-          this.serverless.cli.log("Publishing / Re-publishing " + this.apiDefs[i].name + " (" + api.apiId + ").. NOT OK, proceeding further.");
+          this.serverless.cli.log(pluginNameSuffix + "Publishing / Re-publishing " + apiDefs[i].name + " (" + api.apiId + ").. NOT OK, proceeding further.");
         }
       }
     }
     catch (err) {
-      this.serverless.cli.log("Creating / Updating API definitions.. NOT OK");
+      this.serverless.cli.log(pluginNameSuffix + "Creating / Updating API definitions.. NOT OK");
       throw new Error(err);
     }    
-    this.serverless.cli.log("Deployment complete. \n   Use `sls list apidefs` to view the deployment status.");
+    this.serverless.cli.log(pluginNameSuffix + "Deployment complete. Use `sls info` to view the deployment status.");
   }
 
 
