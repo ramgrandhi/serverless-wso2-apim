@@ -59,7 +59,7 @@ class Serverless_WSO2_APIM {
   }
 
   async validateConfig() {
-    this.serverless.cli.log(pluginNameSuffix + "Validating configuration..");
+    // this.serverless.cli.log(pluginNameSuffix + "Validating configuration..");
     const wso2APIM = this.serverless.service.custom.wso2apim;
     if ((wso2APIM.host == undefined) ||
       (wso2APIM.port == undefined) ||
@@ -75,7 +75,7 @@ class Serverless_WSO2_APIM {
   }
 
   async registerClient() {
-    this.serverless.cli.log(pluginNameSuffix + "Registering client..");
+    // this.serverless.cli.log(pluginNameSuffix + "Registering client..");
     const wso2APIM = this.serverless.service.custom.wso2apim;
     try {
       const data = await wso2apim.registerClient(
@@ -94,7 +94,7 @@ class Serverless_WSO2_APIM {
   }
 
   async generateToken() {
-    this.serverless.cli.log(pluginNameSuffix + "Generating temporary token..");
+    // this.serverless.cli.log(pluginNameSuffix + "Generating temporary token..");
     const wso2APIM = this.serverless.service.custom.wso2apim;
     try {
       const data = await wso2apim.generateToken(
@@ -162,9 +162,9 @@ class Serverless_WSO2_APIM {
 
 
   async listAPIDefs() {
-    if (this.cmd === 'info')
-      this.serverless.cli.log(pluginNameSuffix + "Retrieving API Definitions..");
-
+    if (this.cmd === 'info') {
+      // this.serverless.cli.log(pluginNameSuffix + "Retrieving API Definitions..");
+    }
     const wso2APIM = this.serverless.service.custom.wso2apim;
     const apiDefs = wso2APIM.apidefs;
 
@@ -253,7 +253,7 @@ class Serverless_WSO2_APIM {
     };
 
     if (this.cmd === 'info') {
-      this.serverless.cli.log("Retrieving API Definitions.. OK");
+      this.serverless.cli.log(pluginNameSuffix + "Retrieving API Definitions.. OK");
       console.table(this.cache.deploymentStatus);
     }
   }
@@ -303,7 +303,7 @@ class Serverless_WSO2_APIM {
     try {
       // Loops thru each api definition found in serverless configuration
       for (const [i, apiDef] of apiDefs.entries()) {
-        this.serverless.cli.log(pluginNameSuffix + "Uploading backend certificates for " + apiDef.name + "..");
+        // this.serverless.cli.log(pluginNameSuffix + "Uploading backend certificates for " + apiDef.name + "..");
 
         try {
           // certAlias takes the form of <APIName>|-|<Version>|-|<index>
@@ -370,7 +370,7 @@ class Serverless_WSO2_APIM {
         try {
           //Update
           if (api.apiId !== undefined) {
-            this.serverless.cli.log(pluginNameSuffix + "Updating " + api.apiName + " (" + api.apiId + ")..");
+            // this.serverless.cli.log(pluginNameSuffix + "Updating " + api.apiName + " (" + api.apiId + ")..");
             const data = await wso2apim.updateAPIDef(
               "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/publisher/" + wso2APIM.versionSlug + "/apis",
               wso2APIM.user,
@@ -383,7 +383,7 @@ class Serverless_WSO2_APIM {
           }
           //Create
           else {
-            this.serverless.cli.log(pluginNameSuffix + "Creating " + api.apiName + "..");
+            // this.serverless.cli.log(pluginNameSuffix + "Creating " + api.apiName + "".."");
             const data = await wso2apim.createAPIDef(
               "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/publisher/" + wso2APIM.versionSlug + "/apis",
               wso2APIM.user,
@@ -406,10 +406,10 @@ class Serverless_WSO2_APIM {
         try {
           if (api.apiId !== undefined) {
             if (api.apiStatus === 'CREATED') {
-              this.serverless.cli.log(pluginNameSuffix + "Publishing " + api.apiName + " (" + api.apiId + ")..");
+              // this.serverless.cli.log(pluginNameSuffix + "Publishing " + api.apiName + " (" + api.apiId + ")..");
             }
             else if (api.apiStatus === 'PUBLISHED') {
-              this.serverless.cli.log(pluginNameSuffix + "Re-publishing " + api.apiName + " (" + api.apiId + ")..");
+              // this.serverless.cli.log(pluginNameSuffix + "Re-publishing " + api.apiName + " (" + api.apiId + ")..");
             }
             const data = await wso2apim.publishAPIDef(
               "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/publisher/" + wso2APIM.versionSlug + "/apis/change-lifecycle",
@@ -428,7 +428,9 @@ class Serverless_WSO2_APIM {
       this.serverless.cli.log(pluginNameSuffix + "Creating / Updating API definitions.. NOT OK");
       throw new Error(err);
     }    
-    this.serverless.cli.log(pluginNameSuffix + "Deployment complete. Use `sls info` to view the deployment status.");
+    this.serverless.cli.log(pluginNameSuffix + "Creating / Updating API definitions.. OK");
+    await this.listAPIDefs();
+    console.table(this.cache.deploymentStatus);
   }
 
 
@@ -438,7 +440,7 @@ class Serverless_WSO2_APIM {
       await this.listAPIDefs(); 
       for (let api of this.cache.deploymentStatus) {
         if (api.apiId !== undefined) {
-          this.serverless.cli.log("Deleting " + api.apiId + "..");
+          // this.serverless.cli.log("Deleting " + api.apiId + "..");
           const data = await wso2apim.removeAPIDef(
             "https://" + this.wso2APIM.host + ":" + this.wso2APIM.port + "/api/am/publisher/" + this.wso2APIM.versionSlug + "/apis",
             this.cache.accessToken,
