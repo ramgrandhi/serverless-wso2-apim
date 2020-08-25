@@ -12,10 +12,11 @@ Serverless Framework plugin to manage APIs in [WSO2 API Manager](https://wso2.co
 * [WSO2 API Manager 2.6.0](https://docs.wso2.com/display/AM260/)
 
 ## Features
-* Create or Update your API definitions (including backend certificates) seamlessly with one command - `sls deploy apidefs`.  
-* Manage your API definitions via `sls list apidefs` and `sls remove apidefs`.  
-* Management your backend certificates via `sls list certs` and `sls remove certs`.  
-* Automatically publish / re-publish APIs to WSO2 API Store when changes occur to your API definitions.  
+* Create or Update your API definitions (including backend certificates) seamlessly with one command - `sls deploy`.  
+* Manage your API definitions via `sls info` and `sls remove`.  
+* Automatically uploads backend certificates (including CAs) to enable HTTP/S based connectivity with backends.
+* Backend certificates can be supplied using `file://` (relative to where `serverless.yml` file is located) or `arn:aws:acm:..` (AWS ACM Certificate ARN).  
+* Automatically publish / re-publish APIs to WSO2 API Store on every deploy.
 
 ---
 
@@ -51,55 +52,51 @@ or
 - Add one or more API definitions to your Serverless configuration, as below.
 
   ```yml
-  apidefs:
-    - myAwesomeAPI: # Identifier of your API definition
-      name: 'MyAwesomeAPI'  # Name of API that shows up in WSO2 API Console (CANNOT BE UPDATED LATER)
-      description: 'My Awesome API'
-      rootContext: '/myawesomeapi'  # Runtime context of API which will be appended to the base URL exposed by WSO2 API Gateway. Must be unique across the Gateway Environment. (CANNOT BE UPDATED LATER)
-      version: 'v1' # Version, which also forms a part of the API URL ultimately (CANNOT BE UPDATED LATER)
-      visibility: 'PUBLIC'  # Accessible from Public Internet, Visible to everyone
-      backend: 
-        http: # HTTP-based Backends
-          baseUrl: 'https://backend:port/123'  # Backend RESTful base URL
-          publicCertChain: './certs/backend.cer'  # Optional, public certificate chain in PEM base64 format
-      maxTps: 100 # Throttling, Transactions per second
-      tags:
-        - my-awesome-api
-        - awesomeness
-      swaggerSpec:  # Swagger specification in YML, currently supports 2.0
-        swagger: '2.0'
-        ...
-        info:
-          ...
-        paths:
-          ...
+  custom:
+    wso2apim:
+      apidefs:
+        - myAwesomeAPI: # Identifier of your API definition
+          name: 'MyAwesomeAPI'  # (CANNOT BE UPDATED LATER) Name of API that shows up in WSO2 API Console
+          version: 'v1' # (CANNOT BE UPDATED LATER) Version, which also forms a part of the API URL ultimately 
+          rootContext: '/myawesomeapi'  # (CANNOT BE UPDATED LATER) Runtime context of API which will be exposed by WSO2 API Gateway. Must be unique across the Gateway Environment.
+          description: 'My Awesome API'
+          visibility: 'PUBLIC'  # Accessible from Public Internet, Visible to everyone
+          backend: 
+            http: # HTTP-based Backends
+              baseUrl: 'https://backend:port/123'  # Backend RESTful base URL
+              certChain: 'file://certs/backend.cer'  # Optional, certificate chain in PEM (base64) format. 
+                                                     # Alternatively, you can also supply AWS ACM Certificate ARN (e.g. arn:aws:acm:...) too.
+          maxTps: 100 # Throttling, Transactions per second
+          tags:
+            - my-awesome-api
+            - awesomeness
+          swaggerSpec:  # Swagger specification in YML, currently supports 2.0
+            swagger: '2.0'
+            ...
+            info:
+              ...
+            paths:
+              ...
   ```
 
-- Run `sls deploy apidefs` to create-and-publish (or) update-and-republish API definitions (and associated backend certificates, if mentioned) in WSO2 API Manager.
+- Run `sls deploy` to create-and-publish (or) update-and-republish API definitions (and associated backend certificates, if supplied) in WSO2 API Manager.
 
-- Run `sls list apidefs` to view the status of API deployment on WSO2 API Manager.
+- Run `sls info` to view the status of API deployment on WSO2 API Manager.
 
-- Run `sls list certs` to view the status of backend certificate availability.
-
-- Run `sls remove apidefs` to delete API definitions when there are no active subscriptions made to those APIs.
-
-- Run `sls remove certs` to delete backend certificates when they are found.
+- Run `sls remove` to delete API definitions (and associated backend certificates, if exists) when there are no active subscriptions exist on those APIs.
 
 
 - ** COMING SOON **   
-Run `sls remove apidefs --force` (** USE WITH CAUTION **) to forcefully delete API definitions despite any active subscriptions. It will retire, deprecate and delete API definitions if they cannot be deleted normally.
+Run `sls remove --force` (** USE WITH CAUTION **) to forcefully delete API definitions (and associated backend certificates) despite any active subscriptions that may exist. API definitions will be retired and deprecated before removing it completely from WSO2 API Manager.
 
 
 ## Limitations and Backlog items
 * Limited to creation of RESTful APIs using Swagger 2.0 on WSO2 API Manager. 
 * Limited to WSO2 API Manager 2.6.0 which uses v0.14 as management API version. 
-* Does not support managing APIs which are already created in another manner without using this Plugin.
-* Does not work with Websocket-style APIs.  
-* Does not support publishing API definitions to multiple Gateway environments.  
-* Does not support CORS configuration.
+* For a full list of backlog items, refer to [what's coming up?](https://github.com/ramgrandhi/serverless-wso2-apim/projects/1)
 
 ## Need Help?
-* Raise an issue [here](https://github.com/ramgrandhi/serverless-wso2-apim/issues/new)
+* Join us on Slack [here](https://join.slack.com/t/serverless-wso2-apim/shared_invite/zt-gidayta8-3kEztQh8QzA2lO4fBGv3IA)
 
 ## License
 [MIT](https://github.com/99xt/serverless-dynamodb-local/blob/v1/LICENSE)
