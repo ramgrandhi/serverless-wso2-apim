@@ -528,7 +528,6 @@ class Serverless_WSO2_APIM {
               this.cache.accessToken,
               certAliasPrefix + "___" + j
             );
-            console.log("removed " + certAliasPrefix + "___" + j);
           }
         }
         catch (err) {
