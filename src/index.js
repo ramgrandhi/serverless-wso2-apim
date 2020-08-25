@@ -57,7 +57,7 @@ class Serverless_WSO2_APIM {
     await this.registerClient();
     await this.generateToken();
     await this.removeCerts();
-    // await this.removeAPIDefs();
+    await this.removeAPIDefs();
   }
 
   async splitCertChain(certChainContent) {
@@ -134,7 +134,7 @@ class Serverless_WSO2_APIM {
         "apim:api_create apim:api_publish apim:api_view apim:subscribe apim:tier_view apim:tier_manage apim:subscription_view apim:subscription_block",
       );
       this.cache.accessToken = data.accessToken;
-      this.serverless.cli.log(pluginNameSuffix + "Generating temporary token.. OK");
+      this.serverless.cli.log(pluginNameSuffix + "Generating temporary token.. OK" + " " + this.cache.accessToken);
     }
     catch (err) {
       this.serverless.cli.log(pluginNameSuffix + "Generating temporary token.. NOT OK");
@@ -480,14 +480,20 @@ class Serverless_WSO2_APIM {
       // Delete API definitions, if they exist and there are NO active subscriptions/users
       // It does NOT force delete API definitions, if there are any active subscriptions/users
       for (let api of this.cache.deploymentStatus) {
-        if (api.apiId !== undefined) {
-          // this.serverless.cli.log(pluginNameSuffix + "Deleting " + api.apiId + "..");
-          const data = await wso2apim.removeAPIDef(
-            "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/publisher/" + wso2APIM.versionSlug + "/apis",
-            this.cache.accessToken,
-            api.apiId
-          );
-          this.serverless.cli.log(pluginNameSuffix + "Deleting " + api.apiId + ".. OK");
+        try {
+          if (api.apiId) {
+            // this.serverless.cli.log(pluginNameSuffix + "Deleting " + api.apiId + "..");
+            const data = await wso2apim.removeAPIDef(
+              "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/publisher/" + wso2APIM.versionSlug + "/apis",
+              this.cache.accessToken,
+              api.apiId
+            );
+            this.serverless.cli.log(pluginNameSuffix + "Deleting " + api.apiId + ".. OK");
+          }
+        }
+        catch (err) {
+          this.serverless.cli.log(pluginNameSuffix + "Deleting " + api.apiId + ".. NOT OK, proceeding further.");
+          utils.renderError(err);
         }
       };
       this.serverless.cli.log(pluginNameSuffix + "Deleting API definitions.. OK");
@@ -516,18 +522,18 @@ class Serverless_WSO2_APIM {
           // certAliasPrefix contains only <APIName>___<Version>
           var certAliasPrefix = apiDef.name + "___" + apiDef.version;
           this.serverless.cli.log("Removing backend certificates for " + apiDef.name + " if present..");
-          for (j = 0; j < 5; j++) {
+          for (let j = 0; j < 5; j++) {
             const data = await wso2apim.removeCert(
               "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/publisher/" + wso2APIM.versionSlug + "/certificates",
               this.cache.accessToken,
               certAliasPrefix + "___" + j
             );
+            console.log("removed " + certAliasPrefix + "___" + j);
           }
         }
         catch (err) {
-          utils.renderError(err);
           // Ignore Certificate-not-found-for-that-Alias error gracefully
-          if (err.response.data.code != '404') {
+          if (err.response.data && err.response.data.code != '404') {
             this.serverless.cli.log("An error occurred while removing backend certificate for " + apiDef.name + ", proceeding further.");
           }
         }
