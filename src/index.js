@@ -134,7 +134,7 @@ class Serverless_WSO2_APIM {
         "apim:api_create apim:api_publish apim:api_view apim:subscribe apim:tier_view apim:tier_manage apim:subscription_view apim:subscription_block",
       );
       this.cache.accessToken = data.accessToken;
-      this.serverless.cli.log(pluginNameSuffix + "Generating temporary token.. OK" + " " + this.cache.accessToken);
+      this.serverless.cli.log(pluginNameSuffix + "Generating temporary token.. OK");
     }
     catch (err) {
       this.serverless.cli.log(pluginNameSuffix + "Generating temporary token.. NOT OK");
