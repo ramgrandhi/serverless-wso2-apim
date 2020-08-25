@@ -493,7 +493,6 @@ class Serverless_WSO2_APIM {
         }
         catch (err) {
           this.serverless.cli.log(pluginNameSuffix + "Deleting " + api.apiId + ".. NOT OK, proceeding further.");
-          utils.renderError(err);
         }
       };
       this.serverless.cli.log(pluginNameSuffix + "Deleting API definitions.. OK");
@@ -528,6 +527,7 @@ class Serverless_WSO2_APIM {
               this.cache.accessToken,
               certAliasPrefix + "___" + j
             );
+            console.log("removed " + certAliasPrefix + "___" + j);
           }
         }
         catch (err) {

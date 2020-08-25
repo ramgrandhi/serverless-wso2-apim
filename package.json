@@ -32,6 +32,8 @@
     "https": "^1.0.0",
     "qs": "^6.9.4",
     "release": "^6.3.0",
-    "serverless": "^1.75.1"
-  }
+    "serverless": "^1.75.1",
+    "split-ca": "^1.0.1"
+  },
+  "dependencies": {}
 }
