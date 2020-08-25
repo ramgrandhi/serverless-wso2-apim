@@ -51,8 +51,9 @@ async function registerClient(url, user, pass) {
     }
     catch (err) {
         utils.renderError(err);
-    }  
+    }
 };
+
 
 // Generate a new token
 async function generateToken(url, user, pass, clientId, clientSecret, scope) {
@@ -90,7 +91,7 @@ async function generateToken(url, user, pass, clientId, clientSecret, scope) {
     }
     catch (err) {
         utils.renderError(err);
-    }  
+    }
 };
 
 async function isAPIDeployed(url, accessToken, apiName, apiVersion, apiContext) {
@@ -119,7 +120,7 @@ async function isAPIDeployed(url, accessToken, apiName, apiVersion, apiContext) 
     }
     catch (err) {
         utils.renderError(err);
-    }  
+    }
 };
 
 async function isCertUploaded(url, accessToken, certAlias) {
@@ -150,63 +151,62 @@ async function isCertUploaded(url, accessToken, certAlias) {
     }
     catch (err) {
         utils.renderError(err);
-    }  
+    }
 };
-    
+
 
 
 function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
     try {
-        var wso2ApiDefinition = {};
-
-        if (apiId !== undefined)
-            wso2ApiDefinition.id = apiId;
-
-        wso2ApiDefinition = {
-            'name': apiDef.name,
-            'description': apiDef.description,
-            'context': apiDef.rootContext,
-            'version': apiDef.version,
-            'provider': user,
-            'apiDefinition': JSON.stringify(apiDef.swaggerSpec),
-            'status': 'CREATED',
-            'isDefaultVersion': false,
-            'type': 'HTTP',
-            'transport': ['https'],
-            'tags': [...apiDef.tags, "serverless-wso2-apim"],
-            'tiers': ['Unlimited'],
-            'maxTps': {
-                'sandbox': apiDef.maxTps,
-                'production': apiDef.maxTps
+        const wso2ApiDefinition = {
+            name: apiDef.name,
+            description: apiDef.description,
+            context: apiDef.rootContext,
+            version: apiDef.version,
+            provider: user,
+            apiDefinition: JSON.stringify(apiDef.swaggerSpec),
+            status: 'CREATED',
+            isDefaultVersion: false,
+            type: 'HTTP',
+            transport: ['https'],
+            tags: [...apiDef.tags, "serverless-wso2-apim"],
+            tiers: ['Unlimited'],
+            maxTps: {
+                sandbox: apiDef.maxTps,
+                production: apiDef.maxTps
             },
-            'visibility': apiDef.visibility,
-            'endpointConfig': JSON.stringify({
-                'production_endpoints': {
-                    'url': apiDef.backend.http.baseUrl,
-                    'config': null
+            visibility: apiDef.visibility,
+            endpointConfig: JSON.stringify({
+                production_endpoints: {
+                    url: apiDef.backend.http.baseUrl,
+                    config: null
                 },
-                'sandbox_endpoints': {
-                    'url': apiDef.backend.http.baseUrl,
-                    'config': null
+                sandbox_endpoints: {
+                    url: apiDef.backend.http.baseUrl,
+                    config: null
                 },
-                'endpoint_type': 'http'
+                endpoint_type: 'http'
             }),
-            'endpointSecurity': null,
-            'gatewayEnvironments': gatewayEnv,
-            'subscriptionAvailability': 'current_tenant',
-            'subscriptionAvailableTenants': [],
-            'businessInformation': {
-                'businessOwnerEmail': apiDef.swaggerSpec.info.contact.email,
-                'technicalOwnerEmail': apiDef.swaggerSpec.info.contact.email,
-                'technicalOwner': apiDef.swaggerSpec.info.contact.name,
-                'businessOwner': apiDef.swaggerSpec.info.contact.name
+            endpointSecurity: null,
+            gatewayEnvironments: gatewayEnv,
+            subscriptionAvailability: 'current_tenant',
+            subscriptionAvailableTenants: [],
+            businessInformation: {
+                businessOwnerEmail: apiDef.swaggerSpec.info.contact.email,
+                technicalOwnerEmail: apiDef.swaggerSpec.info.contact.email,
+                technicalOwner: apiDef.swaggerSpec.info.contact.name,
+                businessOwner: apiDef.swaggerSpec.info.contact.name
             }
         };
+
+        if (apiId)
+            wso2ApiDefinition.id = apiId;
+
         return wso2ApiDefinition;
     }
     catch (err) {
         utils.renderError(err);
-    }  
+    }
 };
 
 // Creates API definition
@@ -242,7 +242,7 @@ async function createAPIDef(url, user, accessToken, gatewayEnv, apiDef) {
     }
     catch (err) {
         utils.renderError(err);
-    }  
+    }
 };
 
 // Publishes API definition
@@ -275,7 +275,7 @@ async function publishAPIDef(url, accessToken, apiId) {
     }
     catch (err) {
         utils.renderError(err);
-    }  
+    }
 };
 
 
@@ -305,7 +305,7 @@ async function listInvokableAPIUrl(url, accessToken, apiId) {
     }
     catch (err) {
         utils.renderError(err);
-    }  
+    }
 };
 
 
@@ -342,7 +342,7 @@ async function uploadCert(url, accessToken, certAlias, cert, backendUrl) {
     }
     catch (err) {
         utils.renderError(err);
-    }  
+    }
 };
 
 // Updates API definition
@@ -373,7 +373,7 @@ async function updateAPIDef(url, user, accessToken, gatewayEnv, apiDef, apiId) {
     }
     catch (err) {
         utils.renderError(err);
-    }  
+    }
 };
 
 // Removes API definition (if possible)
@@ -402,10 +402,10 @@ async function removeAPIDef(url, accessToken, apiId) {
     }
     catch (err) {
         utils.renderError(err);
-    }  
+    }
 };
 
-    
+
 // Removes backend certificate
 async function removeCert(url, accessToken, certAlias) {
     try {
@@ -435,7 +435,7 @@ async function removeCert(url, accessToken, certAlias) {
     }
     catch (err) {
         utils.renderError(err);
-    }  
+    }
 };
 
 
