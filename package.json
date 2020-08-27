@@ -1,6 +1,6 @@
 {
   "name": "serverless-wso2-apim",
-  "version": "2.0.0",
+  "version": "0.1.1",
   "description": "Serverless Framework plugin for WSO2 API Manager",
   "main": "src/index.js",
   "scripts": {
@@ -35,5 +35,14 @@
     "serverless": "^1.75.1",
     "split-ca": "^1.0.1"
   },
-  "dependencies": {}
+  "dependencies": {
+    "axios": "^0.19.2",
+    "form-data": "^3.0.0",
+    "fs": "^0.0.1-security",
+    "https": "^1.0.0",
+    "qs": "^6.9.4",
+    "release": "^6.3.0",
+    "serverless": "^1.75.1",
+    "split-ca": "^1.0.1"
+  }
 }
