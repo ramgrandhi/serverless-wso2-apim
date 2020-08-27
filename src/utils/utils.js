@@ -21,8 +21,14 @@ function renderError(err) {
             error: err.message
         });
     }
-};
+}
+
+async function goToSleep(milliS) {
+    return new Promise(resolve => setTimeout(resolve, milliS));
+}
+
 
 module.exports = {
-    renderError
+    renderError,
+    goToSleep
 };

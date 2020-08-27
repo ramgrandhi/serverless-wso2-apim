@@ -3,6 +3,7 @@ const wso2apim = require("./2.6.0/wso2apim");
 const utils = require('./utils/utils');
 const fs = require('fs');
 const splitca = require('split-ca');
+const { SSL_OP_EPHEMERAL_RSA } = require("constants");
 const pluginNameSuffix = '[serverless-wso2-apim] ';
 
 console.log.apply(null);
@@ -133,7 +134,7 @@ class Serverless_WSO2_APIM {
         "apim:api_create apim:api_publish apim:api_view apim:subscribe apim:tier_view apim:tier_manage apim:subscription_view apim:subscription_block",
       );
       this.cache.accessToken = data.accessToken;
-      this.serverless.cli.log(pluginNameSuffix + "Generating temporary token.. OK" + " " + this.cache.accessToken);
+      this.serverless.cli.log(pluginNameSuffix + "Generating temporary token.. OK");
     }
     catch (err) {
       this.serverless.cli.log(pluginNameSuffix + "Generating temporary token.. NOT OK");
@@ -341,7 +342,9 @@ class Serverless_WSO2_APIM {
           // Loop thru all certificates, e.g. Leaf cert, Intermediary CA, Root CA etc
           // Create individual certificate files under /.serverless directory
           if (certs && certs.length > 0) {
-            await Promise.all(certs.map(async (cert, j) => {
+            for (let j = 0; j < certs.length; j++) {
+            // await certs.reduce(async (cert, j) => {
+              let cert = certs[j];
               let certAlias = apiDef.name + "___" + apiDef.version + "___" + j;
               await this.saveCert(cert.toString(), certAlias);
 
@@ -355,6 +358,7 @@ class Serverless_WSO2_APIM {
                   apiDef.backend.http.baseUrl
                 );
                 this.serverless.cli.log(pluginNameSuffix + "Uploading certificate #" + j + " .. OK");
+                await utils.goToSleep(1000);
               }
               catch (err) {
                 if (err.response.data && err.response.data.code != '409') {
@@ -362,7 +366,7 @@ class Serverless_WSO2_APIM {
                   utils.renderError(err);
                 }
               }
-            }));
+            }
             this.serverless.cli.log(pluginNameSuffix + "Uploading backend certificates for " + apiDef.name + ".. OK");
           }
         }
@@ -427,6 +431,9 @@ class Serverless_WSO2_APIM {
           this.serverless.cli.log("Creating / Updating " + `${apiDefs[i].name}` + ".. NOT OK, proceeding further.");
         }
       }
+
+      await utils.goToSleep(3000);
+
       // By calling listAPIDefs(), we are re-collecting the current deployment status in WSO2 API Manager
       await this.listAPIDefs();
 
