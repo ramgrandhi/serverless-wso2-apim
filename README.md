@@ -41,6 +41,7 @@ or
   ```yml
   custom:
     wso2apim:
+      enabled: true
       host: 'wso2-apimanager.com' # WSO2 API Manager Host
       port: 443 # WSO2 API Manager Port
       versionSlug: 'v0.14'  # WSO2 API Manager's Management API version
@@ -54,6 +55,7 @@ or
   ```yml
   custom:
     wso2apim:
+      enabled: true
       apidefs:
         - myAwesomeAPI: # Identifier of your API definition
           name: 'MyAwesomeAPI'  # (CANNOT BE UPDATED LATER) Name of API that shows up in WSO2 API Console

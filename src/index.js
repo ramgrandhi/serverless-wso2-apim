@@ -12,15 +12,9 @@ class Serverless_WSO2_APIM {
 
   constructor(serverless, options) {
     this.cache = {}
-
     this.serverless = serverless;
     this.options = options;
-
-    this.wso2APIM = serverless.service.custom.wso2apim;
-    this.apiDefs = this.wso2APIM.apidefs;
     this.cmd = this.serverless.pluginManager.cliCommands.join('|');
-
-
     this.hooks = {
       'after:deploy:deploy': this.deploy.bind(this),
       'after:info:info': this.info.bind(this),
@@ -40,21 +34,41 @@ class Serverless_WSO2_APIM {
   // * Use `throw new Error(err)` when you want the execution to halt!
   // -----------------
 
+  initPluginState() {
+    this.wso2APIM = this.serverless.service.custom.wso2apim;
+    this.apiDefs = this.wso2APIM.apidefs;
+  }
+
   async deploy() {
+    this.initPluginState();
     await this.validateConfig();
+    if (!this.wso2APIM.enabled) {
+      this.serverless.cli.log(pluginNameSuffix + "WO2APIM is disabled. Skipping..");
+      return;
+    }
     await this.registerClient();
     await this.generateToken();
     await this.uploadCerts();
     await this.createOrUpdateAPIDefs();
   }
   async info() {
+    this.initPluginState();
     await this.validateConfig();
+    if (!this.wso2APIM.enabled) {
+      this.serverless.cli.log(pluginNameSuffix + "WO2APIM is disabled. Skipping..");
+      return;
+    }
     await this.registerClient();
     await this.generateToken();
     await this.listAPIDefs();
   }
   async remove() {
+    this.initPluginState();
     await this.validateConfig();
+    if (!this.wso2APIM.enabled) {
+      this.serverless.cli.log(pluginNameSuffix + "WO2APIM is disabled. Skipping..");
+      return;
+    }
     await this.registerClient();
     await this.generateToken();
     await this.removeAPIDefsAndCerts();
