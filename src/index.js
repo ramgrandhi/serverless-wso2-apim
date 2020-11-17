@@ -16,10 +16,7 @@ class Serverless_WSO2_APIM {
     this.serverless = serverless;
     this.options = options;
 
-    this.wso2APIM = serverless.service.custom.wso2apim;
-    this.apiDefs = this.wso2APIM.apidefs;
     this.cmd = this.serverless.pluginManager.cliCommands.join('|');
-
 
     this.hooks = {
       'after:deploy:deploy': this.deploy.bind(this),
@@ -39,22 +36,41 @@ class Serverless_WSO2_APIM {
   // * Use no `console.log()` but use `this.serverless.cli.log()`
   // * Use `throw new Error(err)` when you want the execution to halt!
   // -----------------
-
+  
+  async initPluginState() {
+    this.wso2APIM = this.serverless.service.custom.wso2apim;
+    this.apiDefs = this.wso2APIM.apidefs;
+  }
   async deploy() {
+    await this.initPluginState();
     await this.validateConfig();
+    if (this.wso2APIM.enabled !== undefined && this.wso2APIM.enabled === false) {
+      this.serverless.cli.log(pluginNameSuffix + "Configuration is disabled globally, Skipping deployment.. OK");
+      return;
+    }
     await this.registerClient();
     await this.generateToken();
     await this.uploadCerts();
     await this.createOrUpdateAPIDefs();
   }
   async info() {
+    await this.initPluginState();
     await this.validateConfig();
+    if (this.wso2APIM.enabled !== undefined && this.wso2APIM.enabled === false) {
+      this.serverless.cli.log(pluginNameSuffix + "Configuration is disabled globally, Skipping retrieval.. OK");
+      return;
+    }
     await this.registerClient();
     await this.generateToken();
     await this.listAPIDefs();
   }
   async remove() {
+    await this.initPluginState();
     await this.validateConfig();
+    if (this.wso2APIM.enabled !== undefined && this.wso2APIM.enabled === false) {
+      this.serverless.cli.log(pluginNameSuffix + "Configuration is disabled globally, Skipping deletion.. OK");
+      return;
+    }
     await this.registerClient();
     await this.generateToken();
     await this.removeAPIDefsAndCerts();

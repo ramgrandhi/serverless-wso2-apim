@@ -1,7 +1,7 @@
 # Changelog
 
 
-## [0.2.1](https://www.npmjs.com/package/serverless-wso2-apim/v/0.2.1) (2020-08-27)
+## [0.2.0](https://www.npmjs.com/package/serverless-wso2-apim/v/0.2.0) (2020-08-27)
 
 ### New Features
 - All parameters under `custom : wso2apim` now supports [Serverless variables](https://www.serverless.com/framework/docs/providers/aws/guide/variables/) syntax.

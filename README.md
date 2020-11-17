@@ -41,6 +41,7 @@ or
   ```yml
   custom:
     wso2apim:
+      enabled: false # Default is 'true'. When set to 'false' explicitly, deployment will be skipped
       host: 'wso2-apimanager.com' # WSO2 API Manager Host
       port: 443 # WSO2 API Manager Port
       versionSlug: 'v0.14'  # WSO2 API Manager's Management API version
