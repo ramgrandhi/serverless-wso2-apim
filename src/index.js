@@ -40,6 +40,11 @@ class Serverless_WSO2_APIM {
   async initPluginState() {
     this.wso2APIM = this.serverless.service.custom.wso2apim;
     this.apiDefs = this.wso2APIM.apidefs;
+
+    //Retrieve tenantSuffix in case of multi-tenant setup
+    if (this.wso2APIM.user.includes("@")) {
+      this.cache.tenantSuffix = this.wso2APIM.user.split("@")[1];
+    }
   }
   async deploy() {
     await this.initPluginState();
@@ -155,53 +160,6 @@ class Serverless_WSO2_APIM {
     catch (err) {
       this.serverless.cli.log(pluginNameSuffix + "Generating temporary token.. NOT OK");
       throw new Error(err);
-    }
-  }
-
-
-  async listCerts() {
-
-    try {
-      this.serverless.cli.log("Retrieving backend certificates..");
-      this.cache.certAvailability = [];
-      // Loops thru each api definition found in serverless configuration
-      for (let apiDef of this.apiDefs) {
-        try {
-          // certAlias takes the form of <APIName>-<Version>
-          var certAliasClob = apiDef.name + "-" + apiDef.version;
-          const certData = await wso2apim.isCertUploaded(
-            "https://" + this.wso2APIM.host + ":" + this.wso2APIM.port + "/api/am/publisher/" + this.wso2APIM.versionSlug + "/certificates",
-            this.cache.accessToken,
-            certAliasClob
-          );
-          //Record certificate availability if found
-          this.cache.certAvailability.push({
-            apiName: apiDef.name,
-            apiVersion: apiDef.version,
-            apiContext: apiDef.rootContext,
-            backendCertValidUntil: certData.validity.to,
-            backendCertStatus: certData.status,
-          });
-        }
-        catch (err) {
-          if (err.response.data.code != '404') {
-            this.serverless.cli.log("Retrieving backend certificates.. NOT OK for " + `${apiDef.name}` + ", proceeding further.");
-          }
-          //Record certificate availability if not found
-          this.cache.certAvailability.push({
-            apiName: apiDef.name,
-            apiVersion: apiDef.version,
-            apiContext: apiDef.rootContext,
-            backendCertValidUntil: "NOT FOUND",
-            backendCertStatus: "NOT FOUND",
-          });
-        }
-      }
-      this.serverless.cli.log("Retrieving backend certificates.. OK");
-      console.table(this.cache.certAvailability);
-    }
-    catch (err) {
-      this.serverless.cli.log("Retrieving backend certificates.. NOT OK");
     }
   }
 
@@ -352,7 +310,6 @@ class Serverless_WSO2_APIM {
         // this.serverless.cli.log(pluginNameSuffix + "Uploading backend certificates for " + apiDef.name + "..");
 
         try {
-          // certAlias takes the form of <APIName>___<Version>___<index>
           let certs = await this.detectAndSplitCerts(apiDef.backend.http.certChain);
 
           // Loop thru all certificates, e.g. Leaf cert, Intermediary CA, Root CA etc
@@ -361,7 +318,16 @@ class Serverless_WSO2_APIM {
             for (let j = 0; j < certs.length; j++) {
             // await certs.reduce(async (cert, j) => {
               let cert = certs[j];
-              let certAlias = apiDef.name + "___" + apiDef.version + "___" + j;
+              // certAlias
+              var certAlias;
+              if (this.cache.tenantSuffix) {
+                // certAlias takes the form of <APIName>___<Version>___<index>_at_<tenantSuffix>
+                certAlias = apiDef.name + "___" + apiDef.version + "___" + j + "_at_" + this.cache.tenantSuffix;
+              }
+              else {
+                // certAlias takes the form of <APIName>___<Version>___<index>
+                certAlias = apiDef.name + "___" + apiDef.version + "___" + j;
+              }
               await this.saveCert(cert.toString(), certAlias);
 
               // Upload Cert to WSO2 API Manager
@@ -489,11 +455,6 @@ class Serverless_WSO2_APIM {
     const wso2APIM = this.serverless.service.custom.wso2apim;
     const apiDefs = wso2APIM.apidefs;
 
-    //Retrieve tenantSuffix in case of multi-tenant setup
-    if (this.wso2APIM.user.includes("@")) {
-      this.cache.tenantSuffix = this.wso2APIM.user.split("@")[1];
-    }
-
     try {
       // By calling listAPIDefs(), we are re-collecting the current deployment status in WSO2 API Manager
       await this.listAPIDefs();
@@ -513,16 +474,22 @@ class Serverless_WSO2_APIM {
             this.serverless.cli.log(pluginNameSuffix + "Deleting " + api.apiId + ".. OK");
 
             // Delete associated backend Certificates, if any
+            var certAlias
             for (let j = 0; j < 5; j++) {
               try {
-                // certAlias takes the form of <APIName>___<Version>___<index>
-                // certAliasPrefix contains only <APIName>___<Version>              
-                let certAliasPrefix = api.apiName + "___" + api.apiVersion;
+                if (this.cache.tenantSuffix) {
+                  // certAlias takes the form of <APIName>___<Version>___<index>_at_<tenantSuffix>
+                  certAlias = api.apiName + "___" + api.apiVersion + "___" + j + "_at_" + this.cache.tenantSuffix
+                }
+                else {
+                  // certAlias takes the form of <APIName>___<Version>___<index>
+                  certAlias = api.apiName + "___" + api.apiVersion + "___" + j
+                }
 
                 const data = await wso2apim.removeCert(
                   "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/publisher/" + wso2APIM.versionSlug + "/certificates",
                   this.cache.accessToken,
-                  certAliasPrefix + "___" + j
+                  certAlias
                 );
                 this.serverless.cli.log(pluginNameSuffix + "Deleting certificate #" + j + " for " + api.apiName + ".. OK");
               }
