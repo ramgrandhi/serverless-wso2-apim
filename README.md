@@ -15,8 +15,11 @@ Serverless Framework plugin to manage APIs in [WSO2 API Manager](https://wso2.co
 * Create or Update your API definitions (including backend certificates) seamlessly with one command - `sls deploy`.  
 * Manage your API definitions via `sls info` and `sls remove`.  
 * Automatically uploads backend certificates (including CAs) to enable HTTP/S based connectivity with backends.
-* Backend certificates can be supplied using `file://` (relative to where `serverless.yml` file is located) or `arn:aws:acm:..` (AWS ACM Certificate ARN).  
 * Automatically publish / re-publish APIs to WSO2 API Store on every deploy.
+* Backend certificates can be supplied using various possibilities.
+  1. **File system** - Use the syntax `file://xx/yy.cer` containing backend certifiate chain. Note that the path is relative to where `serverless.yml` file is located in your project. 
+  2. **AWS Certificate ARN** - Use the syntax `arn:aws:acm:..` to automatically retrieve backend certificate chain.
+  3. **CloudFormation Export** - Use ths syntax `!ImportValue xx` or `!Ref xx` where the export value must contain a valid AWS Certificate ARN (arn:aws:acm:..) to have the plug-in automatically retrieve backnd certificate chain.
 
 ---
 
@@ -50,8 +53,9 @@ or
       gatewayEnv: 'Production'  # Target Gateway Environment
   ```
 
-- Add one or more API definitions to your Serverless configuration, as below.
+- Add one or more API definitions to your Serverless configuration, as below. 
 
+  `serverless.yml:`
   ```yml
   custom:
     wso2apim:
@@ -66,7 +70,8 @@ or
             http: # HTTP-based Backends
               baseUrl: 'https://backend:port/123'  # Backend RESTful base URL
               certChain: 'file://certs/backend.cer'  # Optional, certificate chain in PEM (base64) format. 
-                                                     # Alternatively, you can also supply AWS ACM Certificate ARN (e.g. arn:aws:acm:...) too.
+                                                     # Alternatively, you can also supply AWS ACM Certificate ARN directly (e.g. arn:aws:acm:...).
+                                                     # Or, you can supply AWS CloudFormation Export containing Certificat ARN (e.g. !Ref xx  or  !ImportValue yy).
           maxTps: 100 # Throttling, Transactions per second
           tags:
             - my-awesome-api
@@ -80,15 +85,38 @@ or
               ...
   ```
 
+  NOTE: If you think that the above configuration is too clunky, here is another way to organize your project differently.
+
+  `serverless.yml:` 
+  ```yml
+  custom:
+    wso2apim:
+      apidefs:
+        - ${file('./myAwesomeAPI1.yml')}
+        - ${file('./myAwesomeAPI2.yml')}
+  ```
+
+  `myAwesomeAPI1.yml:`
+  ```yml
+  name: 'MyAwesomeAPI'
+  version: 'v1'
+  rootContext: '/myawesomeapi'
+  ...
+  ```
+
+  `myAwesomeAPI2.yml:`
+  ```yml
+  name: 'MyAwesomeAPI2'
+  version: 'v1'
+  rootContext: '/myawesomeapi2'
+  ...
+  ````
+
 - Run `sls deploy` to create-and-publish (or) update-and-republish API definitions (and associated backend certificates, if supplied) in WSO2 API Manager.
 
 - Run `sls info` to view the status of API deployment on WSO2 API Manager.
 
 - Run `sls remove` to delete API definitions (and associated backend certificates, if exists) when there are no active subscriptions exist on those APIs.
-
-
-- ** COMING SOON **   
-Run `sls remove --force` (** USE WITH CAUTION **) to forcefully delete API definitions (and associated backend certificates) despite any active subscriptions that may exist. API definitions will be retired and deprecated before removing it completely from WSO2 API Manager.
 
 
 ## Limitations and Backlog items
@@ -97,7 +125,7 @@ Run `sls remove --force` (** USE WITH CAUTION **) to forcefully delete API defin
 * For a full list of backlog items, refer to [what's coming up?](https://github.com/ramgrandhi/serverless-wso2-apim/projects/1)
 
 ## Need Help?
-* Join us on Slack [here](https://join.slack.com/t/serverless-wso2-apim/shared_invite/zt-gidayta8-3kEztQh8QzA2lO4fBGv3IA)
+* Create an issue [here](https://github.com/ramgrandhi/serverless-wso2-apim/issues) 
 
 ## License
 [MIT](https://github.com/99xt/serverless-dynamodb-local/blob/v1/LICENSE)

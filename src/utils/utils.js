@@ -27,8 +27,20 @@ async function goToSleep(milliS) {
     return new Promise(resolve => setTimeout(resolve, milliS));
 }
 
+function resolveCfImportValue(provider, name) {
+    return provider.request('CloudFormation', 'listExports').then(result => {
+      const targetExportMeta = result.Exports.find(exportMeta => exportMeta.Name === name);
+      if (targetExportMeta) return targetExportMeta.Value;
+      if (result.NextToken) {
+        return resolveCfImportValue(name, { NextToken: result.NextToken });
+      }
+      return null;
+    });
+}
+  
 
 module.exports = {
     renderError,
-    goToSleep
+    goToSleep,
+    resolveCfImportValue,
 };
