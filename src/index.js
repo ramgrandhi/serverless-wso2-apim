@@ -260,34 +260,60 @@ class Serverless_WSO2_APIM {
       console.table(this.cache.deploymentStatus);
     }
   }
+  
 
   async detectAndSplitCerts(certChain) {
     var certs = [];
     var certOutput;
-    // If certChain is provided as a file (relative to where serverless.yml is located)
-    if (certChain.startsWith("file://")) {
-      certOutput = fs.readFileSync(certChain.split("file://")[1], "utf8");
-      certs = await this.splitCertChain(certOutput);
 
-      return certs;
+    // if certChain is an object
+    if (typeof certChain == 'object') {
+      // If certChain ARN is obtained via Cloud Formation's intrinsic function syntax (!Ref or Fn::ImportValue)
+      if (certChain["Fn::ImportValue"]) {
+        this.provider = this.serverless.getProvider('aws');
+        certChain = await utils.resolveCfImportValue(this.provider, certChain["Fn::ImportValue"]);
+        if (certChain.startsWith("arn:aws:acm:")) {
+          certOutput = await this.provider.request('ACM', 'getCertificate', {
+            CertificateArn: certChain
+          });
+          if (certOutput) {
+            const leafCert = certOutput.Certificate;
+            const CAs = certOutput.CertificateChain;
+            // Push the leaf certificate to the list
+            certs.push(leafCert);
+            certs.push(await this.splitCertChain(CAs));
+
+            return certs;
+          }
+        }
+      }
     }
-    // If certChain is provided as an AWS ACM ARN
-    else if (certChain.startsWith("arn:aws:acm:")) {
-      this.provider = this.serverless.getProvider('aws');
-      certOutput = await this.provider.request('ACM', 'getCertificate', {
-        CertificateArn: certChain
-      });
-      if (certOutput) {
-        const leafCert = certOutput.Certificate;
-        const CAs = certOutput.CertificateChain;
-        // Push the leaf certificate to the list
-        certs.push(leafCert);
-        certs.push(await this.splitCertChain(CAs));
+    // if certChain is NOT an object
+    else {
+      // If certChain is provided as a file (relative to where serverless.yml is located)
+      if (certChain.startsWith("file://")) {
+        certOutput = fs.readFileSync(certChain.split("file://")[1], "utf8");
+        certs = await this.splitCertChain(certOutput);
 
         return certs;
       }
-    }
+      // If certChain is provided as an AWS ACM ARN
+      else if (certChain.startsWith("arn:aws:acm:")) {
+        this.provider = this.serverless.getProvider('aws');
+        certOutput = await this.provider.request('ACM', 'getCertificate', {
+          CertificateArn: certChain
+        });
+        if (certOutput) {
+          const leafCert = certOutput.Certificate;
+          const CAs = certOutput.CertificateChain;
+          // Push the leaf certificate to the list
+          certs.push(leafCert);
+          certs.push(await this.splitCertChain(CAs));
 
+          return certs;
+        }
+      }
+    }
   }
 
   async saveCert(certContent, certAlias) {
