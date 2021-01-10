@@ -333,7 +333,7 @@ class Serverless_WSO2_APIM {
     try {
       // Loops thru each api definition found in serverless configuration
       for (const [i, apiDef] of apiDefs.entries()) {
-        // this.serverless.cli.log(pluginNameSuffix + "Uploading backend certificates for " + apiDef.name + "..");
+        // this.serverless.cli.log(pluginNameSuffix + "Uploading / Updating backend certificates for " + apiDef.name + "..");
 
         try {
           let certs = await this.detectAndSplitCerts(apiDef.backend.http.certChain);
@@ -342,9 +342,7 @@ class Serverless_WSO2_APIM {
           // Create individual certificate files under /.serverless directory
           if (certs && certs.length > 0) {
             for (let j = 0; j < certs.length; j++) {
-            // await certs.reduce(async (cert, j) => {
               let cert = certs[j];
-              // certAlias
               var certAlias;
               if (this.cache.tenantSuffix) {
                 // certAlias takes the form of <APIName>___<Version>___<index>_at_<tenantSuffix>
@@ -369,18 +367,30 @@ class Serverless_WSO2_APIM {
                 await utils.goToSleep(1000);
               }
               catch (err) {
-                if (err.response.data && err.response.data.code != '409') {
+                // If Certificate-exists-for-that-Alias error occurs.. then update it.
+                if (err.response.data && err.response.data.code == '409') {
+                  await wso2apim.updateCert(
+                    "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/publisher/" + wso2APIM.versionSlug + "/certificates",
+                    this.cache.accessToken,
+                    certAlias,
+                    slsDir + "/" + certAlias + ".cer"
+                  );
+                  this.serverless.cli.log(pluginNameSuffix + "Updating certificate #" + j + " .. OK");
+                  await utils.goToSleep(1000);   
+                }
+                // Handle all other exceptions as Errors
+                else {
                   this.serverless.cli.log(pluginNameSuffix + "Uploading certificate #" + j + " .. NOT OK, proceeding further");
                   utils.renderError(err);
                 }
               }
             }
-            this.serverless.cli.log(pluginNameSuffix + "Uploading backend certificates for " + apiDef.name + ".. OK");
+            this.serverless.cli.log(pluginNameSuffix + "Uploading / Updating backend certificates for " + apiDef.name + ".. OK");
           }
         }
         catch (err) {
           if (err.response.data && err.response.data.code != '409') {
-            this.serverless.cli.log(pluginNameSuffix + "Uploading backend certificates for " + apiDef.name + ".. NOT OK, proceeding further.");
+            this.serverless.cli.log(pluginNameSuffix + "Uploading / Updating backend certificates for " + apiDef.name + ".. NOT OK, proceeding further.");
           }
         }
       }
@@ -460,11 +470,11 @@ class Serverless_WSO2_APIM {
               this.cache.accessToken,
               api.apiId
             );
-            this.serverless.cli.log(pluginNameSuffix + "Publishing / Re-publishing " + api.apiName + " (" + api.apiId + ").. OK");
+            this.serverless.cli.log(pluginNameSuffix + "Publishing " + api.apiName + " (" + api.apiId + ").. OK");
           }
         }
         catch (err) {
-          this.serverless.cli.log(pluginNameSuffix + "Publishing / Re-publishing " + apiDefs[i].name + " (" + api.apiId + ").. NOT OK, proceeding further.");
+          this.serverless.cli.log(pluginNameSuffix + "Publishing " + apiDefs[i].name + " (" + api.apiId + ").. NOT OK, proceeding further.");
         }
       }
     }
@@ -497,7 +507,7 @@ class Serverless_WSO2_APIM {
               this.cache.accessToken,
               api.apiId
             );
-            this.serverless.cli.log(pluginNameSuffix + "Deleting " + api.apiId + ".. OK");
+            this.serverless.cli.log(pluginNameSuffix + "Deleting " + api.apiName + ".. OK");
 
             // Delete associated backend Certificates, if any
             var certAlias
@@ -529,7 +539,7 @@ class Serverless_WSO2_APIM {
           }
         }
         catch (err) {
-          this.serverless.cli.log(pluginNameSuffix + "Deleting " + api.apiId + ".. NOT OK, proceeding further.");
+          this.serverless.cli.log(pluginNameSuffix + "Deleting " + api.apiName + ".. NOT OK, proceeding further.");
         }
       };
       this.serverless.cli.log(pluginNameSuffix + "Deleting API definitions.. OK");
