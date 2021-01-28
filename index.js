@@ -71,16 +71,11 @@ class ServerlessPlugin {
   async registerClient() {
     try {
       console.log('Registering client..');
+      const { host, port, versionSlug, user, pass } = this.wso2APIM;
       const data = await wso2apim.registerClient(
-        'https://' +
-          this.wso2APIM.host +
-          ':' +
-          this.wso2APIM.port +
-          '/client-registration/' +
-          this.wso2APIM.versionSlug +
-          '/register',
-        this.wso2APIM.user,
-        this.wso2APIM.pass
+        `https://${host:port}/client-registration/${versionSlug}/register`,
+        user,
+        pass
       );
       this.cache.clientId = data.clientId;
       this.cache.clientSecret = data.clientSecret;
@@ -93,14 +88,11 @@ class ServerlessPlugin {
   async generateToken() {
     try {
       console.log('Generating temporary token..');
+      const { host, port, user, pass } = this.wso2APIM;
       const data = await wso2apim.generateToken(
-        'https://' +
-          this.wso2APIM.host +
-          ':' +
-          this.wso2APIM.port +
-          '/oauth2/token',
-        this.wso2APIM.user,
-        this.wso2APIM.pass,
+        `https://${host}:${port}/oauth2/token`
+        user,
+        pass,
         this.cache.clientId,
         this.cache.clientSecret,
         'apim:api_create apim:api_publish apim:api_view apim:subscribe apim:tier_view apim:tier_manage apim:subscription_view apim:subscription_block'
@@ -123,8 +115,7 @@ class ServerlessPlugin {
     // Loops thru each api definition found in serverless configuration
     for (let apiDef of this.apiDefs) {
       try {
-        var apiDefClob =
-          apiDef.name + '|-|' + apiDef.version + '|-|' + apiDef.rootContext;
+        var apiDefClob = `${apiDef.name}|-|${apiDef.version}|-|${apiDev.rootContext}`;
         const data = await wso2apim.isAPIDeployed(
           `https://${host}:${port}/api/am/publisher/${versionSlug}/apis`,
           this.cache.accessToken,
@@ -142,14 +133,11 @@ class ServerlessPlugin {
               this.cache.tenantSuffix
             )[1];
           }
+          const { name, version, context } = deployedAPI;
+
           this.cache.deployedAPIs.push({
             apiId: deployedAPI.id,
-            apiClob:
-              deployedAPI.name +
-              '|-|' +
-              deployedAPI.version +
-              '|-|' +
-              deployedAPI.context,
+            apiClob: `${name}|-|${version}|-|${context}`,
             apiStatus: deployedAPI.status,
           });
         });
@@ -198,8 +186,8 @@ class ServerlessPlugin {
     const wso2Url = `https://${host}:${port}/api/am/publisher/${versionSlug}/apis`;
     const logMessage =
       apiId !== undefined
-        ? 'Updating ' + apiDef.name + '(' + apiId + ')..'
-        : 'Creating ' + apiDef.name + '..';
+        ? `Updating ${apiDef.name} (${apiId})..`
+        : `Creating ${apiDef.name}..`;
 
     console.log(logMessage);
 
@@ -237,6 +225,8 @@ class ServerlessPlugin {
   }
 
   async removeAPIDefs() {
+    const { host, port, versionSlug, user, gatewayEnv } = this.wso2APIM;
+
     try {
       // By calling listAPIDefs(), we are re-collecting the current deployment status in WSO2 API Manager
       await this.listAPIDefs();
@@ -245,13 +235,7 @@ class ServerlessPlugin {
         .filter((api) => api.apiId.length > 0)
         .map((api) =>
           wso2apim.removeAPIDef(
-            'https://' +
-              this.wso2APIM.host +
-              ':' +
-              this.wso2APIM.port +
-              '/api/am/publisher/' +
-              this.wso2APIM.versionSlug +
-              '/apis',
+            `https://${host}:${port}/api/am/publisher/${versionSlug}/apis`,
             this.cache.accessToken,
             api.apiId
           )

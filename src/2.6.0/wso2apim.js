@@ -22,7 +22,7 @@ function renderError(err) {
 
 // Register a new client
 async function registerClient(url, user, pass) {
-  let authToken = user + ':' + pass;
+  let authToken = `${user}:${pass}`;
   let authTokenBase64 = new Buffer(authToken).toString('base64');
   var data = {
     clientName: 'serverless-wso2-apim',
@@ -32,7 +32,7 @@ async function registerClient(url, user, pass) {
   };
   var config = {
     headers: {
-      Authorization: 'Basic ' + authTokenBase64,
+      Authorization: `Basic ${authTokenBase64}`,
       'Content-Type': 'application/json',
     },
     httpsAgent: new https.Agent({
@@ -89,7 +89,7 @@ async function isAPIDeployed(
   const queryStr = `query=name:${apiName} version:${apiVersion} context:${apiContext}`;
   let config = {
     headers: {
-      Authorization: 'Bearer ' + accessToken,
+      Authorization: `Bearer ${accessToken}`,
     },
     httpsAgent: new https.Agent({
       rejectUnauthorized: false,
@@ -158,7 +158,7 @@ async function updateAPIDef(url, user, accessToken, gatewayEnv, apiDef, apiId) {
   var data = constructAPIDef(user, gatewayEnv, apiDef, apiId);
   var config = {
     headers: {
-      Authorization: 'Bearer ' + accessToken,
+      Authorization: `Bearer ${accessToken}`,
       'Content-Type': 'application/json',
     },
     httpsAgent: new https.Agent({
