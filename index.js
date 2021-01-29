@@ -73,7 +73,7 @@ class ServerlessPlugin {
       console.log('Registering client..');
       const { host, port, versionSlug, user, pass } = this.wso2APIM;
       const data = await wso2apim.registerClient(
-        `https://${host:port}/client-registration/${versionSlug}/register`,
+        `https://${host}:{port}/client-registration/${versionSlug}/register`,
         user,
         pass
       );
@@ -90,7 +90,7 @@ class ServerlessPlugin {
       console.log('Generating temporary token..');
       const { host, port, user, pass } = this.wso2APIM;
       const data = await wso2apim.generateToken(
-        `https://${host}:${port}/oauth2/token`
+        `https://${host}:${port}/oauth2/token`,
         user,
         pass,
         this.cache.clientId,
