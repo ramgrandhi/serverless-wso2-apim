@@ -73,7 +73,7 @@ class ServerlessPlugin {
       console.log('Registering client..');
       const { host, port, versionSlug, user, pass } = this.wso2APIM;
       const data = await wso2apim.registerClient(
-        `https://${host}:{port}/client-registration/${versionSlug}/register`,
+        `https://${host}:${port}/client-registration/${versionSlug}/register`,
         user,
         pass
       );
@@ -115,7 +115,7 @@ class ServerlessPlugin {
     // Loops thru each api definition found in serverless configuration
     for (let apiDef of this.apiDefs) {
       try {
-        var apiDefClob = `${apiDef.name}|-|${apiDef.version}|-|${apiDev.rootContext}`;
+        var apiDefClob = `${apiDef.name}|-|${apiDef.version}|-|${apiDef.rootContext}`;
         const data = await wso2apim.isAPIDeployed(
           `https://${host}:${port}/api/am/publisher/${versionSlug}/apis`,
           this.cache.accessToken,
@@ -123,6 +123,8 @@ class ServerlessPlugin {
           apiDef.version,
           apiDef.rootContext
         );
+
+        console.log('d', data);
 
         this.cache.deployedAPIs = [];
         // Loops thru each deployed api definition returned from WSO2 API Manager (we need to find exact match out of 1:n results returned)
@@ -148,6 +150,7 @@ class ServerlessPlugin {
             (deployedAPI) => deployedAPI.apiClob === apiDefClob
           )
         ) {
+          console.log(1);
           this.cache.deploymentStatus.push({
             apiName: apiDef.name,
             apiVersion: apiDef.version,
