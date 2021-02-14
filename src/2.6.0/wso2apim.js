@@ -21,7 +21,7 @@ const utils = require('../utils/utils');
 async function registerClient(url, user, pass) {
     try {
         let authToken = user + ":" + pass;
-        let authTokenBase64 = new Buffer(authToken).toString('base64');
+        let authTokenBase64 = Buffer.from(authToken).toString('base64');
         var data = {
             "clientName": 'serverless-wso2-apim',
             "owner": user,
@@ -59,7 +59,7 @@ async function registerClient(url, user, pass) {
 async function generateToken(url, user, pass, clientId, clientSecret, scope) {
     try {
         let authToken = clientId + ":" + clientSecret;
-        let authTokenBase64 = new Buffer(authToken).toString('base64');
+        let authTokenBase64 = Buffer.from(authToken).toString('base64');
         var data = qs.stringify({
             'grant_type': 'password',
             'username': user,
@@ -439,6 +439,69 @@ async function removeCert(url, accessToken, certAlias) {
 };
 
 
+// Updates backend certificate
+async function updateCert(url, accessToken, certAlias, cert) {
+    try {
+        url = url + "/" + certAlias;
+        var data = new FormData();
+        data.append('certificate', fs.createReadStream(cert))
+        let config = {
+            headers: {
+                'Authorization': 'Bearer ' + accessToken,
+                'Content-Type': 'multipart/form-data'
+            },
+            httpsAgent: new https.Agent({
+                rejectUnauthorized: false
+            })
+        };
+
+        return new Promise((resolve, reject) => {
+            axios.put(url, data, config)
+                .then((res) => {
+                    resolve(res);
+                })
+                .catch((err) => {
+                    utils.renderError(err);
+                    reject(err);
+                });
+        });
+    }
+    catch (err) {
+        utils.renderError(err);
+    }
+};
+
+// Lists certificate information (like validFrom, validTo, subject etc)
+async function listCertInfo(url, accessToken, certAlias) {
+    try {
+        url = url + "/" + certAlias;
+        let config = {
+            headers: {
+                'Authorization': 'Bearer ' + accessToken,
+                'Accept': 'application/json'
+            },
+            httpsAgent: new https.Agent({
+                rejectUnauthorized: false
+            })
+        };
+
+        return new Promise((resolve, reject) => {
+            axios.get(url, config)
+                .then((res) => {
+                    resolve(res.data);
+                })
+                .catch((err) => {
+                    utils.renderError(err);
+                    reject(err);
+                });
+        });
+    }
+    catch (err) {
+        utils.renderError(err);
+    }
+};
+
+
 module.exports = {
     registerClient,
     generateToken,
@@ -447,8 +510,10 @@ module.exports = {
     createAPIDef,
     publishAPIDef,
     uploadCert,
+    updateCert,
+    removeCert,
+    listCertInfo,
     updateAPIDef,
     removeAPIDef,
-    removeCert,
     listInvokableAPIUrl,
 };
