@@ -12,10 +12,10 @@ Serverless Framework plugin to manage APIs on [WSO2 API Manager](https://wso2.co
 * [WSO2 API Manager 2.6.0](https://docs.wso2.com/display/AM260/)
 
 ## Features
-* Create or update your API definitions via `sls deploy`.  
-* Manage your API definitions via `sls info` and `sls remove`.  
-* Automatically uploads / updates backend certificates (including CAs) to enable HTTP/S based connectivity with backends.
-* Automatically publish / re-publish APIs to WSO2 API Store upon every deploy.
+* Create, Update and Publish your API definitions via `sls deploy`.  
+* Manage your API definitions via `sls info` and `sls remove`.
+* Supports HTTP and JMS backends with mediation policies.
+* Uploads backend certificates (including CAs) to enable HTTP/s connectivity with backends.
 * Supports Swagger 2.0 and OpenAPI 3.0 specifications.
 ---
 
@@ -66,6 +66,10 @@ or
             http: # HTTP-based Backends
               baseUrl: 'https://backend:port/123'  
               certChain: 'file://certs/backend.cer'
+          mediationPolicies: # Optional
+            in: 'log_in_message'
+            out: 'None'
+            fault: 'None'
           maxTps: 100
           tags:
             - my-awesome-api
@@ -102,16 +106,24 @@ or
 | `version` | (CANNOT BE UPDATED LATER) <br> Your API Version, which also forms a part of the API URL ultimately | `v1` |
 | `rootContext` | (CANNOT BE UPDATED LATER) <br> Your API Context, which will be exposed by WSO2 API Gateway. Must be unique per Gateway Environment. | `/myawesomeapi` |
 | `description` | Free-form text | `My Awesome API` |
-| `visibility` |  Currently supports only `PUBLIC`. <br> Accessible from Public Internet, Visible to everyone | `PUBLIC` |
-| `backend` | Currently supports only `http`-based backends |  |
-| `backend.http.baseUrl` | Your backend base URL | `https://backend:port/123` |
-| `backend.http.certChain` | Optional, your backend certificate chain in PEM (base64) format. <br> It can be supplied using various possibilities. <br> a. **File system** - Path must be relative to where `serverless.yml` is located. <br> b. **AWS Certificate ARN** <br> c. **AWS CloudFormation Export** - Exported value must contain a valid AWS Certificate ARN. | `file://certs/backend.cer` <br> (or) <br> `arn:aws:acm:..` <br> (or) <br> `!ImportValue xx` <br> (or) <br> `!Ref xx` |
+| `visibility` |  Currently supports only `PUBLIC`. Accessible from Public Internet, Visible to everyone | `PUBLIC` |
+| `backend` | Supports `http` and `jms` backends. <br> Note: One API definition supports only one backend. |  |
+| `backend.http.baseUrl` | Your HTTP backend base URL | `https://backend:port/123` |
+| `backend.http.certChain` | Optional, your backend certificate chain in PEM (base64) format. <br><br> It supports: <br> a. **File system** - Path must be relative to where `serverless.yml` is located. <br> b. **AWS Certificate ARN** <br> c. **AWS CloudFormation Export** - Exported value must contain a valid AWS Certificate ARN. | `file://certs/backend.cer` <br> (or) <br> `arn:aws:acm:..` <br> (or) <br> `!ImportValue xx` <br> (or) <br> `!Ref xx` |
+| `backend.jms.destination` | Your JMS backend destination (queue or topic name) | `MY.BACKEND.TOPIC` |
+| `backend.jms.parameters` | List of JMS connection parameters to be used in `key`:`value` form as described [here](https://axis.apache.org/axis2/java/transports/jms.html). | `transport.jms.ConnectionFactory: 'My-ConnectionFactory'`|
+| `mediationPolicies` | Optional, your choice of mediation policies (or) sequences. They can manipulate input/output/fault messages as described [here](https://docs.wso2.com/display/AM260/Adding+Mediation+Extensions) | |
+| `mediationPolicies.in` | Input mediation policy, it manipulates the request going to your backend | `log_in_message` |
+| `mediationPolicies.out` | Output mediation policy, it manipulates the response going back to your API consumer | `json_validator` |
+| `mediationPolicies.fault` | Fault mediation policy, it manipulates the fault handling | `None` |
 | `maxTps` | Max. Transactions per second, used for throttling. | `100` |
 | `tags` | Tags as an array that show up in WSO2 consoles | |
 | `swaggerSpec` | Swagger 2.0 / OpenAPI 3.0 specification in YML | |
 
 ---
-## 💡Tip : Organize your project files
+## 💡Tip : Organize your project files efficiently.
+
+You can spread the configuration across multiple files, so you can manage it better. Bonus, you can use linters and validators effectively.
 
   **`serverless.yml:`** 
   ```yml
