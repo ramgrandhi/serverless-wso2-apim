@@ -333,64 +333,65 @@ class Serverless_WSO2_APIM {
     try {
       // Loops thru each api definition found in serverless configuration
       for (const [i, apiDef] of apiDefs.entries()) {
-        // this.serverless.cli.log(pluginNameSuffix + "Uploading / Updating backend certificates for " + apiDef.name + "..");
+        if (apiDef.backend.http.certChain) {
+          this.serverless.cli.log(pluginNameSuffix + "Uploading / Updating backend certificates for " + apiDef.name + "..");
+          try {
+            let certs = await this.detectAndSplitCerts(apiDef.backend.http.certChain);
 
-        try {
-          let certs = await this.detectAndSplitCerts(apiDef.backend.http.certChain);
+            // Loop thru all certificates, e.g. Leaf cert, Intermediary CA, Root CA etc
+            // Create individual certificate files under /.serverless directory
+            if (certs && certs.length > 0) {
+              for (let j = 0; j < certs.length; j++) {
+                let cert = certs[j];
+                var certAlias;
+                if (this.cache.tenantSuffix) {
+                  // certAlias takes the form of <APIName>___<Version>___<index>_at_<tenantSuffix>
+                  certAlias = apiDef.name + "___" + apiDef.version + "___" + j + "_at_" + this.cache.tenantSuffix;
+                }
+                else {
+                  // certAlias takes the form of <APIName>___<Version>___<index>
+                  certAlias = apiDef.name + "___" + apiDef.version + "___" + j;
+                }
+                await this.saveCert(cert.toString(), certAlias);
 
-          // Loop thru all certificates, e.g. Leaf cert, Intermediary CA, Root CA etc
-          // Create individual certificate files under /.serverless directory
-          if (certs && certs.length > 0) {
-            for (let j = 0; j < certs.length; j++) {
-              let cert = certs[j];
-              var certAlias;
-              if (this.cache.tenantSuffix) {
-                // certAlias takes the form of <APIName>___<Version>___<index>_at_<tenantSuffix>
-                certAlias = apiDef.name + "___" + apiDef.version + "___" + j + "_at_" + this.cache.tenantSuffix;
-              }
-              else {
-                // certAlias takes the form of <APIName>___<Version>___<index>
-                certAlias = apiDef.name + "___" + apiDef.version + "___" + j;
-              }
-              await this.saveCert(cert.toString(), certAlias);
-
-              // Upload Cert to WSO2 API Manager
-              try {
-                await wso2apim.uploadCert(
-                  "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/publisher/" + wso2APIM.versionSlug + "/certificates",
-                  this.cache.accessToken,
-                  certAlias,
-                  slsDir + "/" + certAlias + ".cer",
-                  apiDef.backend.http.baseUrl
-                );
-                this.serverless.cli.log(pluginNameSuffix + "Uploading certificate #" + j + " .. OK");
-                await utils.goToSleep(1000);
-              }
-              catch (err) {
-                // If Certificate-exists-for-that-Alias error occurs.. then update it.
-                if (err.response.data && err.response.data.code == '409') {
-                  await wso2apim.updateCert(
+                // Upload Cert to WSO2 API Manager
+                try {
+                  await wso2apim.uploadCert(
                     "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/publisher/" + wso2APIM.versionSlug + "/certificates",
                     this.cache.accessToken,
                     certAlias,
-                    slsDir + "/" + certAlias + ".cer"
+                    slsDir + "/" + certAlias + ".cer",
+                    apiDef.backend.http.baseUrl
                   );
-                  this.serverless.cli.log(pluginNameSuffix + "Updating certificate #" + j + " .. OK");
-                  await utils.goToSleep(1000);   
+                  this.serverless.cli.log(pluginNameSuffix + "Uploading certificate #" + j + " .. OK");
+                  await utils.goToSleep(1000);
                 }
-                // Handle all other exceptions as Errors
-                else {
-                  this.serverless.cli.log(pluginNameSuffix + "Uploading certificate #" + j + " .. NOT OK, proceeding further");
-                  utils.renderError(err);
+                catch (err) {
+                  // If Certificate-exists-for-that-Alias error occurs.. then update it.
+                  if (err.response.data && err.response.data.code == '409') {
+                    await wso2apim.updateCert(
+                      "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/publisher/" + wso2APIM.versionSlug + "/certificates",
+                      this.cache.accessToken,
+                      certAlias,
+                      slsDir + "/" + certAlias + ".cer"
+                    );
+                    this.serverless.cli.log(pluginNameSuffix + "Updating certificate #" + j + " .. OK");
+                    await utils.goToSleep(1000);
+                  }
+                  // Handle all other exceptions as Errors
+                  else {
+                    this.serverless.cli.log(pluginNameSuffix + "Uploading certificate #" + j + " .. NOT OK, proceeding further");
+                    utils.renderError(err);
+                  }
                 }
               }
+              this.serverless.cli.log(pluginNameSuffix + "Uploading / Updating backend certificates for " + apiDef.name + ".. OK");
             }
-            this.serverless.cli.log(pluginNameSuffix + "Uploading / Updating backend certificates for " + apiDef.name + ".. OK");
           }
-        }
-        catch (err) {
-          if (err.response.data && err.response.data.code != '409') {
-            this.serverless.cli.log(pluginNameSuffix + "Uploading / Updating backend certificates for " + apiDef.name + ".. NOT OK, proceeding further.");
+          catch (err) {
+            if (err.response.data && err.response.data.code != '409') {
+              this.serverless.cli.log(pluginNameSuffix + "Uploading / Updating backend certificates for " + apiDef.name + ".. NOT OK, proceeding further.");
+            }
           }
         }
       }

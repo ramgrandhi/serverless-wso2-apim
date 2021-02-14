@@ -21,7 +21,7 @@ const utils = require('../utils/utils');
 async function registerClient(url, user, pass) {
     try {
         let authToken = user + ":" + pass;
-        let authTokenBase64 = new Buffer(authToken).toString('base64');
+        let authTokenBase64 = Buffer.from(authToken).toString('base64');
         var data = {
             "clientName": 'serverless-wso2-apim',
             "owner": user,
@@ -59,7 +59,7 @@ async function registerClient(url, user, pass) {
 async function generateToken(url, user, pass, clientId, clientSecret, scope) {
     try {
         let authToken = clientId + ":" + clientSecret;
-        let authTokenBase64 = new Buffer(authToken).toString('base64');
+        let authTokenBase64 = Buffer.from(authToken).toString('base64');
         var data = qs.stringify({
             'grant_type': 'password',
             'username': user,
