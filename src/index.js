@@ -325,7 +325,6 @@ class Serverless_WSO2_APIM {
     }
   }
 
-
   async uploadCerts() {
     const wso2APIM = this.serverless.service.custom.wso2apim;
     const apiDefs = wso2APIM.apidefs;
@@ -333,7 +332,7 @@ class Serverless_WSO2_APIM {
     try {
       // Loops thru each api definition found in serverless configuration
       for (const [i, apiDef] of apiDefs.entries()) {
-        if (apiDef.backend.http.certChain) {
+        if ((apiDef.backend.http) && (apiDef.backend.http.certChain)) {
           this.serverless.cli.log(pluginNameSuffix + "Uploading / Updating backend certificates for " + apiDef.name + "..");
           try {
             let certs = await this.detectAndSplitCerts(apiDef.backend.http.certChain);
@@ -400,7 +399,6 @@ class Serverless_WSO2_APIM {
       throw new Error(err);
     }
   }
-
 
   async createOrUpdateAPIDefs() {
     const wso2APIM = this.serverless.service.custom.wso2apim;
@@ -486,7 +484,6 @@ class Serverless_WSO2_APIM {
     await this.listAPIDefs();
     console.table(this.cache.deploymentStatus);
   }
-
 
   async removeAPIDefsAndCerts() {
     const wso2APIM = this.serverless.service.custom.wso2apim;

@@ -158,6 +158,41 @@ async function isCertUploaded(url, accessToken, certAlias) {
 
 function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
     try {
+
+        // Construct backend-specific parameters
+        var backendBaseUrl, backendType, backendTransport;
+        // 1. HTTP-based backend
+        if (apiDef.backend.http) {
+            if (apiDef.backend.http.baseUrl) {
+                backendBaseUrl = apiDef.backend.http.baseUrl
+            }
+            backendType = 'HTTP';
+            backendTransport = ['https'];
+        }
+        // 2. JMS-based backend
+        else if (apiDef.backend.jms) {
+            if (apiDef.backend.jms.destination) {
+                backendBaseUrl = ['jms:', apiDef.backend.jms.destination].join('/');
+                backendBaseUrl = [backendBaseUrl, qs.stringify(apiDef.backend.jms.parameters, { encode: false })].join('?');
+            }
+            backendType = 'HTTP';
+            backendTransport = ['https'];            
+        }
+
+        // Construct mediation policies
+        var mediationPolicies = [];
+        if (apiDef.mediationPolicies) {
+            if (apiDef.mediationPolicies.in) {
+                mediationPolicies.push({ "name": apiDef.mediationPolicies.in, "type": "in" });
+            }
+            if (apiDef.mediationPolicies.out) {
+                mediationPolicies.push({ "name": apiDef.mediationPolicies.out, "type": "out" });
+            }
+            if (apiDef.mediationPolicies.fault) {
+                mediationPolicies.push({ "name": apiDef.mediationPolicies.fault, "type": "fault" });
+            }
+        }
+
         const wso2ApiDefinition = {
             name: apiDef.name,
             description: apiDef.description,
@@ -167,40 +202,45 @@ function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
             apiDefinition: JSON.stringify(apiDef.swaggerSpec),
             status: 'CREATED',
             isDefaultVersion: false,
-            type: 'HTTP',
-            transport: ['https'],
+            type: backendType,
+            transport: backendTransport,
             tags: [...apiDef.tags, "serverless-wso2-apim"],
             tiers: ['Unlimited'],
             maxTps: {
-                sandbox: apiDef.maxTps,
-                production: apiDef.maxTps
+                sandbox: (apiDef.maxTps) ? apiDef.maxTps : undefined,
+                production: (apiDef.maxTps) ? apiDef.maxTps : undefined
             },
             visibility: apiDef.visibility,
             endpointConfig: JSON.stringify({
                 production_endpoints: {
-                    url: apiDef.backend.http.baseUrl,
+                    url: backendBaseUrl,
                     config: null
                 },
                 sandbox_endpoints: {
-                    url: apiDef.backend.http.baseUrl,
+                    url: backendBaseUrl,
                     config: null
                 },
                 endpoint_type: 'http'
             }),
             endpointSecurity: null,
             gatewayEnvironments: gatewayEnv,
+            sequences: mediationPolicies,
             subscriptionAvailability: 'current_tenant',
             subscriptionAvailableTenants: [],
             businessInformation: {
-                businessOwnerEmail: apiDef.swaggerSpec.info.contact.email,
-                technicalOwnerEmail: apiDef.swaggerSpec.info.contact.email,
-                technicalOwner: apiDef.swaggerSpec.info.contact.name,
-                businessOwner: apiDef.swaggerSpec.info.contact.name
+                businessOwnerEmail: ((apiDef.swaggerSpec.info) && (apiDef.swaggerSpec.info.contact) && (apiDef.swaggerSpec.info.contact.email)) ? apiDef.swaggerSpec.info.contact.email : undefined,
+                technicalOwnerEmail: ((apiDef.swaggerSpec.info) && (apiDef.swaggerSpec.info.contact) && (apiDef.swaggerSpec.info.contact.email)) ? apiDef.swaggerSpec.info.contact.email : undefined,
+                technicalOwner: ((apiDef.swaggerSpec.info) && (apiDef.swaggerSpec.info.contact) && (apiDef.swaggerSpec.info.contact.name)) ? apiDef.swaggerSpec.info.contact.name : undefined,
+                businessOwner: ((apiDef.swaggerSpec.info) && (apiDef.swaggerSpec.info.contact) && (apiDef.swaggerSpec.info.contact.name)) ? apiDef.swaggerSpec.info.contact.name : undefined,
             }
         };
 
         if (apiId)
             wso2ApiDefinition.id = apiId;
+
+        backendBaseUrl = "";
+        backendType = "";
+        backendTransport = "";
 
         return wso2ApiDefinition;
     }
