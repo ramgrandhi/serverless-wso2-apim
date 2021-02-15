@@ -225,6 +225,7 @@ function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
             endpointSecurity: null,
             gatewayEnvironments: gatewayEnv,
             sequences: mediationPolicies,
+            additionalProperties: ((apiDef.apiProperties) && (Object.keys(apiDef.apiProperties).length > 0)) ? apiDef.apiProperties : undefined,
             subscriptionAvailability: 'current_tenant',
             subscriptionAvailableTenants: [],
             businessInformation: {
