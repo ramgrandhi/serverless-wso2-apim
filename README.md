@@ -14,7 +14,7 @@ Serverless Framework plugin to manage APIs on [WSO2 API Manager](https://wso2.co
 ## Features
 * Create, Update and Publish your API definitions via `sls deploy`.  
 * Manage your API definitions via `sls info` and `sls remove`.
-* Supports HTTP and JMS backends with mediation policies.
+* Supports HTTP and JMS backends with mediation policies & additional API properties.
 * Uploads backend certificates (including CAs) to enable HTTP/s connectivity with backends.
 * Supports Swagger 2.0 and OpenAPI 3.0 specifications.
 ---
@@ -70,6 +70,9 @@ or
             in: 'log_in_message'
             out: 'None'
             fault: 'None'
+          apiProperties:  # Optional
+            'property1': 'value1'
+            'property2': 'value2'
           maxTps: 100
           tags:
             - my-awesome-api
@@ -116,6 +119,7 @@ or
 | `mediationPolicies.in` | Input mediation policy, it manipulates the request going to your backend | `log_in_message` |
 | `mediationPolicies.out` | Output mediation policy, it manipulates the response going back to your API consumer | `json_validator` |
 | `mediationPolicies.fault` | Fault mediation policy, it manipulates the fault handling | `None` |
+| `apiProperties` | Optional, List of API properties to be used in `key`:`value` form as described [here](https://docs.wso2.com/display/AM260/Adding+Custom+Properties+to+APIs) | `'property1': 'value1'`|
 | `maxTps` | Max. Transactions per second, used for throttling. | `100` |
 | `tags` | Tags as an array that show up in WSO2 consoles | |
 | `swaggerSpec` | Swagger 2.0 / OpenAPI 3.0 specification in YML | |
