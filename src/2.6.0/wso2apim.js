@@ -18,8 +18,10 @@ const fs = require('fs');
 const utils = require('../utils/utils');
 
 // Register a new client
-async function registerClient(url, user, pass) {
+async function registerClient(wso2APIM) {
     try {
+        let url = "https://" + wso2APIM.host + ":" + wso2APIM.port + "/client-registration/" + wso2APIM.versionSlug + "/register";
+        let { user, pass } = wso2APIM;
         let authToken = user + ":" + pass;
         let authTokenBase64 = Buffer.from(authToken).toString('base64');
         var data = {
@@ -56,8 +58,11 @@ async function registerClient(url, user, pass) {
 
 
 // Generate a new token
-async function generateToken(url, user, pass, clientId, clientSecret, scope) {
+async function generateToken(wso2APIM, clientId, clientSecret) {
     try {
+        let url = "https://" + wso2APIM.host + ":" + wso2APIM.port + "/oauth2/token";
+        let { user, pass } = wso2APIM;
+        let scope = "apim:api_create apim:api_publish apim:api_view apim:subscribe apim:tier_view apim:tier_manage apim:subscription_view apim:subscription_block";
         let authToken = clientId + ":" + clientSecret;
         let authTokenBase64 = Buffer.from(authToken).toString('base64');
         var data = qs.stringify({
@@ -94,8 +99,9 @@ async function generateToken(url, user, pass, clientId, clientSecret, scope) {
     }
 };
 
-async function isAPIDeployed(url, accessToken, apiName, apiVersion, apiContext) {
+async function isAPIDeployed(wso2APIM, accessToken, apiName, apiVersion, apiContext) {
     try {
+        let url = "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/publisher/" + wso2APIM.versionSlug + "/apis"
         let queryStr = "query=name:" + apiName + " version:" + apiVersion + " context:" + apiContext;
         url = url + "?" + queryStr;
         let config = {
@@ -123,9 +129,9 @@ async function isAPIDeployed(url, accessToken, apiName, apiVersion, apiContext) 
     }
 };
 
-async function isCertUploaded(url, accessToken, certAlias) {
+async function isCertUploaded(wso2APIM, accessToken, certAlias) {
     try {
-        url = url + "/" + certAlias;
+        let url = "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/publisher/" + wso2APIM.versionSlug + "/certificates/" + certAlias;
         let config = {
             headers: {
                 'Authorization': 'Bearer ' + accessToken
@@ -167,7 +173,6 @@ function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
                 backendBaseUrl = apiDef.backend.http.baseUrl
             }
             backendType = 'HTTP';
-            backendTransport = ['https'];
         }
         // 2. JMS-based backend
         else if (apiDef.backend.jms) {
@@ -176,7 +181,6 @@ function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
                 backendBaseUrl = [backendBaseUrl, qs.stringify(apiDef.backend.jms.parameters, { encode: false })].join('?');
             }
             backendType = 'HTTP';
-            backendTransport = ['https'];            
         }
 
         // Construct mediation policies
@@ -203,7 +207,7 @@ function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
             status: 'CREATED',
             isDefaultVersion: false,
             type: backendType,
-            transport: backendTransport,
+            transport: ['https'],
             tags: [...apiDef.tags, "serverless-wso2-apim"],
             tiers: ['Unlimited'],
             maxTps: {
@@ -251,8 +255,10 @@ function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
 };
 
 // Creates API definition
-async function createAPIDef(url, user, accessToken, gatewayEnv, apiDef) {
+async function createAPIDef(wso2APIM, user, accessToken, apiDef) {
     try {
+        let url = "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/publisher/" + wso2APIM.versionSlug + "/apis";
+        let { user, gatewayEnv } = wso2APIM;
         var data = constructAPIDef(user, gatewayEnv, apiDef);
         var config = {
             headers: {
@@ -287,8 +293,9 @@ async function createAPIDef(url, user, accessToken, gatewayEnv, apiDef) {
 };
 
 // Publishes API definition
-async function publishAPIDef(url, accessToken, apiId) {
+async function publishAPIDef(wso2APIM, accessToken, apiId) {
     try {
+        let url = "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/publisher/" + wso2APIM.versionSlug + "/apis/change-lifecycle";
         var data = {};
         var config = {
             headers: {
@@ -321,9 +328,9 @@ async function publishAPIDef(url, accessToken, apiId) {
 
 
 // Retrieves invokable API endpoint
-async function listInvokableAPIUrl(url, accessToken, apiId) {
+async function listInvokableAPIUrl(wso2APIM, accessToken, apiId) {
     try {
-        url = url + "/" + apiId;
+        let url = "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/store/" + wso2APIM.versionSlug + "/apis/" + apiId;
         var config = {
             headers: {
                 'Authorization': 'Bearer ' + accessToken
@@ -351,8 +358,9 @@ async function listInvokableAPIUrl(url, accessToken, apiId) {
 
 
 // Uploads backend certificate
-async function uploadCert(url, accessToken, certAlias, cert, backendUrl) {
+async function uploadCert(wso2APIM, accessToken, certAlias, cert, backendUrl) {
     try {
+        let url = "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/publisher/" + wso2APIM.versionSlug + "/certificates";
         var data = new FormData();
         data.append('certificate', fs.createReadStream(cert))
         data.append('alias', certAlias);
@@ -387,9 +395,10 @@ async function uploadCert(url, accessToken, certAlias, cert, backendUrl) {
 };
 
 // Updates API definition
-async function updateAPIDef(url, user, accessToken, gatewayEnv, apiDef, apiId) {
+async function updateAPIDef(wso2APIM, accessToken, apiDef, apiId) {
     try {
-        url = url + "/" + apiId;
+        let url = "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/publisher/" + wso2APIM.versionSlug + "/apis/" + apiId;
+        let { user, gatewayEnv } = wso2APIM;
         var data = constructAPIDef(user, gatewayEnv, apiDef, apiId);
         var config = {
             headers: {
@@ -418,9 +427,9 @@ async function updateAPIDef(url, user, accessToken, gatewayEnv, apiDef, apiId) {
 };
 
 // Removes API definition (if possible)
-async function removeAPIDef(url, accessToken, apiId) {
+async function removeAPIDef(wso2APIM, accessToken, apiId) {
     try {
-        url = url + "/" + apiId;
+        let url = "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/publisher/" + wso2APIM.versionSlug + "/apis/" + apiId;
         let config = {
             headers: {
                 'Authorization': 'Bearer ' + accessToken
@@ -448,9 +457,9 @@ async function removeAPIDef(url, accessToken, apiId) {
 
 
 // Removes backend certificate
-async function removeCert(url, accessToken, certAlias) {
+async function removeCert(wso2APIM, accessToken, certAlias) {
     try {
-        url = url + "/" + certAlias;
+        let url = "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/publisher/" + wso2APIM.versionSlug + "/certificates/" + certAlias;
         let config = {
             headers: {
                 'Authorization': 'Bearer ' + accessToken
@@ -481,9 +490,9 @@ async function removeCert(url, accessToken, certAlias) {
 
 
 // Updates backend certificate
-async function updateCert(url, accessToken, certAlias, cert) {
+async function updateCert(wso2APIM, accessToken, certAlias, cert) {
     try {
-        url = url + "/" + certAlias;
+        let url = "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/publisher/" + wso2APIM.versionSlug + "/certificates/" + certAlias;
         var data = new FormData();
         data.append('certificate', fs.createReadStream(cert))
         let config = {
@@ -513,9 +522,9 @@ async function updateCert(url, accessToken, certAlias, cert) {
 };
 
 // Lists certificate information (like validFrom, validTo, subject etc)
-async function listCertInfo(url, accessToken, certAlias) {
+async function listCertInfo(wso2APIM, accessToken, certAlias) {
     try {
-        url = url + "/" + certAlias;
+        let url = "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/publisher/" + wso2APIM.versionSlug + "/certificates/" + certAlias;
         let config = {
             headers: {
                 'Authorization': 'Bearer ' + accessToken,

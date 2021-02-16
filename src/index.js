@@ -1,5 +1,5 @@
 'use strict';
-const wso2apim = require("./2.6.0/wso2apim");
+var wso2apim = require("./2.6.0/wso2apim");
 const utils = require('./utils/utils');
 const fs = require('fs');
 const splitca = require('split-ca');
@@ -15,7 +15,6 @@ class Serverless_WSO2_APIM {
 
     this.serverless = serverless;
     this.options = options;
-
     this.cmd = this.serverless.pluginManager.cliCommands.join('|');
 
     this.hooks = {
@@ -127,11 +126,7 @@ class Serverless_WSO2_APIM {
     // this.serverless.cli.log(pluginNameSuffix + "Registering client..");
     const wso2APIM = this.serverless.service.custom.wso2apim;
     try {
-      const data = await wso2apim.registerClient(
-        "https://" + wso2APIM.host + ":" + wso2APIM.port + "/client-registration/" + wso2APIM.versionSlug + "/register",
-        wso2APIM.user,
-        wso2APIM.pass
-      );
+      const data = await wso2apim.registerClient(wso2APIM);
       this.cache.clientId = data.clientId;
       this.cache.clientSecret = data.clientSecret;
       this.serverless.cli.log(pluginNameSuffix + "Registering client.. OK");
@@ -147,12 +142,9 @@ class Serverless_WSO2_APIM {
     const wso2APIM = this.serverless.service.custom.wso2apim;
     try {
       const data = await wso2apim.generateToken(
-        "https://" + wso2APIM.host + ":" + wso2APIM.port + "/oauth2/token",
-        wso2APIM.user,
-        wso2APIM.pass,
+        wso2APIM,
         this.cache.clientId,
-        this.cache.clientSecret,
-        "apim:api_create apim:api_publish apim:api_view apim:subscribe apim:tier_view apim:tier_manage apim:subscription_view apim:subscription_block",
+        this.cache.clientSecret
       );
       this.cache.accessToken = data.accessToken;
       this.serverless.cli.log(pluginNameSuffix + "Generating temporary token.. OK");
@@ -184,7 +176,7 @@ class Serverless_WSO2_APIM {
         // It takes the form of <APIName>___<Version>___<RootContext>
         var apiDefClob = apiDef.name + "___" + apiDef.version + "___" + apiDef.rootContext;
         const data = await wso2apim.isAPIDeployed(
-          "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/publisher/" + wso2APIM.versionSlug + "/apis",
+          wso2APIM,
           this.cache.accessToken,
           apiDef.name,
           apiDef.version,
@@ -218,7 +210,7 @@ class Serverless_WSO2_APIM {
           try {
             if (apiStatus == 'PUBLISHED') {
               const data = await wso2apim.listInvokableAPIUrl(
-                "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/store/" + wso2APIM.versionSlug + "/apis",
+                wso2APIM,
                 this.cache.accessToken,
                 apiId);
               invokableAPIURL = data.endpointURLs.filter((Url) => { return Url.environmentName == wso2APIM.gatewayEnv })[0].environmentURLs.https;
@@ -356,7 +348,7 @@ class Serverless_WSO2_APIM {
                 // Upload Cert to WSO2 API Manager
                 try {
                   await wso2apim.uploadCert(
-                    "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/publisher/" + wso2APIM.versionSlug + "/certificates",
+                    wso2APIM,
                     this.cache.accessToken,
                     certAlias,
                     slsDir + "/" + certAlias + ".cer",
@@ -369,7 +361,7 @@ class Serverless_WSO2_APIM {
                   // If Certificate-exists-for-that-Alias error occurs.. then update it.
                   if (err.response.data && err.response.data.code == '409') {
                     await wso2apim.updateCert(
-                      "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/publisher/" + wso2APIM.versionSlug + "/certificates",
+                      wso2APIM,
                       this.cache.accessToken,
                       certAlias,
                       slsDir + "/" + certAlias + ".cer"
@@ -422,10 +414,8 @@ class Serverless_WSO2_APIM {
           if (api.apiId !== undefined) {
             // this.serverless.cli.log(pluginNameSuffix + "Updating " + api.apiName + " (" + api.apiId + ")..");
             const data = await wso2apim.updateAPIDef(
-              "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/publisher/" + wso2APIM.versionSlug + "/apis",
-              wso2APIM.user,
+              wso2APIM,
               this.cache.accessToken,
-              wso2APIM.gatewayEnv,
               apiDefs[i],
               api.apiId
             );
@@ -435,10 +425,8 @@ class Serverless_WSO2_APIM {
           else {
             // this.serverless.cli.log(pluginNameSuffix + "Creating " + api.apiName + "".."");
             const data = await wso2apim.createAPIDef(
-              "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/publisher/" + wso2APIM.versionSlug + "/apis",
-              wso2APIM.user,
+              wso2APIM,
               this.cache.accessToken,
-              wso2APIM.gatewayEnv,
               apiDefs[i]
             );
             this.serverless.cli.log(pluginNameSuffix + "Creating " + api.apiName + ".. OK");
@@ -465,7 +453,7 @@ class Serverless_WSO2_APIM {
               // this.serverless.cli.log(pluginNameSuffix + "Re-publishing " + api.apiName + " (" + api.apiId + ")..");
             }
             const data = await wso2apim.publishAPIDef(
-              "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/publisher/" + wso2APIM.versionSlug + "/apis/change-lifecycle",
+              wso2APIM,
               this.cache.accessToken,
               api.apiId
             );
@@ -501,7 +489,7 @@ class Serverless_WSO2_APIM {
           if (api.apiId) {
             // this.serverless.cli.log(pluginNameSuffix + "Deleting " + api.apiId + "..");
             const data = await wso2apim.removeAPIDef(
-              "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/publisher/" + wso2APIM.versionSlug + "/apis",
+              wso2APIM,
               this.cache.accessToken,
               api.apiId
             );
@@ -521,7 +509,6 @@ class Serverless_WSO2_APIM {
                 }
 
                 const data = await wso2apim.removeCert(
-                  "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/publisher/" + wso2APIM.versionSlug + "/certificates",
                   this.cache.accessToken,
                   certAlias
                 );
