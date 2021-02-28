@@ -21,10 +21,10 @@ jest.mock('./2.6.0/wso2apim', () => ({
     Promise.resolve({
       list: [
         {
-          id: 'apifooid',
-          name: 'apidefname',
-          version: 1,
-          context: 'apirootctx',
+          id: '123456789',
+          name: 'MyAwesomeAPI',
+          version: 'v1',
+          context: '/myawesomeapi',
         },
       ],
     })
@@ -39,17 +39,31 @@ function getPluginInstance() {
     service: {
       custom: {
         wso2apim: {
-          host: 'foohost',
-          user: 'baruser',
-          pass: 'bazpassword',
-          status: 'deployed',
+          enabled: true,
+          host: 'wso2-apimanager.com',
+          port: 443,
+          versionSlug: 'v0.14',
+          user: 'foo',
+          pass: 'bar',
+          gatewayEnv: 'Local',
           apidefs: [
             {
-              name: 'apidefname',
-              version: 1,
-              rootContext: 'apirootctx',
-            },
-          ],
+              name: 'MyAwesomeAPI',
+              description: 'My Awesome API',
+              rootContext: '/myawesomeapi',
+              version: 'v1',
+              visibility: 'PUBLIC',
+              backend: {
+                http: {
+                  baseUrl: 'https://backend.url',
+                  certChain: 'file://xxx.cer'
+                }
+              },
+              tags: [ 'awesomeness', 'myawesomeapi'],
+              maxTps: 999,
+              swaggerSpec: 'xxx'
+            }
+          ]
         },
       },
     },
@@ -115,11 +129,11 @@ describe('WSO2APIM ServerlessPlugin', () => {
       await pluginInstance.listAPIDefs();
       expect(pluginInstance.cache.deploymentStatus).toEqual([
         {
-          apiContext: 'apirootctx',
-          apiId: 'apifooid',
-          apiName: 'apidefname',
+          apiContext: '/myawesomeapi',
+          apiId: '123456789',
+          apiName: 'MyAwesomeAPI',
           apiStatus: undefined,
-          apiVersion: 1,
+          apiVersion: 'v1',
           invokableAPIURL: 'null 🚀',
         },
       ]);

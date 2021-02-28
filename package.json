@@ -48,5 +48,8 @@
     "release": "^6.3.0",
     "serverless": "^1.75.1",
     "split-ca": "^1.0.1"
+  },
+  "peerDependencies": {
+    "serverless": ">=1.75.0"
   }
 }

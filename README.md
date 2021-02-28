@@ -1,6 +1,22 @@
 serverless-wso2-apim
 ====================
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+<p>
+  <a href="https://www.serverless.com">
+    <img src="http://public.serverless.com/badges/v3.svg">
+  </a>
+  <a href="https://www.npmjs.com/package/serverless-wso2-apim">
+    <img src="https://img.shields.io/npm/v/serverless-wso2-apim?style=flat-square">
+  </a>
+  <a href="https://www.serverless.com">
+    <img src="https://img.shields.io/npm/dependency-version/serverless-wso2-apim/peer/serverless.svg?style=flat-square"/>
+  </a>
+  <a href="https://opensource.org/licenses/MIT">
+    <img src="https://img.shields.io/npm/l/serverless-wso2-apim.svg?style=flat-square">
+  </a>
+  <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square">
+</p>
+
 
 Serverless Framework plugin to manage APIs on [WSO2 API Manager](https://wso2.com/api-management/).
 
@@ -10,14 +26,15 @@ Serverless Framework plugin to manage APIs on [WSO2 API Manager](https://wso2.co
 ## Compatible with
 * serverlessˆ1.75
 * [WSO2 API Manager 2.6.0](https://docs.wso2.com/display/AM260/)
-* [WSO2 API Manager 3.2.0](https://apim.docs.wso2.com/en/3.2.0/)
+* [WSO2 API Manager 3.2.0](https://apim.docs.wso2.com/en/3.2.0/) <img src="https://img.shields.io/badge/-New-yellow?style=flat-square">
 
 ## Features
 * Create, Update and Publish your API definitions via `sls deploy`.  
 * Manage your API definitions via `sls info` and `sls remove`.
-* Supports HTTP and JMS backends with mediation policies & additional API properties.
+* Supports `HTTP` and `JMS` backends with mediation policies & additional API properties.
 * Uploads backend certificates (including CAs) to enable HTTP/s connectivity with backends.
-* Supports Swagger 2.0 and OpenAPI 3.0 specifications.
+* Supports `Swagger 2.0` and `OpenAPI 3.0` specifications.
+* Automagically detects the version of WSO2 API Manager running.
 ---
 
 ## Install Plugin
@@ -96,7 +113,7 @@ or
 | `enabled` | Default is `true`. <br> When set to `false` explicitly, deployment of APIs on WSO2 will be skipped. Suitable for offline testing etc. | `true`|
 | `host` | WSO2 API Manager Hostname | `wso2-apimanager.com` |
 | `port` | WSO2 API Manager Port | `443` |
-| `versionSlug` | WSO2 API Manager's management API version. <br> - WSO2 API Manager `2.6.0` supports `v0.14` | `v0.14` |
+| `versionSlug` | WSO2 API Manager's management API version. <br> - WSO2 API Manager `2.6.0` supports `v0.14` <br> - WSO2 API Manager `3.2.0` supports `v0.17`| `v0.14` |
 | `user` | Username with an optional tenant symbol. | `user@tenant` |
 | `pass` | Password, supports [Serverless Variables](https://www.serverless.com/framework/docs/providers/aws/guide/variables/) syntax.| `xxx` |
 | `gatewayEnv` | Target gateway environment, as configured in your WSO2 installation. | `Production` |

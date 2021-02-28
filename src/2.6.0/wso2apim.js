@@ -53,7 +53,7 @@ async function registerClient(wso2APIM) {
   }
   catch (err) {
     utils.renderError(err);
-  }
+}
 }
 
 
@@ -194,7 +194,8 @@ function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
         }
     }
 
-    const wso2ApiDefinition = {
+      const wso2ApiDefinition = {
+        id: (apiId) ? apiId: undefined,
         name: apiDef.name,
         description: apiDef.description,
         context: apiDef.rootContext,
@@ -237,13 +238,10 @@ function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
         }
     };
 
-    if (apiId)
-        wso2ApiDefinition.id = apiId;
-
     backendBaseUrl = "";
     backendType = "";
     backendTransport = "";
-
+      
     return wso2ApiDefinition;
   }
   catch (err) {
