@@ -1,10 +1,15 @@
 'use strict';
 const wso2apim = require('./2.6.0/wso2apim');
 const utils = require('./utils/utils');
+const axios = require('axios');
+const https = require('https');
 const fs = require('fs');
 const splitca = require('split-ca');
 const { SSL_OP_EPHEMERAL_RSA } = require('constants');
 const pluginNameSuffix = '[serverless-wso2-apim] ';
+
+const wso2ApimVersionsSupported = ['2.6.0', '3.2.0'];
+const versionSlugsSupported = ['v0.14', 'v0.17'];
 
 console.log.apply(null);
 
@@ -129,24 +134,74 @@ class Serverless_WSO2_APIM {
   }
 
   async validateConfig() {
-    // this.serverless.cli.log(pluginNameSuffix + "Validating configuration..");
-    const wso2APIM = this.serverless.service.custom.wso2apim;
-    if (
-      wso2APIM.host == undefined ||
-      wso2APIM.port == undefined ||
-      wso2APIM.user == undefined ||
-      wso2APIM.pass == undefined ||
-      wso2APIM.apidefs == undefined
-    ) {
-      this.serverless.cli.log(
-        pluginNameSuffix + 'Validating configuration.. NOT OK'
-      );
-      throw new Error();
-    } else {
+    try {
+      // this.serverless.cli.log(pluginNameSuffix + "Validating configuration..");
+      const wso2APIM = this.serverless.service.custom.wso2apim;
+
+      // Key value checks, with corresponding error messages
+      const conditionsArray = [
+        ((wso2APIM.enabled) && ([true, false].includes(wso2APIM.enabled))),
+        ((wso2APIM.host) && (wso2APIM.host.length > 0)),
+        ((wso2APIM.port) && (wso2APIM.port > 0)),
+        ((wso2APIM.versionSlug) && (versionSlugsSupported.includes(wso2APIM.versionSlug))),
+        ((wso2APIM.user) && (wso2APIM.user.length > 0)),
+        ((wso2APIM.pass) && (wso2APIM.pass.length > 0)),
+        ((wso2APIM.gatewayEnv) && (wso2APIM.gatewayEnv.length > 0)),
+        (wso2APIM.apidefs.length > 0)
+      ];
+      const messagesArray = [
+        "Invalid value assigned to `custom.wso2apim.enabled`",
+        "Invalid value assigned to `custom.wso2apim.host`",
+        "Invalid value assigned to `custom.wso2apim.port`",
+        "Invalid value assigned to `custom.wso2apim.versionSlug`",
+        "Invalid value assigned to `custom.wso2apim.user`",
+        "Invalid value assigned to `custom.wso2apim.pass`",
+        "Invalid value assigned to `custom.wso2apim.gatewayEnv`",
+        "No API definitions supplied `custom.wso2apim.apidefs`",
+      ];
+
+      if (conditionsArray.indexOf(false) !== -1) {
+        throw new Error(`${messagesArray[Number(conditionsArray.indexOf(false))]}`);
+      }
+
+      // Detect WSO2 API Manager product version to use correct management APIs
+      const { data } = await this.detectProductVersion();
+      if ((data) && (data.includes('WSO2 API Manager-'))) {
+        this.cache.wso2apimVersion = data.split('WSO2 API Manager-')[1].split('</')[0];
+        if (wso2ApimVersionsSupported.includes(this.cache.wso2apimVersion)) {
+          this.serverless.cli.log(
+            pluginNameSuffix + 'Auto-detected WSO2 API Manager version.. ' + this.cache.wso2apimVersion
+          );
+        }
+        else {
+          throw new Error('Incompatible WSO2 API Manager version.. ' + this.cache.wso2apimVersion);
+        }
+      }
+      else {
+        throw new Error('Unable to detect WSO2 API Manager version.. ');
+      }
       this.serverless.cli.log(
         pluginNameSuffix + 'Validating configuration.. OK'
       );
+    } 
+    catch (err) {
+      utils.renderError(err);
+      this.serverless.cli.log(
+        pluginNameSuffix + 'Validating configuration.. NOT OK'
+      );
+      throw new Error(err);
     }
+  }
+
+  async detectProductVersion() {
+    const wso2APIM = this.serverless.service.custom.wso2apim;
+    let url = "https://" + wso2APIM.host + ":" + wso2APIM.port + "/services/Version";
+    let config = {
+      httpsAgent: new https.Agent({
+        rejectUnauthorized: false
+      })
+    };
+    return axios.get(url, config);
   }
 
   async registerClient() {
@@ -276,7 +331,7 @@ class Serverless_WSO2_APIM {
             apiStatus: apiStatus,
             apiId,
             apiId,
-            invokableAPIURL: invokableAPIURL + ' 🚀',
+            invokableAPIURL: invokableAPIURL + ' 🚀 ',
           });
         } else {
           this.cache.deploymentStatus.push({
