@@ -64,7 +64,6 @@ or
       enabled: false
       host: 'wso2-apimanager.com'
       port: 443
-      versionSlug: 'v0.14'
       user: 'user@tenant'
       pass: 'pass'
       gatewayEnv: 'Production'
@@ -116,7 +115,6 @@ or
 | `enabled` | Default is `true`. <br> When set to `false` explicitly, deployment of APIs on WSO2 will be skipped. Suitable for offline testing etc. | `true`|
 | `host` | WSO2 API Manager Hostname | `wso2-apimanager.com` |
 | `port` | WSO2 API Manager Port | `443` |
-| `versionSlug` | WSO2 API Manager's management API version. <br> - WSO2 API Manager `2.6.0` supports `v0.14` <br> - WSO2 API Manager `3.2.0` supports `v1.2`| `v0.14` |
 | `user` | Username with an optional tenant symbol. | `user@tenant` |
 | `pass` | Password, supports [Serverless Variables](https://www.serverless.com/framework/docs/providers/aws/guide/variables/) syntax.| `xxx` |
 | `gatewayEnv` | Target gateway environment, as configured in your WSO2 installation. | `Production` |

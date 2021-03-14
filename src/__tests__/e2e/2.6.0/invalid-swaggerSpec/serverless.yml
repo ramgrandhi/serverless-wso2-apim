@@ -1,0 +1,39 @@
+service: serverless-wso2-apim
+provider:
+  name: aws
+plugins:
+  localPath: '../../../../../'
+  modules:
+    - src
+
+############################################################################
+# -- START HERE : Modify the plugin configuration to suit the test case -- #
+custom:
+  wso2apim:
+    enabled: true
+    host: ${env:WSO2_HOST}
+    port: ${env:WSO2_PORT}
+    user: ${env:WSO2_USER}
+    pass: ${env:WSO2_PASS}
+    gatewayEnv: ${env:WSO2_ENV}
+    apidefs:
+      - name: ${env:TEST_ID}
+        description: ${env:TEST_ID}
+        rootContext: /${env:TEST_ID}
+        version: 'v1'
+        visibility: 'PUBLIC'
+        backend:
+          http:
+            baseUrl: 'https://baseUrl'
+        maxTps: 10
+        tags:
+          - ${env:TEST_ID}
+        swaggerSpec:
+          swagger: '2.0'
+          pathssssssssssssssssssssssssssssssssssssssssssssss:
+            /*:
+              post:
+                responses:
+                  '201':
+                    description: Created
+                x-auth-type: 'None'

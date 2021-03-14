@@ -6,6 +6,7 @@
   "scripts": {
     "test": "jest",
     "lint": "eslint .",
+    "test:e2e": "jest e2e",
     "release:alpha": "release pre alpha",
     "release:patch": "release patch",
     "release:minor": "release minor",
@@ -47,7 +48,8 @@
     "qs": "^6.9.4",
     "release": "^6.3.0",
     "serverless": "^1.75.1",
-    "split-ca": "^1.0.1"
+    "split-ca": "^1.0.1",
+    "swagger-parser": "^10.0.2"
   },
   "peerDependencies": {
     "serverless": ">=1.75.0"

@@ -1,5 +1,5 @@
 'use strict';
-const wso2apim = require('./2.6.0/wso2apim');
+var wso2apim;
 const utils = require('./utils/utils');
 const axios = require('axios');
 const https = require('https');
@@ -9,9 +9,14 @@ const { SSL_OP_EPHEMERAL_RSA } = require('constants');
 const pluginNameSuffix = '[serverless-wso2-apim] ';
 
 const wso2ApimVersionsSupported = ['2.6.0', '3.2.0'];
-const versionSlugsSupported = ['v0.14', 'v0.17'];
-
-console.log.apply(null);
+const versionSlugsSupported = {
+	"2.6.0": {
+		"versionSlug": "v0.14"
+	},
+	"3.2.0": {
+		"versionSlug": "v1.2"
+	}
+};
 
 class Serverless_WSO2_APIM {
   constructor(serverless, options) {
@@ -143,7 +148,6 @@ class Serverless_WSO2_APIM {
         ((wso2APIM.enabled) && ([true, false].includes(wso2APIM.enabled))),
         ((wso2APIM.host) && (wso2APIM.host.length > 0)),
         ((wso2APIM.port) && (wso2APIM.port > 0)),
-        ((wso2APIM.versionSlug) && (versionSlugsSupported.includes(wso2APIM.versionSlug))),
         ((wso2APIM.user) && (wso2APIM.user.length > 0)),
         ((wso2APIM.pass) && (wso2APIM.pass.length > 0)),
         ((wso2APIM.gatewayEnv) && (wso2APIM.gatewayEnv.length > 0)),
@@ -153,7 +157,6 @@ class Serverless_WSO2_APIM {
         "Invalid value assigned to `custom.wso2apim.enabled`",
         "Invalid value assigned to `custom.wso2apim.host`",
         "Invalid value assigned to `custom.wso2apim.port`",
-        "Invalid value assigned to `custom.wso2apim.versionSlug`",
         "Invalid value assigned to `custom.wso2apim.user`",
         "Invalid value assigned to `custom.wso2apim.pass`",
         "Invalid value assigned to `custom.wso2apim.gatewayEnv`",
@@ -172,6 +175,8 @@ class Serverless_WSO2_APIM {
           this.serverless.cli.log(
             pluginNameSuffix + 'Auto-detected WSO2 API Manager version.. ' + this.cache.wso2apimVersion
           );
+          wso2apim = require('./' + this.cache.wso2apimVersion + '/wso2apim');
+          wso2APIM.versionSlug = versionSlugsSupported[this.cache.wso2apimVersion].versionSlug;
         }
         else {
           throw new Error('Incompatible WSO2 API Manager version.. ' + this.cache.wso2apimVersion);
@@ -344,6 +349,7 @@ class Serverless_WSO2_APIM {
           });
         }
       } catch (err) {
+        console.log(err);
         this.serverless.cli.log(
           pluginNameSuffix + 'Retrieving API Definitions.. NOT OK'
         );
