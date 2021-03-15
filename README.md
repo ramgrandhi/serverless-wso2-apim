@@ -33,11 +33,11 @@ Serverless Framework plugin to manage APIs on [WSO2 API Manager](https://wso2.co
 
 ## Features
 * Create, Update and Publish your API definitions via `sls deploy`.  
-* Manage your API definitions via `sls info` and `sls remove`.
-* Supports `HTTP` and `JMS` backends with mediation policies & additional API properties.
-* Uploads backend certificates (including CAs) to enable HTTP/s connectivity with backends.
-* Supports `Swagger 2.0` and `OpenAPI 3.0` specifications.
-* Automagically detects the version of WSO2 API Manager running.
+* Manage your API definitions via `sls info` and `sls remove`.  
+* Supports `HTTP` and `JMS` backends with mediation policies & additional API properties.  
+* Uploads backend certificates (including CAs) to enable HTTP/s connectivity with backends.  
+* Supports `Swagger 2.0` and `OpenAPI 3.0` specifications.  
+* Automatically detects the version of WSO2 API Manager running. <img src="https://img.shields.io/badge/-New-yellow?style=flat-square"> 
 ---
 
 ## Install Plugin
@@ -128,7 +128,7 @@ or
 | `version` | (CANNOT BE UPDATED LATER) <br> Your API Version, which also forms a part of the API URL ultimately. | `v1` |
 | `rootContext` | (CANNOT BE UPDATED LATER) <br> Your API Context, which will be exposed by WSO2 API Gateway. Must be unique per Gateway Environment. | `/myawesomeapi` |
 | `description` | Free-form text | `My Awesome API` |
-| `visibility` |  Currently supports only `PUBLIC`. Accessible from Public Internet, Visible to everyone. | `PUBLIC` |
+| `visibility` |  Supports `PUBLIC` (Visible to everyone) and `PRIVATE` (Visible to current tenant) | `PUBLIC` |
 | `backend` | Supports `http` and `jms` backends. <br> Note: One API definition supports only one backend. |  |
 | `backend.http.baseUrl` | Your HTTP backend base URL | `https://backend:port/123` |
 | `backend.http.certChain` | Optional, your backend certificate chain in PEM (base64) format. <br><br> It supports: <br> a. **File system** - Path must be relative to where `serverless.yml` is located. <br> b. **AWS Certificate ARN** <br> c. **AWS CloudFormation Export** - Exported value must contain a valid AWS Certificate ARN. | `file://certs/backend.cer` <br> (or) <br> `arn:aws:acm:..` <br> (or) <br> `!ImportValue xx` <br> (or) <br> `!Ref xx` |
