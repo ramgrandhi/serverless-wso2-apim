@@ -8,9 +8,6 @@ serverless-wso2-apim
   <a href="https://www.npmjs.com/package/serverless-wso2-apim">
     <img src="https://img.shields.io/npm/v/serverless-wso2-apim?style=flat-square">
   </a>
-  <a href="https://www.serverless.com">
-    <img src="https://img.shields.io/npm/dependency-version/serverless-wso2-apim/peer/serverless.svg?style=flat-square"/>
-  </a>
   <a href="https://www.npmjs.com/package/serverless-wso2-apim">
     <img src="https://img.shields.io/npm/dm/serverless-wso2-apim.svg">
   </a>
