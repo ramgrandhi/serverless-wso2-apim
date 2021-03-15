@@ -291,7 +291,7 @@ class Serverless_WSO2_APIM {
                 deployedAPI.version +
                 '___' +
                 deployedAPIContext,
-              apiStatus: deployedAPI.status,
+              apiStatus: deployedAPI.status || deployedAPI.lifeCycleStatus,
             });
           });
         }
@@ -318,11 +318,18 @@ class Serverless_WSO2_APIM {
                 this.cache.accessToken,
                 apiId
               );
-              invokableAPIURL = data.endpointURLs.filter((Url) => {
-                return Url.environmentName == wso2APIM.gatewayEnv;
-              })[0].environmentURLs.https;
+              const invokableAPIURLObj = data.endpointURLs.filter((Url) => {
+                return Url.environmentName === wso2APIM.gatewayEnv;
+              });
+              if (invokableAPIURLObj[0].environmentURLs) {
+                invokableAPIURL = invokableAPIURLObj[0].environmentURLs.https;
+              }
+              else if (invokableAPIURLObj[0].URLs) {
+                invokableAPIURL = invokableAPIURLObj[0].URLs.https;
+              }
             }
           } catch (err) {
+            console.log(err);
             this.serverless.cli.log(
               pluginNameSuffix +
                 'An error occurred while retrieving Invokable API URL, proceeding further.'

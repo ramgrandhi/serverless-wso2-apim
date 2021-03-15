@@ -206,10 +206,13 @@ async function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
         operations: await constructAPIOperations(apiDef.swaggerSpec),
         lifeCycleStatus: 'CREATED', 
         isDefaultVersion: false,
+        enableStore: true,
         type: backendType,
         transport: ['https'],
         tags: [...apiDef.tags, "serverless-wso2-apim"],
-        policies : ['Unlimited'],
+        policies: ['Unlimited'],
+        apiThrottlingPolicy: 'Unlimited',
+        securityScheme: ['oauth2'],
         maxTps: {
             production: (apiDef.maxTps) ? apiDef.maxTps : undefined
         },
@@ -224,6 +227,7 @@ async function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
         },
         endpointImplementationType: 'ENDPOINT',
         endpointSecurity: null,
+        gatewayEnvironments: [ gatewayEnv ],
         mediationPolicies: mediationPolicies,
         additionalProperties: ((apiDef.apiProperties) && (Object.keys(apiDef.apiProperties).length > 0)) ? apiDef.apiProperties : undefined,
         subscriptionAvailability: 'CURRENT_TENANT',
@@ -369,7 +373,6 @@ async function listInvokableAPIUrl(wso2APIM, accessToken, apiId) {
     return new Promise((resolve, reject) => {
         axios.get(url, config)
             .then((res) => {
-                console.log("#*#*", res.data);
                 resolve(res.data);
             })
             .catch((err) => {
