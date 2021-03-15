@@ -56,7 +56,6 @@ async function registerClient(wso2APIM) {
 }
 }
 
-
 // Generate a new token
 async function generateToken(wso2APIM, clientId, clientSecret) {
   try {
@@ -164,6 +163,7 @@ function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
   try {
     // Construct backend-specific parameters
     var backendBaseUrl, backendType, backendTransport;
+
     // 1. HTTP-based backend
     if (apiDef.backend.http) {
         if (apiDef.backend.http.baseUrl) {
@@ -350,7 +350,6 @@ async function listInvokableAPIUrl(wso2APIM, accessToken, apiId) {
   }
 }
 
-
 // Uploads backend certificate
 async function uploadCert(wso2APIM, accessToken, certAlias, cert, backendUrl) {
   try {
@@ -449,7 +448,6 @@ async function removeAPIDef(wso2APIM, accessToken, apiId) {
   }
 }
 
-
 // Removes backend certificate
 async function removeCert(wso2APIM, accessToken, certAlias) {
   try {
@@ -481,7 +479,6 @@ async function removeCert(wso2APIM, accessToken, certAlias) {
     utils.renderError(err);
   }
 }
-
 
 // Updates backend certificate
 async function updateCert(wso2APIM, accessToken, certAlias, cert) {

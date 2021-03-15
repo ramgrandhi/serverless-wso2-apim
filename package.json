@@ -4,9 +4,10 @@
   "description": "Serverless Framework plugin for WSO2 API Manager",
   "main": "src/index.js",
   "scripts": {
-    "test": "jest",
     "lint": "eslint .",
+    "test:unit": "jest \"^(.*\/)*(.*\\.)*(spec)\\.js$\"",
     "test:e2e": "jest e2e",
+    "test": "jest",
     "release:alpha": "release pre alpha",
     "release:patch": "release patch",
     "release:minor": "release minor",
