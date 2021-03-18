@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "lint": "eslint .",
-    "test:unit": "jest \"^(.*\/)*(.*\\.)*(spec)\\.js$\"",
+    "test:unit": "jest \"^(.*\/)*(.*\\.)*(spec)\\.js$\" --verbose",
     "test:e2e": "jest e2e",
     "test": "jest",
     "release:alpha": "release pre alpha",

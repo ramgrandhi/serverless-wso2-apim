@@ -197,7 +197,7 @@ async function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
         }
     }
 
-      const wso2ApiDefinition = {
+    const wso2ApiDefinition = {
         id: (apiId) ? apiId: undefined,
         name: apiDef.name,
         description: apiDef.description,
@@ -243,7 +243,7 @@ async function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
     backendBaseUrl = "";
     backendType = "";
     backendTransport = "";
-      
+
     return wso2ApiDefinition;
   }
   catch (err) {
@@ -291,7 +291,7 @@ async function createAPIDef(wso2APIM, accessToken, apiDef) {
         // TODO - dynamically retrieve swaggerSpec version
         let queryStr = "openAPIVersion=V3";
         url = url + "?" + queryStr;
-            var config = {
+        var config = {
             headers: {
                 'Authorization': 'Bearer ' + accessToken,
                 'Content-Type': 'application/json'
