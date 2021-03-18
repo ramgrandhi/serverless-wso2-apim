@@ -1,8 +1,9 @@
-# Let's get going..
+# Thank you for considering to contribute.
 
 <a href="https://github.com/ramgrandhi/serverless-wso2-apim/fork">![x](./assets/fork-me-on-github.png)</a>
 
-Thank you for considering to contribute.  Just follow these simple steps.
+# Let's get going..
+Just follow these simple steps.
 
 1. `Fork` the repository by clicking the link above.
 2. Create a `feature` branch and start building your feature.
@@ -21,10 +22,5 @@ Thank you for considering to contribute.  Just follow these simple steps.
 
 4. Now, do not forget to add tests related to the feature you just built by creating folders under `src/__tests__/e2e/*` (follow the naming). Run `yarn e2e:test` again. 
 
-5. If all tests are passing, you're ready to create a `merge request` into `develop` branch of main repository. _Voila!_
-
-----
-
-
-# Thanks for contributing! 🙌 
+5. If all tests are passing, you're ready to create a `merge request` into `develop` branch of main repository. _Voila!_ 🚀
 
