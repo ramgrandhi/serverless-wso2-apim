@@ -11,7 +11,7 @@ plugins:
 #⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇ For a full list of env vars that you can use, refer `src/__tests__/e2e/e2e.test.js`
 custom:
   wso2apim:
-    enabled: true
+    enabled: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
     host: ${env:WSO2_HOST}
     port: ${env:WSO2_PORT}
     user: ${env:WSO2_USER}
@@ -30,10 +30,10 @@ custom:
         tags:
           - ${env:TEST_ID}-1
         swaggerSpec:
-          openapi: 3.0.0
+          swagger: '2.0'
           info:
             title: ${env:TEST_ID}-1
-            version: "v1"
+            version: 'v1'
             contact:
               name: ${env:TEST_ID}-1
               email: ${env:TEST_ID}-1
@@ -41,6 +41,6 @@ custom:
             /*:
               post:
                 responses:
-                  "201":
+                  '201':
                     description: Created
                 x-auth-type: 'None'

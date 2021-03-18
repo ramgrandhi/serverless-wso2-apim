@@ -30,6 +30,7 @@ describe('E2E on WSO2 API Manager 2.6.0', () => {
 
                 if (dir.split('-')[0] === 'valid') {
                     expect(child.status).toBe(0);
+                    expect(child.output.toString()).toEqual(expect.not.stringContaining('NOT OK'));
                 }
                 else if (dir.split('-')[0] === 'invalid') {
                     expect(child.output.toString().includes('NOT OK'));

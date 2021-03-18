@@ -24,8 +24,15 @@ custom:
         version: 'v1'
         visibility: 'PRIVATE'
         backend:
-          http:
-            baseUrl: 'https://baseUrl'
+          jms:
+            destination: 'MY.JMS.TOPIC'
+            parameters:
+              java.naming.provider.url: 'tcp://my-jms-server:61616'
+              java.naming.factory.initial: 'org.apache.activemq.jndi.ActiveMQInitialContextFactory'
+              transport.jms.ConnectionFactoryJNDIName: 'TopicConnectionFactory'
+              java.naming.security.principal: 'jndi-user'
+              java.naming.security.credentials: 'jndi-pass'
+              transport.jms.ContentTypeProperty: 'Content-Type'
         maxTps: 10
         tags:
           - ${env:TEST_ID}-1

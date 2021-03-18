@@ -6,8 +6,9 @@ plugins:
   modules:
     - src
 
-############################################################################
-# -- START HERE : Modify the plugin configuration to suit the test case -- #
+#⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇ Modify the configuration below to suit your test case.
+#⬇⬇⬇ START HERE ⬇⬇⬇⬇ Help: https://github.com/ramgrandhi/serverless-wso2-apim#configuration-reference
+#⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇ For a full list of env vars that you can use, refer `src/__tests__/e2e/e2e.test.js`
 custom:
   wso2apim:
     enabled: true
@@ -17,17 +18,17 @@ custom:
     pass: ${env:WSO2_PASS}
     gatewayEnv: ${env:WSO2_ENV}
     apidefs:
-      - name: ${env:TEST_ID}
-        description: ${env:TEST_ID}
-        rootContext: /${env:TEST_ID}
+      - name: ${env:TEST_ID}-1
+        description: ${env:TEST_ID}-1
+        rootContext: /${env:TEST_ID}-1
         version: 'v1'
-        visibility: 'PUBLIC'
+        visibility: 'PRIVATE'
         backend:
           http:
             baseUrl: 'https://baseUrl'
         maxTps: 10
         tags:
-          - ${env:TEST_ID}
+          - ${env:TEST_ID}-1
         swaggerSpec:
           swagger: '2.0'
           pathssssssssssssssssssssssssssssssssssssssssssssss:
