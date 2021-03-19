@@ -4,18 +4,16 @@ const utils = require('./utils/utils');
 const axios = require('axios');
 const https = require('https');
 const fs = require('fs');
-const splitca = require('split-ca');
-const { SSL_OP_EPHEMERAL_RSA } = require('constants');
 const pluginNameSuffix = '[serverless-wso2-apim] ';
 
 const wso2ApimVersionsSupported = ['2.6.0', '3.2.0'];
 const versionSlugsSupported = {
-	"2.6.0": {
-		"versionSlug": "v0.14"
-	},
-	"3.2.0": {
-		"versionSlug": "v1.2"
-	}
+  '2.6.0': {
+    'versionSlug': 'v0.14'
+  },
+  '3.2.0': {
+    'versionSlug': 'v1.2'
+  }
 };
 
 class Serverless_WSO2_APIM {
@@ -109,7 +107,6 @@ class Serverless_WSO2_APIM {
 
   async splitCertChain(certChainContent) {
     const split = '\n';
-    const encoding = 'utf8';
     let chain = certChainContent;
 
     var certs = [];
@@ -154,13 +151,13 @@ class Serverless_WSO2_APIM {
         (wso2APIM.apidefs.length > 0)
       ];
       const messagesArray = [
-        "Invalid value assigned to `custom.wso2apim.enabled`",
-        "Invalid value assigned to `custom.wso2apim.host`",
-        "Invalid value assigned to `custom.wso2apim.port`",
-        "Invalid value assigned to `custom.wso2apim.user`",
-        "Invalid value assigned to `custom.wso2apim.pass`",
-        "Invalid value assigned to `custom.wso2apim.gatewayEnv`",
-        "No API definitions supplied `custom.wso2apim.apidefs`",
+        'Invalid value assigned to `custom.wso2apim.enabled`',
+        'Invalid value assigned to `custom.wso2apim.host`',
+        'Invalid value assigned to `custom.wso2apim.port`',
+        'Invalid value assigned to `custom.wso2apim.user`',
+        'Invalid value assigned to `custom.wso2apim.pass`',
+        'Invalid value assigned to `custom.wso2apim.gatewayEnv`',
+        'No API definitions supplied `custom.wso2apim.apidefs`',
       ];
 
       if (conditionsArray.indexOf(false) !== -1) {
@@ -200,7 +197,7 @@ class Serverless_WSO2_APIM {
 
   async detectProductVersion() {
     const wso2APIM = this.serverless.service.custom.wso2apim;
-    let url = "https://" + wso2APIM.host + ":" + wso2APIM.port + "/services/Version";
+    let url = 'https://' + wso2APIM.host + ':' + wso2APIM.port + '/services/Version';
     let config = {
       httpsAgent: new https.Agent({
         rejectUnauthorized: false
@@ -342,7 +339,6 @@ class Serverless_WSO2_APIM {
             apiContext: apiDef.rootContext,
             apiStatus: apiStatus,
             apiId,
-            apiId,
             invokableAPIURL: invokableAPIURL + ' 🚀 ',
           });
         } else {
@@ -445,7 +441,7 @@ class Serverless_WSO2_APIM {
     const slsDir = this.serverless.config.servicePath + '/.serverless';
     try {
       // Loops thru each api definition found in serverless configuration
-      for (const [i, apiDef] of apiDefs.entries()) {
+      for (const [, apiDef] of apiDefs.entries()) {
         if (apiDef.backend.http && apiDef.backend.http.certChain) {
           this.serverless.cli.log(
             pluginNameSuffix +
@@ -564,7 +560,7 @@ class Serverless_WSO2_APIM {
           //Update
           if (api.apiId !== undefined) {
             // this.serverless.cli.log(pluginNameSuffix + "Updating " + api.apiName + " (" + api.apiId + ")..");
-            const data = await wso2apim.updateAPIDef(
+            await wso2apim.updateAPIDef(
               wso2APIM,
               this.cache.accessToken,
               apiDefs[i],
@@ -582,7 +578,7 @@ class Serverless_WSO2_APIM {
           //Create
           else {
             // this.serverless.cli.log(pluginNameSuffix + "Creating " + api.apiName + "".."");
-            const data = await wso2apim.createAPIDef(
+            await wso2apim.createAPIDef(
               wso2APIM,
               this.cache.accessToken,
               apiDefs[i]
@@ -614,7 +610,7 @@ class Serverless_WSO2_APIM {
             } else if (api.apiStatus === 'PUBLISHED') {
               // this.serverless.cli.log(pluginNameSuffix + "Re-publishing " + api.apiName + " (" + api.apiId + ")..");
             }
-            const data = await wso2apim.publishAPIDef(
+            await wso2apim.publishAPIDef(
               wso2APIM,
               this.cache.accessToken,
               api.apiId
@@ -651,7 +647,6 @@ class Serverless_WSO2_APIM {
 
   async removeAPIDefsAndCerts() {
     const wso2APIM = this.serverless.service.custom.wso2apim;
-    const apiDefs = wso2APIM.apidefs;
 
     try {
       // By calling listAPIDefs(), we are re-collecting the current deployment status in WSO2 API Manager
@@ -664,7 +659,7 @@ class Serverless_WSO2_APIM {
         try {
           if (api.apiId) {
             // this.serverless.cli.log(pluginNameSuffix + "Deleting " + api.apiId + "..");
-            const data = await wso2apim.removeAPIDef(
+            await wso2apim.removeAPIDef(
               wso2APIM,
               this.cache.accessToken,
               api.apiId
@@ -692,7 +687,7 @@ class Serverless_WSO2_APIM {
                   certAlias = api.apiName + '___' + api.apiVersion + '___' + j;
                 }
 
-                const data = await wso2apim.removeCert(
+                await wso2apim.removeCert(
                   this.cache.accessToken,
                   certAlias
                 );

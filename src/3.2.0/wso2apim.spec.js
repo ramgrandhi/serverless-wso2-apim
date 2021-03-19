@@ -15,7 +15,6 @@ const {
 } = require('./wso2apim');
 const axios = require('axios');
 const qs = require('qs');
-const https = require('https');
 
 afterEach(() => {
   jest.clearAllMocks();
@@ -52,21 +51,21 @@ const wso2APIM = {
       tags: [ 'awesomeness', 'myawesomeapi'],
       maxTps: 999,
       swaggerSpec: {
-        "openapi": "3.0.0",
-        "info": {
-          "title": "MyAwesomeAPI",
-          "version": "v1",
-          "contact": {
-            "name": "MyTeam",
-            "email": "myteam@myteam.com"
+        'openapi': '3.0.0',
+        'info': {
+          'title': 'MyAwesomeAPI',
+          'version': 'v1',
+          'contact': {
+            'name': 'MyTeam',
+            'email': 'myteam@myteam.com'
           }
         },
-        "paths": {
-          "/*": {
-            "post": {
-              "responses": {
-                "201": {
-                  "description": "Created"
+        'paths': {
+          '/*': {
+            'post': {
+              'responses': {
+                '201': {
+                  'description': 'Created'
                 }
               }
             }
@@ -95,7 +94,7 @@ describe('wso2apim-3.2.0', () => {
       const response = await registerClient(wso2APIM);
 
       expect(axios.post).toHaveBeenCalledWith(
-        "https://" + wso2APIM.host + ":" + wso2APIM.port + "/client-registration/" + "v0.17" + "/register",
+        'https://' + wso2APIM.host + ':' + wso2APIM.port + '/client-registration/' + 'v0.17' + '/register',
         {
           clientName: 'serverless-wso2-apim',
           owner: wso2APIM.user,
@@ -134,7 +133,7 @@ describe('wso2apim-3.2.0', () => {
       const response = await generateToken(wso2APIM, 'foo123', 'xxxyyyzzz');
 
       expect(axios.post).toHaveBeenCalledWith(
-        "https://" + wso2APIM.host + ":" + wso2APIM.port + "/oauth2/token",
+        'https://' + wso2APIM.host + ':' + wso2APIM.port + '/oauth2/token',
         qs.stringify({
           'grant_type': 'password',
           'username': wso2APIM.user,
@@ -164,7 +163,7 @@ describe('wso2apim-3.2.0', () => {
       const response = await isAPIDeployed(wso2APIM, 'xxx', wso2APIM.apidefs[0].name, wso2APIM.apidefs[0].version, wso2APIM.apidefs[0].rootContext);
 
       expect(axios.get).toHaveBeenCalledWith(
-        "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/publisher/" + wso2APIM.versionSlug + "/apis" + "?" + "query=name:" + wso2APIM.apidefs[0].name + " version:" + wso2APIM.apidefs[0].version + " context:" + wso2APIM.apidefs[0].rootContext,
+        'https://' + wso2APIM.host + ':' + wso2APIM.port + '/api/am/publisher/' + wso2APIM.versionSlug + '/apis' + '?' + 'query=name:' + wso2APIM.apidefs[0].name + ' version:' + wso2APIM.apidefs[0].version + ' context:' + wso2APIM.apidefs[0].rootContext,
         {
           headers: {
             Authorization: 'Bearer xxx',
@@ -192,7 +191,7 @@ describe('wso2apim-3.2.0', () => {
       const response = await isCertUploaded(wso2APIM, 'xxx', 'alias');
 
       expect(axios.get).toHaveBeenCalledWith(
-        "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/publisher/" + wso2APIM.versionSlug + "/certificates/alias",
+        'https://' + wso2APIM.host + ':' + wso2APIM.port + '/api/am/publisher/' + wso2APIM.versionSlug + '/certificates/alias',
         {
           headers: {
             Authorization: 'Bearer xxx',
@@ -234,7 +233,7 @@ describe('wso2apim-3.2.0', () => {
       );
 
       expect(axios.post).toHaveBeenCalledWith(
-        "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/publisher/" + wso2APIM.versionSlug + "/apis?openAPIVersion=V3",
+        'https://' + wso2APIM.host + ':' + wso2APIM.port + '/api/am/publisher/' + wso2APIM.versionSlug + '/apis?openAPIVersion=V3',
         expect.objectContaining({}),
         {
           headers: {
@@ -273,7 +272,7 @@ describe('wso2apim-3.2.0', () => {
       );
 
       expect(axios.post).toHaveBeenCalledWith(
-        "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/publisher/" + wso2APIM.versionSlug + "/apis/change-lifecycle",
+        'https://' + wso2APIM.host + ':' + wso2APIM.port + '/api/am/publisher/' + wso2APIM.versionSlug + '/apis/change-lifecycle',
         expect.objectContaining({}),
         {
           headers: {
@@ -310,7 +309,7 @@ describe('wso2apim-3.2.0', () => {
       );
 
       expect(axios.get).toHaveBeenCalledWith(
-        "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/store/" + wso2APIM.versionSlug + "/apis/" + apiId,
+        'https://' + wso2APIM.host + ':' + wso2APIM.port + '/api/am/store/' + wso2APIM.versionSlug + '/apis/' + apiId,
         {
           headers: {
             Authorization: 'Bearer xxx'
@@ -368,7 +367,7 @@ describe('wso2apim-3.2.0', () => {
       );
 
       expect(axios.put).toHaveBeenCalledWith(
-        "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/publisher/" + wso2APIM.versionSlug + "/apis/" + apiId,
+        'https://' + wso2APIM.host + ':' + wso2APIM.port + '/api/am/publisher/' + wso2APIM.versionSlug + '/apis/' + apiId,
         expect.objectContaining({}),
         {
           headers: {
@@ -401,13 +400,13 @@ describe('wso2apim-3.2.0', () => {
       );
 
       expect(axios.delete).toHaveBeenCalledWith(
-        "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/publisher/" + wso2APIM.versionSlug + "/apis/" + apiId,
+        'https://' + wso2APIM.host + ':' + wso2APIM.port + '/api/am/publisher/' + wso2APIM.versionSlug + '/apis/' + apiId,
         {
           headers: {
             Authorization: 'Bearer xxx',
-        },
-        httpsAgent: expect.objectContaining({}),
-      });
+          },
+          httpsAgent: expect.objectContaining({}),
+        });
       expect(response).toEqual('foo');
     });
 
@@ -431,13 +430,13 @@ describe('wso2apim-3.2.0', () => {
       );
 
       expect(axios.delete).toHaveBeenCalledWith(
-        "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/publisher/" + wso2APIM.versionSlug + "/certificates/alias",
+        'https://' + wso2APIM.host + ':' + wso2APIM.port + '/api/am/publisher/' + wso2APIM.versionSlug + '/certificates/alias',
         {
           headers: {
             Authorization: 'Bearer xxx',
-        },
-        httpsAgent: expect.objectContaining({}),
-      });
+          },
+          httpsAgent: expect.objectContaining({}),
+        });
       expect(response.data).toEqual('foo');
     });
 
@@ -463,7 +462,7 @@ describe('wso2apim-3.2.0', () => {
       );
 
       expect(axios.put).toHaveBeenCalledWith(
-        "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/publisher/" + wso2APIM.versionSlug + "/endpoint-certificates/alias",
+        'https://' + wso2APIM.host + ':' + wso2APIM.port + '/api/am/publisher/' + wso2APIM.versionSlug + '/endpoint-certificates/alias',
         expect.objectContaining({}),
         {
           headers: {
@@ -496,7 +495,7 @@ describe('wso2apim-3.2.0', () => {
       );
 
       expect(axios.get).toHaveBeenCalledWith(
-        "https://" + wso2APIM.host + ":" + wso2APIM.port + "/api/am/publisher/" + wso2APIM.versionSlug + "/certificates/alias",
+        'https://' + wso2APIM.host + ':' + wso2APIM.port + '/api/am/publisher/' + wso2APIM.versionSlug + '/certificates/alias',
         {
           headers: {
             Authorization: 'Bearer xxx',
