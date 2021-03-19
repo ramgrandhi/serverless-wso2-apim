@@ -255,9 +255,7 @@ async function constructAPIOperations(apiDef) {
 
   // Traverse through paths
   for (var pathObj in swaggerObj.paths) {
-    // if (swaggerObj.paths.hasOwnProperty(pathObj)) {
     if (Object.prototype.hasOwnProperty.call(swaggerObj.paths, pathObj)) {
-      // console.log(swaggerObj.paths[pathObj]);
       // Traverse through verbs
       for (var verbObj in swaggerObj.paths[pathObj]) {
         // Traverse through verb properties
