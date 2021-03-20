@@ -64,7 +64,7 @@ async function generateToken(wso2APIM, clientId, clientSecret) {
   try {
     let url = `https://${wso2APIM.host}:${wso2APIM.port}/oauth2/token`;
     let { user, pass } = wso2APIM;
-    let scope = 'apim:api_create apim:api_publish apim:api_view apim:subscribe apim:tier_view apim:tier_manage apim:subscription_view apim:subscription_block';
+    let scope = 'apim:api_create apim:api_view apim:api_publish apim:api_delete';
     let authToken = clientId + ':' + clientSecret;
     let authTokenBase64 = Buffer.from(authToken).toString('base64');
     var data = qs.stringify({
@@ -150,7 +150,7 @@ async function isCertUploaded(wso2APIM, accessToken, certAlias) {
         })
         .catch((err) => {
           // Ignore Certificate-not-found-for-that-Alias error gracefully
-          if (err.response.data.code != '404') {
+          if (err.responseCode != '404') {
             utils.renderError(err);
           }
           reject(err);
@@ -503,7 +503,7 @@ async function removeCert(wso2APIM, accessToken, certAlias) {
         })
         .catch((err) => {
           // Ignore Certificate-not-found-for-that-Alias error gracefully
-          if (err.response.data.code != '404') {
+          if (err.response.status != '404') {
             utils.renderError(err);
           }
           reject(err);
