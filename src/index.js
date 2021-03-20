@@ -142,7 +142,7 @@ class Serverless_WSO2_APIM {
 
       // Key value checks, with corresponding error messages
       const conditionsArray = [
-        ((wso2APIM.enabled) && ([true, false].includes(wso2APIM.enabled))),
+        ((wso2APIM.enabled) && (typeof wso2APIM.enabled === 'boolean')),
         ((wso2APIM.host) && (wso2APIM.host.length > 0)),
         ((wso2APIM.port) && (wso2APIM.port > 0)),
         ((wso2APIM.user) && (wso2APIM.user.length > 0)),
