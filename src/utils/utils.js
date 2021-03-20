@@ -17,9 +17,7 @@ function renderError(err) {
     }
   }
   else {
-    console.log ({
-      error: err.message
-    });
+    console.log(err);
   }
 }
 
