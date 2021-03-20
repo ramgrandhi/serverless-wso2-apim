@@ -12,7 +12,7 @@ serverless-wso2-apim
     <img src="https://img.shields.io/npm/dm/serverless-wso2-apim.svg?style=flat-square">
   </a>
   <a href="https://www.npmjs.com/package/serverless-wso2-apim">
-    <img src="http://hits.dwyl.com/ramgrandhi/serverless-wso2-apim.svg">
+    <img src="https://views.whatilearened.today/views/github/ramgrandhi/serverless-wso2-apim.svg">
   </a>
   <a href="https://opensource.org/licenses/MIT">
     <img src="https://img.shields.io/npm/l/serverless-wso2-apim.svg?style=flat-square">
