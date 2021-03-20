@@ -24,10 +24,24 @@ class Serverless_WSO2_APIM {
     this.options = options;
     this.cmd = this.serverless.pluginManager.cliCommands.join('|');
 
+    this.commands = {
+      remove: {
+        commands: {
+          apidefs: {
+            usage: 'Deletes API definitions in WSO2 API Manager.',
+            lifecycleEvents: [
+              'removeAPIDefsAndCerts'
+            ],
+          },
+        }
+      }
+    };
+
     this.hooks = {
       'after:deploy:deploy': this.deploy.bind(this),
       'after:info:info': this.info.bind(this),
       'after:remove:remove': this.remove.bind(this),
+      'remove:apidefs:removeAPIDefsAndCerts': this.remove.bind(this)
     };
   }
 
@@ -688,6 +702,7 @@ class Serverless_WSO2_APIM {
                 }
 
                 await wso2apim.removeCert(
+                  wso2APIM,
                   this.cache.accessToken,
                   certAlias
                 );
@@ -701,7 +716,7 @@ class Serverless_WSO2_APIM {
                 );
               } catch (err) {
                 // Ignore Certificate-not-found-for-that-Alias error gracefully
-                if (err.response.data && err.response.data.code != '404') {
+                if ((err.response.data && err.response.data.code != '404') || (err.response.status != '404')) {
                   this.serverless.cli.log(
                     pluginNameSuffix +
                       'Deleting certificate #' +
