@@ -30,7 +30,7 @@ class Serverless_WSO2_APIM {
           apidefs: {
             usage: 'Deletes API definitions in WSO2 API Manager.',
             lifecycleEvents: [
-              'removeAPIDefsAndCerts'
+              'removeAPIDefs'
             ],
           },
         }
@@ -41,7 +41,7 @@ class Serverless_WSO2_APIM {
       'after:deploy:deploy': this.deploy.bind(this),
       'after:info:info': this.info.bind(this),
       'after:remove:remove': this.remove.bind(this),
-      'remove:apidefs:removeAPIDefsAndCerts': this.remove.bind(this)
+      'remove:apidefs:removeAPIDefs': this.remove.bind(this)
     };
   }
 
