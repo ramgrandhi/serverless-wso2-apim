@@ -1,6 +1,6 @@
 {
   "name": "serverless-wso2-apim",
-  "version": "0.4.2",
+  "version": "0.5.0",
   "description": "Serverless Framework plugin for WSO2 API Manager",
   "main": "src/index.js",
   "scripts": {
@@ -9,10 +9,10 @@
     "test:unit": "jest \"^(.*/)*(.*\\.)*(spec)\\.js$\" --verbose --collectCoverage",
     "test:e2e": "jest e2e --verbose",
     "test": "jest",
-    "release:alpha": "release --skip-questions pre alpha",
-    "release:patch": "release --skip-questions patch",
-    "release:minor": "release --skip-questions minor",
-    "release:major": "release --skip-questions major"
+    "release:alpha": "release pre alpha --skip-questions",
+    "release:patch": "release patch --skip-questions",
+    "release:minor": "release minor --skip-questions",
+    "release:major": "release major --skip-questions"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
