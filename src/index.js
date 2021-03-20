@@ -197,7 +197,7 @@ class Serverless_WSO2_APIM {
 
   async detectProductVersion() {
     const wso2APIM = this.serverless.service.custom.wso2apim;
-    let url = 'https://' + wso2APIM.host + ':' + wso2APIM.port + '/services/Version';
+    let url = `https://${wso2APIM.host}:${wso2APIM.port}/services/Version`;
     let config = {
       httpsAgent: new https.Agent({
         rejectUnauthorized: false

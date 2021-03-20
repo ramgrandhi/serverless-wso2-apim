@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "test:unit": "jest \"^(.*/)*(.*\\.)*(spec)\\.js$\" --verbose",
+    "test:unit": "jest \"^(.*/)*(.*\\.)*(spec)\\.js$\" --verbose --collectCoverage",
     "test:e2e": "jest e2e --verbose",
     "test": "jest",
     "release:alpha": "release pre alpha",
