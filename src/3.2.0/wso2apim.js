@@ -165,7 +165,7 @@ async function isCertUploaded(wso2APIM, accessToken, certAlias) {
 async function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
   try {
     // Construct backend-specific parameters
-    var backendBaseUrl, backendType;
+    let backendBaseUrl, backendType;
     // 1. HTTP-based backend
     if (apiDef.backend.http) {
       if (apiDef.backend.http.baseUrl) {
