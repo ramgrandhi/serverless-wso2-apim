@@ -9,10 +9,10 @@
     "test:unit": "jest \"^(.*/)*(.*\\.)*(spec)\\.js$\" --verbose --collectCoverage",
     "test:e2e": "jest e2e --verbose",
     "test": "jest",
-    "release:alpha": "release pre alpha",
-    "release:patch": "release patch",
-    "release:minor": "release minor",
-    "release:major": "release major"
+    "release:alpha": "release --skip-questions pre alpha",
+    "release:patch": "release --skip-questions patch",
+    "release:minor": "release --skip-questions minor",
+    "release:major": "release --skip-questions major"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
