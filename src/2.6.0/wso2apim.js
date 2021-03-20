@@ -194,7 +194,7 @@ function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
     }
 
     const wso2ApiDefinition = {
-      id: (apiId) ? apiId: undefined,
+      id: apiId,
       name: apiDef.name,
       description: apiDef.description,
       context: apiDef.rootContext,

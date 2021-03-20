@@ -1,4 +1,5 @@
 const fs = require('fs');
+const chalk = require('chalk');
 const { spawnSync } = require('child_process');
 
 describe('E2E on WSO2 API Manager 2.6.0', () => {
@@ -26,16 +27,16 @@ describe('E2E on WSO2 API Manager 2.6.0', () => {
           }
         );
 
-        console.log('\x1b[43m\x1b[30m%s\x1b[0m%s', '🧪 ' + dir, '\n' + child.output.toString());
-
         if (dir.split('-')[0] === 'valid') {
+          console.log(chalk.whiteBright.bgGreen('🧪 ' + dir));
           expect(child.status).toBe(0);
           expect(child.output.toString()).toEqual(expect.not.stringContaining('NOT OK'));
         }
         else if (dir.split('-')[0] === 'invalid') {
+          console.log(chalk.whiteBright.bgRed('🧪 ' + dir));
           expect(child.output.toString().includes('NOT OK'));
         }
-
+        console.log(child.output.toString());
       });
     }
   });
@@ -63,14 +64,16 @@ describe('E2E on WSO2 API Manager 3.2.0', () => {
           }
         );
 
-        console.log('\x1b[43m\x1b[30m%s\x1b[0m%s', '🧪 ' + dir, '\n' + child.output.toString());
-
         if (dir.split('-')[0] === 'valid') {
+          console.log(chalk.whiteBright.bgGreen('🧪 ' + dir));
           expect(child.status).toBe(0);
+          expect(child.output.toString()).toEqual(expect.not.stringContaining('NOT OK'));
         }
         else if (dir.split('-')[0] === 'invalid') {
+          console.log(chalk.whiteBright.bgRed('🧪 ' + dir));
           expect(child.output.toString().includes('NOT OK'));
         }
+        console.log(child.output.toString());
       });
     }
   });
