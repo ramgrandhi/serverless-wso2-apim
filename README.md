@@ -6,18 +6,23 @@ serverless-wso2-apim
     <img src="http://public.serverless.com/badges/v3.svg">
   </a>
   <a href="https://www.npmjs.com/package/serverless-wso2-apim">
-    <img src="https://img.shields.io/npm/v/serverless-wso2-apim?style=flat-square">
+    <img src="https://img.shields.io/npm/v/serverless-wso2-apim">
   </a>
   <a href="https://www.npmjs.com/package/serverless-wso2-apim">
-    <img src="https://img.shields.io/npm/dm/serverless-wso2-apim.svg?style=flat-square">
+    <img src="https://img.shields.io/npm/dt/serverless-wso2-apim.svg">
   </a>
   <a href="https://www.npmjs.com/package/serverless-wso2-apim">
     <img src="https://views.whatilearened.today/views/github/ramgrandhi/serverless-wso2-apim.svg">
   </a>
   <a href="https://opensource.org/licenses/MIT">
-    <img src="https://img.shields.io/npm/l/serverless-wso2-apim.svg?style=flat-square">
+    <img src="https://img.shields.io/npm/l/serverless-wso2-apim.svg">
   </a>
-  <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square">
+  <a href="https://github.com/ramgrandhi/serverless-wso2-apim/fork">
+    <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg">
+  </a>
+  <a href="https://github.com/ramgrandhi/serverless-wso2-apim/stargazers">
+    <img src="https://img.shields.io/github/stars/ramgrandhi/serverless-wso2-apim?style=social">
+  </a>
 </p>
 
 
