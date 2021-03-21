@@ -20,6 +20,9 @@ serverless-wso2-apim
   <a href="https://github.com/ramgrandhi/serverless-wso2-apim/fork">
     <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg">
   </a>
+  <a href="https://github.com/ramgrandhi/serverless-wso2-apim/graphs/contributors">
+    <img src = "https://img.shields.io/github/contributors/ramgrandhi/serverless-wso2-apim">
+  </a>
   <a href="https://github.com/ramgrandhi/serverless-wso2-apim/stargazers">
     <img src="https://img.shields.io/github/stars/ramgrandhi/serverless-wso2-apim?style=social">
   </a>
