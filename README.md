@@ -69,12 +69,12 @@ or
   ```yml
   custom:
     wso2apim:
-      enabled: false
+      enabled: true
       host: 'wso2-apimanager.com'
       port: 443
       user: 'user@tenant'
-      pass: 'pass'
-      gatewayEnv: 'Production'
+      pass: 'password'
+      gatewayEnv: 'Production and Sandbox'
   ```
 
 - Add one or more API definitions to your Serverless configuration, as below. 
@@ -125,8 +125,7 @@ or
 | `port` | WSO2 API Manager Port | `443` |
 | `user` | Username with an optional tenant symbol. | `user@tenant` |
 | `pass` | Password, supports [Serverless Variables](https://www.serverless.com/framework/docs/providers/aws/guide/variables/) syntax.| `xxx` |
-| `gatewayEnv` | Target gateway environment, as configured in your WSO2 installation. | `Production` |
-
+| `gatewayEnv` | Target gateway environment, as configured in your WSO2 installation. | `Production and Sandbox` |
 <br>
 
 > ### **`custom.wso2apim.apidefs.<Your-API>.*`**
@@ -154,7 +153,7 @@ or
 ---
 ## 💡Tip : Organize your project files efficiently.
 
-You can spread the configuration across multiple files, so you can manage it better. Bonus, you can use linters and validators effectively.
+You can spread the configuration across multiple files, so you can manage it better. Bonus, you can use linters and validators effectively on your swaggerSpec.
 
   **`serverless.yml:`** 
   ```yml
