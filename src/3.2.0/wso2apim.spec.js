@@ -138,7 +138,7 @@ describe('wso2apim-3.2.0', () => {
           'grant_type': 'password',
           'username': wso2APIM.user,
           'password': wso2APIM.pass,
-          'scope': 'apim:api_create apim:api_publish apim:api_view apim:subscribe apim:tier_view apim:tier_manage apim:subscription_view apim:subscription_block'
+          'scope': 'apim:api_create apim:api_view apim:api_publish apim:api_delete'
         }),
         expect.objectContaining({})
       );
