@@ -1,10 +1,13 @@
 service: serverless-wso2-apim
 provider:
   name: aws
+  stackName: ${env:STACK_NAME}
+  deploymentBucket:
+    name: ${env:TEST_ID_NORMALIZED}
 plugins:
-  localPath: '../../../../../'
-  modules:
-    - src
+  - serverless-localstack
+  - serverless-deployment-bucket
+  - '../../../../src'
 
 #⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇ Modify the configuration below to suit your test case.
 #⬇⬇⬇ START HERE ⬇⬇⬇⬇ Help: https://github.com/ramgrandhi/serverless-wso2-apim#configuration-reference
@@ -70,3 +73,10 @@ custom:
                   "201":
                     description: Created
                 x-auth-type: 'None'
+
+# Optionally, add your other AWS provider-specific resources below. 
+# Make sure there is at least one resource listed below, otherwise stack deployment would fail.
+resources:
+  Resources:
+    Topic:
+      Type: AWS::SNS::Topic
