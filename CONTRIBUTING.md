@@ -25,15 +25,15 @@ Just follow these simple steps.
 # Troubleshooting
 If you run into issues running above scripts then you may try these steps individually.
 
-a. Run the docker image of **WSO2 API Manager 2.6.0**.  
+a. Start the following docker containers separately in multiple terminals.
 
-> `docker run -it --name api-manager-260 -p 127.0.0.1:8260:8243 -p 127.0.0.1:9260:9443 --rm wso2/wso2am:2.6.0`
+> `docker run --name api-manager-260 -p 127.0.0.1:8260:8243 -p 127.0.0.1:9260:9443 --rm wso2/wso2am:2.6.0`
 
-b. Run the docker image of **WSO2 API Manager 3.2.0**.  
+> `docker run --name api-manager-320 -p 127.0.0.1:8320:8243 -p 127.0.0.1:9320:9443 --rm wso2/wso2am:3.2.0`
 
-> `docker run -it --name api-manager-320 -p 127.0.0.1:8320:8243 -p 127.0.0.1:9320:9443 --rm wso2/wso2am:3.2.0`
+> `docker run --name localstack -p 127.0.0.1:4566:4566 -p 127.0.0.1:4571:4571 --rm localstack/localstack`
 
-c. Start regression tests.
+b. Start regression tests.
     
 > `yarn test:e2e`
 

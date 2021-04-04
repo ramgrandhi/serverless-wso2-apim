@@ -1,10 +1,13 @@
 service: serverless-wso2-apim
 provider:
   name: aws
+  stackName: ${env:STACK_NAME}
+  deploymentBucket:
+    name: ${env:TEST_ID_NORMALIZED}
 plugins:
-  localPath: '../../../../../'
-  modules:
-    - src
+  - serverless-localstack
+  - serverless-deployment-bucket
+  - '../../../../src'
 
 #⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇ Modify the configuration below to suit your test case.
 #⬇⬇⬇ START HERE ⬇⬇⬇⬇ Help: https://github.com/ramgrandhi/serverless-wso2-apim#configuration-reference
@@ -21,12 +24,18 @@ custom:
       - name: ${env:TEST_ID}-1
         description: ${env:TEST_ID}-1
         rootContext: /${env:TEST_ID}-1
-        version: 'v1'
+        version: '1'
         visibility: 'PRIVATE'
         backend:
-          http:
-            baseUrl: 'https://baseUrl'
-            certChain: 'file://cert.cer'
+          jms:
+            destination: 'MY.JMS.TOPIC'
+            parameters:
+              java.naming.provider.url: 'tcp://my-jms-server:61616'
+              java.naming.factory.initial: 'org.apache.activemq.jndi.ActiveMQInitialContextFactory'
+              transport.jms.ConnectionFactoryJNDIName: 'TopicConnectionFactory'
+              java.naming.security.principal: 'jndi-user'
+              java.naming.security.credentials: 'jndi-pass'
+              transport.jms.ContentTypeProperty: 'Content-Type'
         maxTps: 10
         tags:
           - ${env:TEST_ID}-1
@@ -34,7 +43,7 @@ custom:
           openapi: 3.0.0
           info:
             title: ${env:TEST_ID}-1
-            version: "v1"
+            version: "1"
             contact:
               name: ${env:TEST_ID}-1
               email: ${env:TEST_ID}-1
@@ -45,3 +54,10 @@ custom:
                   "201":
                     description: Created
                 x-auth-type: 'None'
+
+# Optionally, add your other AWS provider-specific resources below. 
+# Make sure there is at least one resource listed below, otherwise stack deployment would fail.
+resources:
+  Resources:
+    Topic:
+      Type: AWS::SNS::Topic
