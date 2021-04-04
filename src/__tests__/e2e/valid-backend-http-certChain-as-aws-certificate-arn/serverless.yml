@@ -24,12 +24,12 @@ custom:
       - name: ${env:TEST_ID}-1
         description: ${env:TEST_ID}-1
         rootContext: /${env:TEST_ID}-1
-        version: 'v1'
+        version: '1'
         visibility: 'PRIVATE'
         backend:
           http:
             baseUrl: 'https://baseUrl'
-            # certChain: 'file://cert.cer'
+            certChain: !ImportValue certificateArn
         maxTps: 10
         tags:
           - ${env:TEST_ID}-1
@@ -37,7 +37,7 @@ custom:
           openapi: 3.0.0
           info:
             title: ${env:TEST_ID}-1
-            version: "v1"
+            version: "1"
             contact:
               name: ${env:TEST_ID}-1
               email: ${env:TEST_ID}-1
@@ -55,3 +55,13 @@ resources:
   Resources:
     Topic:
       Type: AWS::SNS::Topic
+    MyCertificate:
+      Type: AWS::CertificateManager::Certificate
+      Properties:
+        DomainName: example.com
+        ValidationMethod: DNS
+  Outputs:
+    CertificateArn:
+      Export:
+        Name: certificateArn
+        Value: !Ref MyCertificate

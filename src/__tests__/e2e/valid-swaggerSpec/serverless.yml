@@ -50,7 +50,7 @@ custom:
       - name: ${env:TEST_ID}-2
         description: ${env:TEST_ID}-2
         rootContext: /${env:TEST_ID}-2
-        version: 'v1'
+        version: '1'
         visibility: 'PUBLIC'
         backend:
           http:
@@ -62,7 +62,7 @@ custom:
           openapi: 3.0.0
           info:
             title: ${env:TEST_ID}-2
-            version: "v1"
+            version: "1"
             contact:
               name: ${env:TEST_ID}-2
               email: ${env:TEST_ID}-2

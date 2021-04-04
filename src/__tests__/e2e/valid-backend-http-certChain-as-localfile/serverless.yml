@@ -24,7 +24,7 @@ custom:
       - name: ${env:TEST_ID}-1
         description: ${env:TEST_ID}-1
         rootContext: /${env:TEST_ID}-1
-        version: 'v1'
+        version: '1'
         visibility: 'PRIVATE'
         backend:
           http:
@@ -37,7 +37,7 @@ custom:
           openapi: 3.0.0
           info:
             title: ${env:TEST_ID}-1
-            version: "v1"
+            version: "1"
             contact:
               name: ${env:TEST_ID}-1
               email: ${env:TEST_ID}-1
