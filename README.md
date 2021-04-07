@@ -35,7 +35,7 @@ Serverless Framework plugin to manage APIs on [WSO2 API Manager](https://wso2.co
 ---
 
 ## Compatible with
-* serverlessˆ1.75
+* [Serverless Framework 1.75 and higher](https://www.serverless.com)
 * [WSO2 API Manager 2.6.0](https://docs.wso2.com/display/AM260/)
 * [WSO2 API Manager 3.2.0](https://apim.docs.wso2.com/en/3.2.0/) <img src="https://img.shields.io/badge/-New-yellow?style=flat-square">
 
