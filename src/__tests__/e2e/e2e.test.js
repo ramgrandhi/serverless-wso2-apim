@@ -19,7 +19,6 @@ describe('E2E on WSO2 API Manager', () => {
                 stdio: 'pipe',
                 encoding: 'utf-8',
                 env: {
-                  ...process.env,
                   TEST_ID_NORMALIZED: (testCase + '-' + wso2ApimVersion).toString().toLowerCase().split('-').join('.'),
                   STACK_NAME: (testCase + '-' + wso2ApimVersion).toString().split('.').join('-'),
                   WSO2_VER: wso2ApimVersion,
@@ -28,7 +27,8 @@ describe('E2E on WSO2 API Manager', () => {
                   WSO2_USER: 'admin',
                   WSO2_PASS: 'admin',
                   WSO2_ENV: 'Production and Sandbox',
-                  TEST_ID: testCase.split('-').map(a => a[0]).join('-')
+                  TEST_ID: testCase.split('-').map(a => a[0]).join('-'),
+                  ...process.env
                 }
               }
             );
@@ -50,7 +50,6 @@ describe('E2E on WSO2 API Manager', () => {
                 stdio: 'pipe',
                 encoding: 'utf-8',
                 env: {
-                  ...process.env,
                   TEST_ID_NORMALIZED: (testCase + '-' + wso2ApimVersion).toString().toLowerCase().split('-').join('.'),
                   STACK_NAME: (testCase + '-' + wso2ApimVersion).toString().split('.').join('-'),
                   WSO2_VER: wso2ApimVersion,
@@ -59,7 +58,8 @@ describe('E2E on WSO2 API Manager', () => {
                   WSO2_USER: 'admin',
                   WSO2_PASS: 'admin',
                   WSO2_ENV: 'Production and Sandbox',
-                  TEST_ID: testCase.split('-').map(a => a[0]).join('-')
+                  TEST_ID: testCase.split('-').map(a => a[0]).join('-'),
+                  ...process.env
                 }
               }
             );
