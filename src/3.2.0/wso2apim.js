@@ -222,7 +222,7 @@ async function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
         sandbox_endpoints: {
           url: backendBaseUrl
         },
-        endpoint_type: 'http'
+        endpoint_type: (apiDef.backend.endpointType) ? apiDef.backend.endpointType : 'http'
       },
       endpointImplementationType: 'ENDPOINT',
       endpointSecurity: null,

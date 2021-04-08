@@ -137,6 +137,7 @@ or
 | `description` | Free-form text | `My Awesome API` |
 | `visibility` |  Supports `PUBLIC` (Visible to everyone) and `PRIVATE` (Visible to current tenant) | `PUBLIC` |
 | `backend` | Supports `http` and `jms` backends. <br> Note: One API definition supports only one backend. |  |
+| `backend.endpointType` | Optional, defaults to `http`. If you are using a non standard WSO2 extension, you might want to be able to override this. | `http`, `jms`, `lambda` |
 | `backend.http.baseUrl` | Your HTTP backend base URL | `https://backend:port/123` |
 | `backend.http.certChain` | Optional, your backend certificate chain in PEM (base64) format. <br><br> It supports: <br> a. **File system** - Path must be relative to where `serverless.yml` is located. <br> b. **AWS Certificate ARN** <br> c. **AWS CloudFormation Export** - Exported value must contain a valid AWS Certificate ARN. | `file://certs/backend.cer` <br> (or) <br> `arn:aws:acm:..` <br> (or) <br> `!ImportValue xx` <br> (or) <br> `!Ref xx` |
 | `backend.jms.destination` | Your JMS Destination (queue or topic name) | `MY.BACKEND.TOPIC` |
