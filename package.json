@@ -8,7 +8,7 @@
     "lint:fix": "eslint . --fix",
     "test:unit": "jest \"^(.*/)*(.*\\.)*(spec)\\.js$\" --verbose --collectCoverage",
     "test:e2e:setup": "yarn test:e2e:destroy && concurrently \"yarn start:wso2-2.6.0\" \"yarn start:wso2-3.2.0\" \"yarn start:localstack\"",
-    "test:e2e": "jest e2e --verbose",
+    "test:e2e": "jest e2e --verbose --silent",
     "test:e2e:destroy": "yarn stop:wso2-2.6.0 && yarn stop:wso2-3.2.0 && yarn stop:localstack",
     "test": "yarn test:unit",
     "start:wso2-2.6.0": "docker run --name api-manager-260 -p 127.0.0.1:8260:8243 -p 127.0.0.1:9260:9443 --rm wso2/wso2am:2.6.0",

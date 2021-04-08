@@ -28,8 +28,7 @@ custom:
         visibility: 'PRIVATE'
         backend:
           http:
-            baseUrl: 'https://baseUrl'
-            certChain: !ImportValue certificateArn
+            baseUrl: !ImportValue ${env:TEST_ID}-httpUrl
         maxTps: 10
         tags:
           - ${env:TEST_ID}-1
@@ -55,13 +54,8 @@ resources:
   Resources:
     Topic:
       Type: AWS::SNS::Topic
-    MyCertificate:
-      Type: AWS::CertificateManager::Certificate
-      Properties:
-        DomainName: example.com
-        ValidationMethod: DNS
   Outputs:
-    CertificateArn:
+    HttpUrl:
+      Value: 'http://mybaseUrl.com'
       Export:
-        Name: certificateArn
-        Value: !Ref MyCertificate
+        Name: ${env:TEST_ID}-httpUrl

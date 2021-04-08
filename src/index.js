@@ -75,10 +75,11 @@ class Serverless_WSO2_APIM {
     ) {
       this.serverless.cli.log(
         pluginNameSuffix +
-          'Configuration is disabled globally, Skipping deployment.. OK'
+        'Configuration is disabled globally, Skipping deployment.. OK'
       );
       return;
     }
+    await this.resolveExternalRefs();
     await this.registerClient();
     await this.generateToken();
     await this.uploadCerts();
@@ -93,7 +94,7 @@ class Serverless_WSO2_APIM {
     ) {
       this.serverless.cli.log(
         pluginNameSuffix +
-          'Configuration is disabled globally, Skipping retrieval.. OK'
+        'Configuration is disabled globally, Skipping retrieval.. OK'
       );
       return;
     }
@@ -110,7 +111,7 @@ class Serverless_WSO2_APIM {
     ) {
       this.serverless.cli.log(
         pluginNameSuffix +
-          'Configuration is disabled globally, Skipping deletion.. OK'
+        'Configuration is disabled globally, Skipping deletion.. OK'
       );
       return;
     }
@@ -199,11 +200,44 @@ class Serverless_WSO2_APIM {
       this.serverless.cli.log(
         pluginNameSuffix + 'Validating configuration.. OK'
       );
-    } 
+    }
     catch (err) {
       utils.renderError(err);
       this.serverless.cli.log(
         pluginNameSuffix + 'Validating configuration.. NOT OK'
+      );
+      throw new Error(err);
+    }
+  }
+
+  async resolveExternalRefs() {
+    const wso2APIM = this.serverless.service.custom.wso2apim;
+    const apiDefs = wso2APIM.apidefs;
+
+    try {
+      // Loops thru each api definition found in serverless configuration
+      for (const [idx, apiDef] of apiDefs.entries()) {
+        // Resolving external references for.. backend.http.baseUrl
+        if (apiDef.backend.http && apiDef.backend.http.baseUrl) {
+          let baseUrl = apiDef.backend.http.baseUrl;
+          if (typeof baseUrl == 'object') {
+            // If baseUrl is obtained via Cloud Formation's intrinsic function syntax (!Ref or Fn::ImportValue)
+            if (baseUrl['Fn::ImportValue']) {
+              this.provider = this.serverless.getProvider('aws');
+              baseUrl = await utils.resolveCfImportValue(
+                this.provider,
+                baseUrl['Fn::ImportValue']
+              );
+              this.serverless.service.custom.wso2apim.apidefs[idx].backend.http.baseUrl = baseUrl;
+            }
+          }
+        }
+      }
+    }
+    catch (err) {
+      utils.renderError(err);
+      this.serverless.cli.log(
+        pluginNameSuffix + 'Resolving external references.. NOT OK'
       );
       throw new Error(err);
     }
@@ -340,7 +374,6 @@ class Serverless_WSO2_APIM {
               }
             }
           } catch (err) {
-            console.log(err);
             this.serverless.cli.log(
               pluginNameSuffix +
                 'An error occurred while retrieving Invokable API URL, proceeding further.'
@@ -366,7 +399,6 @@ class Serverless_WSO2_APIM {
           });
         }
       } catch (err) {
-        console.log(err);
         this.serverless.cli.log(
           pluginNameSuffix + 'Retrieving API Definitions.. NOT OK'
         );

@@ -137,11 +137,11 @@ or
 | `description` | Free-form text | `My Awesome API` |
 | `visibility` |  Supports `PUBLIC` (Visible to everyone) and `PRIVATE` (Visible to current tenant) | `PUBLIC` |
 | `backend` | Supports `http` and `jms` backends. <br> Note: One API definition supports only one backend. |  |
-| `backend.endpointType` | Optional, defaults to `http`. If you are using a non standard WSO2 extension, you might want to be able to override this. | `http`, `jms`, `lambda` |
-| `backend.http.baseUrl` | Your HTTP backend base URL | `https://backend:port/123` |
-| `backend.http.certChain` | Optional, your backend certificate chain in PEM (base64) format. <br><br> It supports: <br> a. **File system** - Path must be relative to where `serverless.yml` is located. <br> b. **AWS Certificate ARN** <br> c. **AWS CloudFormation Export** - Exported value must contain a valid AWS Certificate ARN. | `file://certs/backend.cer` <br> (or) <br> `arn:aws:acm:..` <br> (or) <br> `!ImportValue xx` <br> (or) <br> `!Ref xx` |
+| `backend.http.baseUrl` | Your HTTP backend base URL. <br><br> It supports: <br> a. **URL** - Any valid HTTP URL. <br> b. **AWS CloudFormation Export** - Exported value must contain a valid HTTP URL. | `https://backend:port/123` <br> (or) <br> `!ImportValue xx` |
+| `backend.http.certChain` | Optional, your backend certificate chain in PEM (base64) format. <br><br> It supports: <br> a. **File system** - Path must be relative to where `serverless.yml` is located. <br> b. **AWS Certificate ARN** <br> c. **AWS CloudFormation Export** - Exported value must contain a valid AWS Certificate ARN. | `file://certs/backend.cer` <br> (or) <br> `arn:aws:acm:..` <br> (or) <br> `!ImportValue xx` |
 | `backend.jms.destination` | Your JMS Destination (queue or topic name) | `MY.BACKEND.TOPIC` |
 | `backend.jms.parameters` | List of JMS connection parameters to be used in `key`:`value` form as described [here](https://axis.apache.org/axis2/java/transports/jms.html). | `transport.jms.ConnectionFactory: 'My-ConnectionFactory'`|
+| `backend.endpointType` | Optional, defaults to `http`. If you are using a non standard WSO2 extension, you might want to be able to override this. | `http`, `jms`, `lambda` |
 | `mediationPolicies` | Optional, your choice of mediation policies (or) sequences. They can manipulate input/output/fault messages as described [here](https://docs.wso2.com/display/AM260/Adding+Mediation+Extensions). | |
 | `mediationPolicies.in` | Input mediation policy, it manipulates the request going to your backend. | `log_in_message` |
 | `mediationPolicies.out` | Output mediation policy, it manipulates the response going back to your API consumer. | `json_validator` |
