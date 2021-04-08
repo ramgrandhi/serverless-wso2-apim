@@ -221,7 +221,7 @@ function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
           url: backendBaseUrl,
           config: null
         },
-        endpoint_type: 'http'
+        endpoint_type: (apiDef.backend.endpointType) ? apiDef.backend.endpointType : 'http'
       }),
       endpointSecurity: null,
       gatewayEnvironments: gatewayEnv,
