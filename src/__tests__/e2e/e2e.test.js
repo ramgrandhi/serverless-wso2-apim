@@ -10,7 +10,7 @@ describe('E2E on WSO2 API Manager', () => {
     fs.readdirSync('src/__tests__/e2e').forEach(testCase => {
       if (fs.statSync(`src/__tests__/e2e/${testCase}`).isDirectory()) {
         // however, if a specific testCase name(s) are passed as parameters then it executes those selectively
-        if (((process.argv.length > 4) && (process.argv.includes(testCase))) || (process.argv.length == 4)) {
+        if (((process.argv.length > 5) && (process.argv.includes(testCase))) || (process.argv.length == 5)) {
           it(`${wso2ApimVersion}/${testCase}`, () => {
             const procDeploy = spawnSync('sls',
               ['deploy'],
