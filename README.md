@@ -141,6 +141,7 @@ or
 | `backend.http.certChain` | Optional, your backend certificate chain in PEM (base64) format. <br><br> It supports: <br> a. **File system** - Path must be relative to where `serverless.yml` is located. <br> b. **AWS Certificate ARN** <br> c. **AWS CloudFormation Export** - Exported value must contain a valid AWS Certificate ARN. | `file://certs/backend.cer` <br> (or) <br> `arn:aws:acm:..` <br> (or) <br> `!ImportValue xx` |
 | `backend.jms.destination` | Your JMS Destination (queue or topic name) | `MY.BACKEND.TOPIC` |
 | `backend.jms.parameters` | List of JMS connection parameters to be used in `key`:`value` form as described [here](https://axis.apache.org/axis2/java/transports/jms.html). | `transport.jms.ConnectionFactory: 'My-ConnectionFactory'`|
+| `backend.endpointType` | Optional, defaults to `http`. If you are using a non standard WSO2 extension, you might want to be able to override this. | `http`, `jms`, `lambda` |
 | `mediationPolicies` | Optional, your choice of mediation policies (or) sequences. They can manipulate input/output/fault messages as described [here](https://docs.wso2.com/display/AM260/Adding+Mediation+Extensions). | |
 | `mediationPolicies.in` | Input mediation policy, it manipulates the request going to your backend. | `log_in_message` |
 | `mediationPolicies.out` | Output mediation policy, it manipulates the response going back to your API consumer. | `json_validator` |
