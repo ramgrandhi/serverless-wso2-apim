@@ -14,13 +14,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: yarn install
-      - run: yarn start:wso2-2.6.0:background
-      - run: yarn start:wso2-3.2.0:background
-      - run: yarn start:localstack:background
+      - run: yarn run start:wso2-2.6.0:background
+      - run: yarn run start:wso2-3.2.0:background
+      - run: yarn run start:localstack:background
       - name: Sleep for 30 seconds
         uses: jakejarvis/wait-action@master
         with:
           time: '10s'
-      - run: yarn stop:wso2-2.6.0
-      - run: yarn stop:wso2-3.2.0
-      - run: yarn stop:localstack
+      - run: yarn run stop:wso2-2.6.0
+      - run: yarn run stop:wso2-3.2.0
+      - run: yarn run stop:localstack
