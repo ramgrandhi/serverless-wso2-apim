@@ -5,7 +5,6 @@ on:
   push:
     branches:
       - main
-      - fix/e2e-pipeline
   pull_request:
     branches:
       - main
