@@ -9,7 +9,7 @@ on:
     branches:
       - main
 jobs:
-  test:
+  E2E:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout 
