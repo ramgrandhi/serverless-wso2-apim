@@ -10,7 +10,7 @@ describe('E2E on WSO2 API Manager', () => {
     fs.readdirSync('src/__tests__/e2e').forEach(testCase => {
       if (fs.statSync(`src/__tests__/e2e/${testCase}`).isDirectory()) {
         // however, if a specific testCase name(s) are passed as parameters then it executes those selectively
-        if (((process.argv.length > 5) && (process.argv.includes(testCase))) || (process.argv.length == 5)) {
+        if (((process.argv.length > 4) && (process.argv.includes(testCase))) || (process.argv.length == 4)) {
           it(`${wso2ApimVersion}/${testCase}`, () => {
             const procDeploy = spawnSync('sls',
               ['deploy'],
@@ -34,12 +34,12 @@ describe('E2E on WSO2 API Manager', () => {
             );
 
             if (testCase.split('-')[0] === 'valid') {
-              console.log(chalk.bold.underline(`🔆 ${wso2ApimVersion}/${testCase}`), procDeploy.output.toString());
+              console.log("Running.. ", chalk.bold.underline(`🔆 ${wso2ApimVersion}/${testCase}`), "\n\n", procDeploy.output.toString());
               expect(procDeploy.status).toBe(0);
               expect(procDeploy.output.toString()).toEqual(expect.not.stringContaining('NOT OK'));
             }
             else if (testCase.split('-')[0] === 'invalid') {
-              console.log(chalk.bold.underline(`🌧 ${wso2ApimVersion}/${testCase}`), procDeploy.output.toString());
+              console.log("Running.. ", chalk.bold.underline(`🌧 ${wso2ApimVersion}/${testCase}`), "\n\n", procDeploy.output.toString());
               expect(procDeploy.output.toString().includes('NOT OK'));
             }
 
@@ -64,7 +64,12 @@ describe('E2E on WSO2 API Manager', () => {
               }
             );
 
-            console.log(chalk.bold.underline(`🧹  ${wso2ApimVersion}/${testCase}`), procRemove.output.toString());
+            if (testCase.split('-')[0] === 'valid') {
+              console.log("Cleaning up... ", chalk.bold.underline(`🔆 ${wso2ApimVersion}/${testCase}`), "\n\n", procRemove.output.toString());
+            }
+            else if (testCase.split('-')[0] === 'invalid') {
+              console.log("Cleaning up... ", chalk.bold.underline(`🌧 ${wso2ApimVersion}/${testCase}`), "\n\n", procRemove.output.toString());
+            }
             expect(procRemove.status).toBe(0);
             expect(procRemove.output.toString()).toEqual(expect.not.stringContaining('NOT OK'));
           });
