@@ -13,7 +13,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - run: yarn install
       - run: ls -ltr
       - run: yarn run start:wso2-2.6.0:background
       - run: yarn run start:wso2-3.2.0:background
@@ -25,3 +24,5 @@ jobs:
       - run: yarn run stop:wso2-2.6.0
       - run: yarn run stop:wso2-3.2.0
       - run: yarn run stop:localstack
+      - run: yarn install
+      - run: ls -ltr
