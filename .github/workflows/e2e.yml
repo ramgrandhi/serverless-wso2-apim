@@ -23,9 +23,6 @@ jobs:
         uses: jakejarvis/wait-action@master
         with:
           time: '10s'
-      - run: yarn run stop:wso2-2.6.0
-      - run: yarn run stop:wso2-3.2.0
-      - run: yarn run stop:localstack
       - run: yarn install
       - run: ls -ltr
       - run: yarn test:e2e valid-backend-http-certChain-as-localfile
