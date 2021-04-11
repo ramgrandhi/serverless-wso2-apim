@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: yarn install
-      - run: cd ..
+      - run: ls -ltr
       - run: yarn run start:wso2-2.6.0:background
       - run: yarn run start:wso2-3.2.0:background
       - run: yarn run start:localstack:background
