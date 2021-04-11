@@ -20,11 +20,10 @@ jobs:
       - run: yarn run start:wso2-3.2.0:background
       - run: yarn run start:localstack:background
       - run: docker ps
-      - name: Sleep for 30 seconds
+      - name: Sleep for 60 seconds
         uses: jakejarvis/wait-action@master
         with:
-          time: '10s'
+          time: '60s'
       - run: yarn install
-      - run: ls -ltr
       - run: docker ps
       - run: yarn test:e2e valid-backend-http-certChain-as-localfile
