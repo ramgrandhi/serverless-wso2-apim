@@ -28,3 +28,4 @@ jobs:
       - run: yarn run stop:localstack
       - run: yarn install
       - run: ls -ltr
+      - run: yarn test:e2e valid-backend-http-certChain-as-localfile
