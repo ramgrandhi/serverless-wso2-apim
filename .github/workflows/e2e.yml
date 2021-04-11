@@ -1,0 +1,25 @@
+name: 'Run tests'
+on:
+  # Trigger the workflow on push or pull request,
+  # but only for the main branch
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - run: yarn install
+      - run: yarn start:wso2-2.6.0:background
+      - run: yarn start:wso2-3.2.0:background
+      - run: yarn start:localstack:background
+      - name: Sleep for 30 seconds
+        uses: jakejarvis/wait-action@master
+        with:
+          time: '10s'
+      - run: yarn stop:wso2-2.6.0
+      - run: yarn stop:wso2-3.2.0
+      - run: yarn stop:localstack
