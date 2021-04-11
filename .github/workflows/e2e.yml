@@ -21,7 +21,7 @@ jobs:
       - run: yarn run start:localstack:background
       - run: docker ps
       - name: Sleep for 60 seconds
-        uses: jakejarvis/wait-action@master
+        uses: kibertoad/wait-action@1.0.1
         with:
           time: '60s'
       - run: yarn install
