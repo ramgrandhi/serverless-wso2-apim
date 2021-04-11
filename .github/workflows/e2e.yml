@@ -15,15 +15,15 @@ jobs:
     steps:
       - name: Checkout 
         uses: actions/checkout@v2
-      - run: ls -ltr
-      - run: yarn run start:wso2-2.6.0:background
-      - run: yarn run start:wso2-3.2.0:background
-      - run: yarn run start:localstack:background
-      - run: docker ps
+      - name: Setup E2E
+        run: yarn run test:e2e:setup:background
+      - name: Validate
+        run: docker ps
       - name: Sleep for 60 seconds
         uses: kibertoad/wait-action@1.0.1
         with:
           time: '60s'
-      - run: yarn install
-      - run: docker ps
-      - run: yarn test:e2e valid-backend-http-certChain-as-localfile
+      - name: Install
+        run: yarn install
+      - name: Execute E2E
+        run: yarn test:e2e
