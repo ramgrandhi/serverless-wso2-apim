@@ -13,6 +13,8 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout 
+        uses: actions/checkout@v2
       - run: ls -ltr
       - run: yarn run start:wso2-2.6.0:background
       - run: yarn run start:wso2-3.2.0:background
