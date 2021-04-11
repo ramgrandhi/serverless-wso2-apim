@@ -1,0 +1,28 @@
+name: 'Run tests'
+on:
+  # Trigger the workflow on push or pull request,
+  # but only for the main branch
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+jobs:
+  E2E:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 
+        uses: actions/checkout@v2
+      - name: Setup E2E
+        run: yarn run test:e2e:setup:background
+      - name: Validate
+        run: docker ps
+      - name: Sleep for 60 seconds
+        uses: kibertoad/wait-action@1.0.1
+        with:
+          time: '60s'
+      - name: Install
+        run: yarn install
+      - name: Execute E2E
+        run: yarn test:e2e

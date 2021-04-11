@@ -1,4 +1,4 @@
-name: Publish to NPM
+name: 'Publish :latest to NPM'
 on:
   push:
     tags:

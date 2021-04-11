@@ -1,0 +1,95 @@
+service: serverless-wso2-apim
+provider:
+  name: aws
+  stackName: ${env:STACK_NAME}
+  deploymentBucket:
+    name: ${env:TEST_ID_NORMALIZED}
+plugins:
+  - serverless-localstack
+  - serverless-deployment-bucket
+  - '../../../../src'
+
+#⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇ Modify the configuration below to suit your test case.
+#⬇⬇⬇ START HERE ⬇⬇⬇⬇ Help: https://github.com/ramgrandhi/serverless-wso2-apim#configuration-reference
+#⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇ For a full list of env vars that you can use, refer `src/__tests__/e2e/e2e.test.js`
+custom:
+  wso2apim:
+    enabled: true
+    host: ${env:WSO2_HOST}
+    port: ${env:WSO2_PORT}
+    user: ${env:WSO2_USER}
+    pass: ${env:WSO2_PASS}
+    gatewayEnv: ${env:WSO2_ENV}
+    apidefs:
+      - name: ${env:TEST_ID}-1
+        description: ${env:TEST_ID}-1
+        rootContext: /${env:TEST_ID}-1
+        version: '1'
+        visibility: 'PRIVATE'
+        backend:
+          http:
+            baseUrl: 'https://baseUrl'
+            certChain: !ImportValue ${env:TEST_ID}-certificateArn
+        maxTps: 10
+        tags:
+          - ${env:TEST_ID}-1
+        swaggerSpec:
+          openapi: 3.0.0
+          info:
+            title: ${env:TEST_ID}-1
+            version: "1"
+            contact:
+              name: ${env:TEST_ID}-1
+              email: ${env:TEST_ID}-1
+          paths:
+            /*:
+              post:
+                responses:
+                  "201":
+                    description: Created
+                x-auth-type: 'None'
+
+# Optionally, add your other AWS provider-specific resources below. 
+# Make sure there is at least one resource listed below, otherwise stack deployment would fail.
+resources:
+  Resources:
+    Topic:
+      Type: AWS::SNS::Topic
+  CertificateAuthority:
+    Type: AWS::ACMPCA::CertificateAuthority
+    Properties: 
+      KeyAlgorithm: 'RSA_2048'
+      SigningAlgorithm: 'SHA256WITHRSA'
+      Type: 'ROOT'
+      Subject: 
+        CommonName: '*.example.com'
+        Country: 'US'
+        Locality: 'XXX'
+        Organization: 'YYY'
+        OrganizationalUnit: 'ZZZ'
+        State: 'zzz'
+      RevocationConfiguration:
+        CrlConfiguration:
+          Enabled: false
+  Certificate:
+    DependsOn: RootCA
+    Type: AWS::ACMPCA::Certificate
+    Properties: 
+      CertificateAuthorityArn: !Ref RootCA
+      CertificateSigningRequest: !GetAtt RootCA.CertificateSigningRequest
+      SigningAlgorithm: SHA256WITHRSA
+      TemplateArn: 'arn:aws:acm-pca:::template/RootCACertificate/V1'
+      Validity: 
+        Type: YEARS
+        Value: 1
+  Activation:
+    Type: AWS::ACMPCA::CertificateAuthorityActivation
+    Properties: 
+      CertificateAuthorityArn: !Ref RootCA
+      Certificate: !GetAtt RootCACertificate.Certificate
+      Status: ACTIVE
+  Outputs:
+    CertificateArn:
+      Value: !GetAtt Certificate.Arn
+      Export:
+        Name: ${env:TEST_ID}-certificateArn
