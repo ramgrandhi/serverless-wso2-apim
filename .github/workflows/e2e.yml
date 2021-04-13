@@ -5,10 +5,22 @@ on:
   push:
     branches:
       - main
+      - fix/new-badges
   pull_request:
     branches:
       - main
 jobs:
+  Unit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install
+        run: yarn install
+      - name: Execute Unit Tests
+        run: yarn test:unit
+      - name: Collect Coverage
+        run: codecov
   E2E:
     runs-on: ubuntu-latest
     steps:
