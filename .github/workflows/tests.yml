@@ -20,7 +20,7 @@ jobs:
       - name: Execute Unit Tests
         run: yarn test:unit
       - name: Collect Coverage
-        run: codecov
+        run: ./node_modules/codecov/bin/codecov
   E2E:
     runs-on: ubuntu-latest
     steps:
