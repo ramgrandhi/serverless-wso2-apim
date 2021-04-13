@@ -45,6 +45,7 @@
     "axios": "^0.21.1",
     "babel-eslint": "^10.1.0",
     "chalk": "^4.1.0",
+    "codecov": "^3.8.1",
     "concurrently": "^6.0.0",
     "eslint": "^7.20.0",
     "eslint-plugin-jest": "^24.1.5",
@@ -67,5 +68,9 @@
     "qs": "^6.9.6",
     "split-ca": "^1.0.1",
     "swagger-parser": "^10.0.2"
+  },
+  "jest": {
+    "coverageDirectory": "./coverage/",
+    "collectCoverage": true
   }
 }

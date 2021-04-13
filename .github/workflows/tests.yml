@@ -1,4 +1,4 @@
-name: 'Run tests'
+name: 'Tests'
 on:
   # Trigger the workflow on push or pull request,
   # but only for the main branch
@@ -9,6 +9,17 @@ on:
     branches:
       - main
 jobs:
+  Unit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install
+        run: yarn install
+      - name: Execute Unit Tests
+        run: yarn test:unit
+      - name: Collect Coverage
+        run: ./node_modules/codecov/bin/codecov
   E2E:
     runs-on: ubuntu-latest
     steps:

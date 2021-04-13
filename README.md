@@ -8,6 +8,15 @@ serverless-wso2-apim
   <a href="https://www.npmjs.com/package/serverless-wso2-apim">
     <img src="https://img.shields.io/npm/v/serverless-wso2-apim">
   </a>
+  <a href="https://snyk.io/test/github/ramgrandhi/serverless-wso2-apim">
+    <img src="https://snyk.io/test/github/ramgrandhi/serverless-wso2-apim/badge.svg">
+  </a>
+  <a href="https://codecov.io/gh/ramgrandhi/serverless-wso2-apim">
+    <img src="https://codecov.io/gh/ramgrandhi/serverless-wso2-apim/branch/main/graph/badge.svg?token=2J41K143EJ">
+  </a>
+  <a href= "https://github.com/ramgrandhi/serverless-wso2-apim/actions/workflows/tests.yml">
+    <img src="https://github.com/ramgrandhi/serverless-wso2-apim/actions/workflows/tests.yml/badge.svg?branch=main">
+  </a>
   <a href="https://www.npmjs.com/package/serverless-wso2-apim">
     <img src="https://img.shields.io/npm/dt/serverless-wso2-apim.svg">
   </a>
