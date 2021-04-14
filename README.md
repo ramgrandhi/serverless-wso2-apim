@@ -17,6 +17,9 @@ serverless-wso2-apim
   <a href= "https://github.com/ramgrandhi/serverless-wso2-apim/actions/workflows/tests.yml">
     <img src="https://github.com/ramgrandhi/serverless-wso2-apim/actions/workflows/tests.yml/badge.svg?branch=main">
   </a>
+  <a href= "https://www.codacy.com/gh/ramgrandhi/serverless-wso2-apim/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ramgrandhi/serverless-wso2-apim&amp;utm_campaign=Badge_Grade">
+    <img src="https://app.codacy.com/project/badge/Grade/b5e75616282c41e392e19c08a3ca29e2">
+  </a>
   <a href="https://www.npmjs.com/package/serverless-wso2-apim">
     <img src="https://img.shields.io/npm/dt/serverless-wso2-apim.svg">
   </a>
@@ -37,16 +40,15 @@ serverless-wso2-apim
   </a>
 </p>
 
-
 Serverless Framework plugin to manage APIs on [WSO2 API Manager](https://wso2.com/api-management/).
 
 ![img](./assets/serverless-wso2-apim.png)
 ---
 
 ## Compatible with
-* [Serverless Framework 1.75 and higher](https://www.serverless.com)
-* [WSO2 API Manager 2.6.0](https://docs.wso2.com/display/AM260/)
-* [WSO2 API Manager 3.2.0](https://apim.docs.wso2.com/en/3.2.0/) <img src="https://img.shields.io/badge/-New-yellow?style=flat-square">
+  * [Serverless Framework 1.75 and higher](https://www.serverless.com)
+  * [WSO2 API Manager 2.6.0](https://docs.wso2.com/display/AM260/)
+  * [WSO2 API Manager 3.2.0](https://apim.docs.wso2.com/en/3.2.0/) <img src="https://img.shields.io/badge/-New-yellow?style=flat-square">
 
 ## Features
 * Create, Update and Publish your API definitions via `sls deploy`.  
