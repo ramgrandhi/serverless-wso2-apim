@@ -224,11 +224,14 @@ class Serverless_WSO2_APIM {
             // If baseUrl is obtained via Cloud Formation's intrinsic function syntax (!Ref or Fn::ImportValue)
             if (baseUrl['Fn::ImportValue']) {
               this.provider = this.serverless.getProvider('aws');
-              baseUrl = await utils.resolveCfImportValue(
+              let baseUrlResolved = await utils.resolveCfImportValue(
                 this.provider,
                 baseUrl['Fn::ImportValue']
               );
-              this.serverless.service.custom.wso2apim.apidefs[idx].backend.http.baseUrl = baseUrl;
+              if (baseUrlResolved)
+                this.serverless.service.custom.wso2apim.apidefs[idx].backend.http.baseUrl = baseUrlResolved;
+              else
+                throw new Error('Unable to resolve external references for.. ' + baseUrl['Fn::ImportValue']);
             }
           }
         }
