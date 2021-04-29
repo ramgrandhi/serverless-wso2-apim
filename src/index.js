@@ -154,7 +154,14 @@ class Serverless_WSO2_APIM {
     try {
       // this.serverless.cli.log(pluginNameSuffix + "Validating configuration..");
       const wso2APIM = this.serverless.service.custom.wso2apim;
-
+      if (wso2APIM.enabled === false) {
+        this.serverless.cli.log(
+          pluginNameSuffix +
+          'Validation is disabled, Skipping.. OK'
+        );
+        return;
+      }
+      
       // Key value checks, with corresponding error messages
       const conditionsArray = [
         ((typeof wso2APIM.enabled === 'undefined') || (typeof wso2APIM.enabled === 'boolean')),
