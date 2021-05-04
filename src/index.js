@@ -157,7 +157,7 @@ class Serverless_WSO2_APIM {
       if (wso2APIM.enabled === false) {
         this.serverless.cli.log(
           pluginNameSuffix +
-          'Validation is disabled, Skipping.. OK'
+          'Configuration is disabled globally, Skipping validation.. OK'
         );
         return;
       }
