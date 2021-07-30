@@ -34,7 +34,7 @@ custom:
           - ${env:TEST_ID}-1
         cors:
           origins:
-            - https://nn.nl
+            - https://example.com
         swaggerSpec:
           openapi: 3.0.0
           info:

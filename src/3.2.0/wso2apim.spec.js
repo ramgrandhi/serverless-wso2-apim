@@ -5,6 +5,7 @@ const {
   isCertUploaded,
   createAPIDef,
   publishAPIDef,
+  constructAPIDef,
   uploadCert,
   updateCert,
   removeCert,
@@ -516,6 +517,56 @@ describe('wso2apim-3.2.0', () => {
       expect(listCertInfo(wso2APIM, 'xxx', 'alias')).rejects.toThrow();
     });
 
+  });
+
+  describe('cors configuration', () => {
+
+    it('no cors', async () => {
+      const apiDef = await constructAPIDef(wso2APIM.user, wso2APIM.gatewayEnv, wso2APIM.apidefs[0]);
+
+      expect(apiDef.corsConfiguration).toBeUndefined();
+    });
+
+    it('only origin', async () => {
+      const config = {...wso2APIM, apidefs: [{...wso2APIM.apidefs[0], cors: {
+        origins: ['https://www.example.com']
+      }}]};
+
+      const apiDef = await constructAPIDef(config.user, config.gatewayEnv, config.apidefs[0]);
+
+      expect(apiDef.corsConfiguration).toEqual({
+        corsConfigurationEnabled: true,
+        accessControlAllowOrigins: [ 'https://www.example.com' ],
+        accessControlAllowCredentials: false,
+        accessControlAllowHeaders: [
+          'authorization',
+          'Access-Control-Allow-Origin',
+          'Content-Type',
+          'SOAPAction',
+          'apikey'
+        ],
+        accessControlAllowMethods: [ 'GET', 'PUT', 'POST', 'DELETE', 'PATCH', 'OPTIONS' ]
+      });
+    });
+
+    it('fully specified', async () => {
+      const config = {...wso2APIM, apidefs: [{...wso2APIM.apidefs[0], cors: {
+        origins: ['https://www.example.com', 'https://www.example.org'],
+        credentials: true,
+        headers: ['autorization', 'x-custom'],
+        methods: ['GET']
+      }}]};
+
+      const apiDef = await constructAPIDef(config.user, config.gatewayEnv, config.apidefs[0]);
+
+      expect(apiDef.corsConfiguration).toEqual({
+        corsConfigurationEnabled: true,
+        accessControlAllowOrigins: [ 'https://www.example.com', 'https://www.example.org' ],
+        accessControlAllowCredentials: true,
+        accessControlAllowHeaders: ['autorization', 'x-custom'],
+        accessControlAllowMethods: ['GET']
+      });
+    });
   });
   
 });

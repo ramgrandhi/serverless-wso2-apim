@@ -615,6 +615,7 @@ module.exports = {
   isCertUploaded,
   createAPIDef,
   publishAPIDef,
+  constructAPIDef,
   uploadCert,
   updateCert,
   removeCert,

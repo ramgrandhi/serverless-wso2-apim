@@ -34,13 +34,13 @@ custom:
           - ${env:TEST_ID}-1
         cors:
           origins:
-            - https://nn.nl
+            - https://example.com
           methods:
             - GET
             - POST
           headers:
             - authorization
-            - x-nn-test
+            - x-test
           credentials: true
         swaggerSpec:
           openapi: 3.0.0
