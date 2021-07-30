@@ -236,6 +236,9 @@ function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
         businessOwner: ((apiDef.swaggerSpec.info) && (apiDef.swaggerSpec.info.contact) && (apiDef.swaggerSpec.info.contact.name)) ? apiDef.swaggerSpec.info.contact.name : undefined,
       }
     };
+    if (apiDef.cors) {
+      wso2ApiDefinition.corsConfiguration = constructCorsConfiguration(apiDef);
+    }
 
     backendBaseUrl = '';
     backendType = '';
@@ -245,6 +248,32 @@ function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
   catch (err) {
     utils.renderError(err);
   }
+}
+
+function constructCorsConfiguration(apiDef) {
+  const { origins, credentials, headers, methods } = apiDef.cors;
+  const defaultAllowHeaders /* default WSO2 cors config */ = [
+    'authorization',
+    'Access-Control-Allow-Origin',
+    'Content-Type',
+    'SOAPAction',
+    'apikey',
+  ];
+  const defaultAllowMethods /* default WSO2 cors config */ = [
+    'GET',
+    'PUT',
+    'POST',
+    'DELETE',
+    'PATCH',
+    'OPTIONS',
+  ];
+  return {
+    corsConfigurationEnabled: true,
+    accessControlAllowOrigins: origins || ['*'],
+    accessControlAllowCredentials: credentials || false,
+    accessControlAllowHeaders: headers || defaultAllowHeaders,
+    accessControlAllowMethods: methods || defaultAllowMethods,
+  };
 }
 
 // Creates API definition
