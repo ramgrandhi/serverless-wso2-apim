@@ -161,7 +161,7 @@ or
 | `maxTps` | Max. Transactions per second, used for throttling. | `100` |
 | `cors` | Optional, a CORS configuration to enable. Omit this property to disable CORS. See below for properties. | |
 | `cors.origins` | String array of allowed origins. Default: `['*']` | |
-| `cors.headers` | String array of allowed headers. Default: `['authorization', 'Access-Control-Allow-Origin', 'Content-Type', 'SOAPAction', 'apikey']` | |
+| `cors.headers` | String array of allowed headers. Default: `['Authorization', 'Access-Control-Allow-Origin', 'Content-Type', 'SOAPAction']` | |
 | `cors.methods` | String array of allowed methods. Default: `['GET', 'PUT', 'POST', 'DELETE', 'PATCH', 'OPTIONS']` | |
 | `cors.credentials` | Allow credentials (boolean). Default: `false` | `true` |
 | `tags` | Tags as an array that show up in WSO2 console. | |
