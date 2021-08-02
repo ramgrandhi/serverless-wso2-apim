@@ -70,8 +70,11 @@ describe('E2E on WSO2 API Manager', () => {
             else if (testCase.split('-')[0] === 'invalid') {
               console.log("Cleaning up... ", chalk.bold.underline(`🌧 ${wso2ApimVersion}/${testCase}`), "\n\n", procRemove.output.toString());
             }
-            expect(procRemove.status).toBe(0);
-            expect(procRemove.output.toString()).toEqual(expect.not.stringContaining('NOT OK'));
+            const isTestCaseWithInvalidConfig = testCase.split('-')[0] === 'invalid' && procRemove.output.toString().includes('Validating configuration.. NOT OK');
+            if (!isTestCaseWithInvalidConfig) {
+              expect(procRemove.status).toBe(0);
+              expect(procRemove.output.toString()).toEqual(expect.not.stringContaining('NOT OK'));
+            }
           });
         }
         else {

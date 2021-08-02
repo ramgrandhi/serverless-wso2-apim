@@ -518,11 +518,10 @@ describe('wso2apim-2.6.0', () => {
         accessControlAllowOrigins: [ 'https://www.example.com' ],
         accessControlAllowCredentials: false,
         accessControlAllowHeaders: [
-          'authorization',
+          'Authorization',
           'Access-Control-Allow-Origin',
           'Content-Type',
-          'SOAPAction',
-          'apikey'
+          'SOAPAction'
         ],
         accessControlAllowMethods: [ 'GET', 'PUT', 'POST', 'DELETE', 'PATCH', 'OPTIONS' ]
       });
@@ -532,7 +531,7 @@ describe('wso2apim-2.6.0', () => {
       const config = {...wso2APIM, apidefs: [{...wso2APIM.apidefs[0], cors: {
         origins: ['https://www.example.com', 'https://www.example.org'],
         credentials: true,
-        headers: ['autorization', 'x-custom'],
+        headers: ['Authorization', 'x-custom'],
         methods: ['GET']
       }}]};
 
@@ -542,7 +541,7 @@ describe('wso2apim-2.6.0', () => {
         corsConfigurationEnabled: true,
         accessControlAllowOrigins: [ 'https://www.example.com', 'https://www.example.org' ],
         accessControlAllowCredentials: true,
-        accessControlAllowHeaders: ['autorization', 'x-custom'],
+        accessControlAllowHeaders: ['Authorization', 'x-custom'],
         accessControlAllowMethods: ['GET']
       });
     });

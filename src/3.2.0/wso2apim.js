@@ -255,11 +255,10 @@ async function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
 function constructCorsConfiguration(apiDef) {
   const { origins, credentials, headers, methods } = apiDef.cors;
   const defaultAllowHeaders /* default WSO2 cors config */ = [
-    'authorization',
+    'Authorization',
     'Access-Control-Allow-Origin',
     'Content-Type',
     'SOAPAction',
-    'apikey',
   ];
   const defaultAllowMethods /* default WSO2 cors config */ = [
     'GET',
