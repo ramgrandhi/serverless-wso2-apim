@@ -159,10 +159,15 @@ or
 | `mediationPolicies.fault` | Fault mediation policy, it manipulates the fault handling. | `None` |
 | `apiProperties` | Optional, List of API properties to be used in `key`:`value` form as described [here](https://docs.wso2.com/display/AM260/Adding+Custom+Properties+to+APIs). | `'property1': 'value1'`|
 | `maxTps` | Max. Transactions per second, used for throttling. | `100` |
+| `cors` | Optional, a CORS configuration to enable. Omit this property to disable CORS. See below for properties. | |
+| `cors.origins` | String array of allowed origins. Default: `['*']` | |
+| `cors.headers` | String array of allowed headers. Default: `['Authorization', 'Access-Control-Allow-Origin', 'Content-Type', 'SOAPAction']` | |
+| `cors.methods` | String array of allowed methods. Default: `['GET', 'PUT', 'POST', 'DELETE', 'PATCH', 'OPTIONS']` | |
+| `cors.credentials` | Allow credentials (boolean). Default: `false` | `true` |
 | `tags` | Tags as an array that show up in WSO2 console. | |
 | `swaggerSpec` | Swagger 2.0 / OpenAPI 3.0 specification in YML | |
 
----
+
 ## 💡Tip : Organize your project files efficiently.
 
 You can spread the configuration across multiple files, so you can manage it better. Bonus, you can use linters and validators effectively on your swaggerSpec.

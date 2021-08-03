@@ -238,6 +238,9 @@ async function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
         businessOwner: ((apiDef.swaggerSpec.info) && (apiDef.swaggerSpec.info.contact) && (apiDef.swaggerSpec.info.contact.name)) ? apiDef.swaggerSpec.info.contact.name : undefined,
       }
     };
+    if (apiDef.cors) {
+      wso2ApiDefinition.corsConfiguration = constructCorsConfiguration(apiDef);
+    }
 
     backendBaseUrl = '';
     backendType = '';
@@ -247,6 +250,31 @@ async function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
   catch (err) {
     utils.renderError(err);
   }
+}
+
+function constructCorsConfiguration(apiDef) {
+  const { origins, credentials, headers, methods } = apiDef.cors;
+  const defaultAllowHeaders /* default WSO2 cors config */ = [
+    'Authorization',
+    'Access-Control-Allow-Origin',
+    'Content-Type',
+    'SOAPAction',
+  ];
+  const defaultAllowMethods /* default WSO2 cors config */ = [
+    'GET',
+    'PUT',
+    'POST',
+    'DELETE',
+    'PATCH',
+    'OPTIONS',
+  ];
+  return {
+    corsConfigurationEnabled: true,
+    accessControlAllowOrigins: origins || ['*'],
+    accessControlAllowCredentials: credentials || false,
+    accessControlAllowHeaders: headers || defaultAllowHeaders,
+    accessControlAllowMethods: methods || defaultAllowMethods,
+  };
 }
 
 async function constructAPIOperations(apiDef) {
@@ -586,6 +614,7 @@ module.exports = {
   isCertUploaded,
   createAPIDef,
   publishAPIDef,
+  constructAPIDef,
   uploadCert,
   updateCert,
   removeCert,
