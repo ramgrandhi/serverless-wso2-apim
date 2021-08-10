@@ -25,12 +25,12 @@ async function goToSleep(milliS) {
   return new Promise(resolve => setTimeout(resolve, milliS));
 }
 
-function resolveCfImportValue(provider, name) {
-  return provider.request('CloudFormation', 'listExports').then(result => {
+function resolveCfImportValue(provider, name, params = {}) {
+  return provider.request('CloudFormation', 'listExports', params).then(result => {
     const targetExportMeta = result.Exports.find(exportMeta => exportMeta.Name === name);
     if (targetExportMeta) return targetExportMeta.Value;
     if (result.NextToken) {
-      return resolveCfImportValue(name, { NextToken: result.NextToken });
+      return resolveCfImportValue(provider, name, { NextToken: result.NextToken });
     }
     return null;
   });
