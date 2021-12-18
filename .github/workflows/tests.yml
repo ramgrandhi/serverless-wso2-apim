@@ -1,4 +1,4 @@
-name: 'tests'
+name: "tests"
 on:
   # Trigger the workflow on push or pull request,
   # but only for the main branch
@@ -10,7 +10,7 @@ on:
       - main
 jobs:
   Unit:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -21,9 +21,9 @@ jobs:
       - name: Collect Coverage
         run: ./node_modules/codecov/bin/codecov
   E2E:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
-      - name: Checkout 
+      - name: Checkout
         uses: actions/checkout@v2
       - name: Setup E2E
         run: yarn run test:e2e:setup:background
@@ -32,7 +32,7 @@ jobs:
       - name: Sleep for 60 seconds
         uses: kibertoad/wait-action@1.0.1
         with:
-          time: '60s'
+          time: "60s"
       - name: Install
         run: yarn install
       - name: Execute E2E
