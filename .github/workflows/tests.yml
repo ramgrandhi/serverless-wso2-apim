@@ -27,6 +27,7 @@ jobs:
         run: yarn install
       - name: Execute Unit Tests
         run: |
+          nvm alias default 14
           node --version
           yarn test:unit
       - name: Collect Coverage
