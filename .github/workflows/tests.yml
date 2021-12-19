@@ -13,7 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: |
+      - name: Install Node14 and Test
+        run: |
           curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
           export NVM_DIR="$HOME/.nvm"
           [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
@@ -21,12 +22,15 @@ jobs:
           nvm --version
           nvm install 14
           node --version
-      - run: yarn install
-      - run: |
+
+          yarn install
+
           nvm alias default 14
           node --version
+
           yarn test:unit
-      - run: ./node_modules/codecov/bin/codecov
+      - name: Collect coverage
+        run: ./node_modules/codecov/bin/codecov
   E2E:
     runs-on: ubuntu-latest
     steps:
