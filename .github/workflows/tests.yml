@@ -1,4 +1,4 @@
-name: 'tests'
+name: "tests"
 on:
   # Trigger the workflow on push or pull request,
   # but only for the main branch
@@ -12,18 +12,30 @@ jobs:
   Unit:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Install
-        run: yarn install
-      - name: Execute Unit Tests
-        run: yarn test:unit
-      - name: Collect Coverage
+      - uses: actions/checkout@v2
+      - name: Install Node14 and Test
+        run: |
+          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
+          export NVM_DIR="$HOME/.nvm"
+          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+          [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+          nvm --version
+          nvm install 14
+          node --version
+
+          yarn install
+
+          nvm alias default 14
+          node --version
+
+          yarn test:unit
+      - name: Collect coverage
         run: ./node_modules/codecov/bin/codecov
+
   E2E:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout 
+      - name: Checkout
         uses: actions/checkout@v2
       - name: Setup E2E
         run: yarn run test:e2e:setup:background
@@ -32,8 +44,20 @@ jobs:
       - name: Sleep for 60 seconds
         uses: kibertoad/wait-action@1.0.1
         with:
-          time: '60s'
-      - name: Install
-        run: yarn install
-      - name: Execute E2E
-        run: yarn test:e2e
+          time: "60s"
+      - name: Install Node14 and Test
+        run: |
+          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
+          export NVM_DIR="$HOME/.nvm"
+          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+          [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+          nvm --version
+          nvm install 14
+          node --version
+
+          yarn install
+
+          nvm alias default 14
+          node --version
+
+          yarn test:e2e
