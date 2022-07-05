@@ -510,7 +510,6 @@ async function removeAPIDef(wso2APIM, accessToken, apiId) {
   }
 }
 
-
 // Removes backend certificate
 async function removeCert(wso2APIM, accessToken, certAlias) {
   try {
@@ -606,6 +605,40 @@ async function listCertInfo(wso2APIM, accessToken, certAlias) {
   }
 }
 
+/**
+ * Upsert the swagger spec of the wso2 api
+ * see https://apim.docs.wso2.com/en/3.2.0/develop/product-apis/publisher-apis/publisher-v1/publisher-v1/#tag/APIs/paths/~1apis~1{apiId}~1swagger/put for documentation
+ * @param {*} wso2APIM 
+ * @param {*} accessToken 
+ * @param {*} apiId 
+ * @param {*} swaggerSpec 
+ * @returns 
+ */
+ async function upsertSwaggerSpec(wso2APIM, accessToken, apiId, swaggerSpec) {
+  try {
+    const url = `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/apis/${apiId}/swagger`;
+    const config = {
+      headers: {
+        'Authorization': 'Bearer ' + accessToken,
+        'Content-Type': 'multipart/form-data'
+      },
+      httpsAgent: new https.Agent({
+        rejectUnauthorized: false
+      })
+    };
+    
+    const data = new FormData();
+    data.append('apiDefinition', JSON.stringify(swaggerSpec));
+
+    return axios.put(url, data, config)
+      .then((_) => undefined); // eat the http response, not needed outside of this api layer
+  }
+  catch (err) {
+    utils.renderError(err);
+    throw err;
+  }
+}
+
 
 module.exports = {
   registerClient,
@@ -622,4 +655,5 @@ module.exports = {
   updateAPIDef,
   removeAPIDef,
   listInvokableAPIUrl,
+  upsertSwaggerSpec,
 };

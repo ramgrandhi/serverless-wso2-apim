@@ -617,6 +617,7 @@ class Serverless_WSO2_APIM {
       // Update API definitions, if they exist
       for (const [i, api] of this.cache.deploymentStatus.entries()) {
         try {
+          let apiId = api.apiId;
           //Update
           if (api.apiId !== undefined) {
             // this.serverless.cli.log(pluginNameSuffix + "Updating " + api.apiName + " (" + api.apiId + ")..");
@@ -638,15 +639,22 @@ class Serverless_WSO2_APIM {
           //Create
           else {
             // this.serverless.cli.log(pluginNameSuffix + "Creating " + api.apiName + "".."");
-            await wso2apim.createAPIDef(
+            const result = await wso2apim.createAPIDef(
               wso2APIM,
               this.cache.accessToken,
               apiDefs[i]
             );
+            apiId = result.apiId;
+
             this.serverless.cli.log(
               pluginNameSuffix + 'Creating ' + api.apiName + '.. OK'
             );
           }
+
+          // now update the swagger spec of the API
+          this.serverless.cli.log(`${pluginNameSuffix} Upserting Swagger spec for api ${api.apiName} (id=${apiId})`);
+          await wso2apim.upsertSwaggerSpec(wso2APIM, this.cache.accessToken, apiId, apiDefs[i].swaggerSpec);
+          this.serverless.cli.log(`${pluginNameSuffix} Upserting OK`);
         } catch (err) {
           this.serverless.cli.log(
             'Creating / Updating ' +

@@ -56,7 +56,7 @@ Serverless Framework plugin to manage APIs on [WSO2 API Manager](https://wso2.co
 - Manage your API definitions via `sls info` and `sls remove`.
 - Supports `HTTP` and `JMS` backends with mediation policies & additional API properties.
 - Uploads backend certificates (including CAs) to enable HTTP/s connectivity with backends.
-- Supports `Swagger 2.0` and `OpenAPI 3.0` specifications.
+- Supports `Swagger 2.0` and `OpenAPI 3.0` specifications and will upload those to WSO2
 - Automatically detects the version of WSO2 API Manager running.
 
 ---
