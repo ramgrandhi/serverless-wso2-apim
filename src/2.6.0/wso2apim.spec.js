@@ -10,6 +10,7 @@ const {
   updateCert,
   removeCert,
   listCertInfo,
+  upsertSwaggerSpec,
   updateAPIDef,
   removeAPIDef,
   listInvokableAPIUrl,
@@ -453,6 +454,29 @@ describe("wso2apim-2.6.0", () => {
       axios.get.mockImplementationOnce(() => Promise.reject());
 
       expect(listCertInfo(wso2APIM, "xxx", "alias")).rejects.toThrow();
+    });
+  });
+
+  describe("upsertSwaggerSpec()", () => {
+    it("should handle a successful response", async () => {
+      const response = await upsertSwaggerSpec(wso2APIM, "xxx", "id001", wso2APIM.apidefs[0].swaggerSpec);
+
+      expect(axios.put).toHaveBeenCalledWith(
+        `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/apis/id001/swagger`,
+        expect.objectContaining({}),
+        {
+          headers: {
+            Authorization: "Bearer xxx",
+            "Content-Type": "multipart/form-data"
+          },
+          httpsAgent: expect.objectContaining({})
+        }
+      );
+    });
+
+      it("should handle a faulty response", async () => {
+        axios.put.mockImplementationOnce(() => Promise.reject());
+        expect(upsertSwaggerSpec(wso2APIM, "xxx", "id001", wso2APIM.apidefs[0].swaggerSpec)).rejects.toThrow();
     });
   });
 

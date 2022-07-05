@@ -652,9 +652,9 @@ class Serverless_WSO2_APIM {
           }
 
           // now update the swagger spec of the API
-          this.serverless.cli.log(`${pluginNameSuffix} Upserting Swagger spec for api ${api.apiName} (id=${apiId})`);
+          this.serverless.cli.log(`${pluginNameSuffix} Upserting Swagger spec for ${api.apiName}..`);
           await wso2apim.upsertSwaggerSpec(wso2APIM, this.cache.accessToken, apiId, apiDefs[i].swaggerSpec);
-          this.serverless.cli.log(`${pluginNameSuffix} Upserting OK`);
+          this.serverless.cli.log(`${pluginNameSuffix} Upserting.. OK`);
         } catch (err) {
           this.serverless.cli.log(
             'Creating / Updating ' +
