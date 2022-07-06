@@ -7,22 +7,26 @@
     "mocha": true,
     "jest": true
   },
-  "plugins": ["jest"],
+  "extends": [
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint", "jest"],
+  "ignorePatterns": ["src/__tests__/**/*.js"],
   "globals": {
     "console": "readonly",
     "process": "readonly"
   },
-  "extends": "eslint:recommended",
-  "parser": "babel-eslint",
-  "parserOptions": {
-    "ecmaVersion": 2017
-  },
   "rules": {
+    "node/no-unpublished-require": 0,
+    "comma-dangle": ["error", "always-multiline"],
+    "eol-last": ["error", "always"],
+    "semi": ["error", "always"],
+    "@typescript-eslint/no-var-requires": 1,
     "indent": ["error", 2],
     "linebreak-style": ["error", "unix"],
     "quotes": ["error", "single"],
-    "semi": ["error", "always"],
-    "eol-last": ["error", "always"],
     "jest/no-disabled-tests": "warn",
     "jest/no-focused-tests": "error",
     "jest/no-identical-title": "error",

@@ -1,5 +1,5 @@
 'use strict';
-var wso2apim;
+let wso2apim;
 const utils = require('./utils/utils');
 const axios = require('axios');
 const https = require('https');
@@ -9,11 +9,11 @@ const pluginNameSuffix = '[serverless-wso2-apim] ';
 const wso2ApimVersionsSupported = ['2.6.0', '3.2.0'];
 const versionSlugsSupported = {
   '2.6.0': {
-    'versionSlug': 'v0.14'
+    'versionSlug': 'v0.14',
   },
   '3.2.0': {
-    'versionSlug': 'v1.2'
-  }
+    'versionSlug': 'v1.2',
+  },
 };
 
 class Serverless_WSO2_APIM {
@@ -30,18 +30,18 @@ class Serverless_WSO2_APIM {
           apidefs: {
             usage: 'Deletes API definitions in WSO2 API Manager.',
             lifecycleEvents: [
-              'removeAPIDefs'
+              'removeAPIDefs',
             ],
           },
-        }
-      }
+        },
+      },
     };
 
     this.hooks = {
       'after:deploy:deploy': this.deploy.bind(this),
       'after:info:info': this.info.bind(this),
       'after:remove:remove': this.remove.bind(this),
-      'remove:apidefs:removeAPIDefs': this.remove.bind(this)
+      'remove:apidefs:removeAPIDefs': this.remove.bind(this),
     };
   }
 
@@ -124,7 +124,7 @@ class Serverless_WSO2_APIM {
     const split = '\n';
     let chain = certChainContent;
 
-    var certs = [];
+    const certs = [];
     if (
       chain.indexOf('-END CERTIFICATE-') < 0 ||
       chain.indexOf('-BEGIN CERTIFICATE-') < 0
@@ -134,10 +134,10 @@ class Serverless_WSO2_APIM {
       );
     }
     chain = chain.split(split);
-    var cert = [];
-    var _i, _len;
+    let cert = [];
+    let _i, _len;
     for (_i = 0, _len = chain.length; _i < _len; _i++) {
-      var line = chain[_i];
+      const line = chain[_i];
       if (!(line.length !== 0)) {
         continue;
       }
@@ -173,7 +173,7 @@ class Serverless_WSO2_APIM {
         (wso2APIM.apidefs.length > 0),
         (wso2APIM.apidefs.every(def => typeof def.cors === 'undefined' ||
           (typeof def.cors.credentials === 'undefined' || typeof def.cors.credentials === 'boolean'))
-        )
+        ),
       ];
       const messagesArray = [
         'Invalid value assigned to `custom.wso2apim.enabled`',
@@ -183,7 +183,7 @@ class Serverless_WSO2_APIM {
         'Invalid value assigned to `custom.wso2apim.pass`',
         'Invalid value assigned to `custom.wso2apim.gatewayEnv`',
         'No API definitions supplied `custom.wso2apim.apidefs`',
-        'Invalid value assigned to `custom.wso2apim.apiDefs[i].cors.credentials`'
+        'Invalid value assigned to `custom.wso2apim.apiDefs[i].cors.credentials`',
       ];
 
       if (conditionsArray.indexOf(false) !== -1) {
@@ -230,12 +230,12 @@ class Serverless_WSO2_APIM {
       for (const [idx, apiDef] of apiDefs.entries()) {
         // Resolving external references for.. backend.http.baseUrl
         if (apiDef.backend.http && apiDef.backend.http.baseUrl) {
-          let baseUrl = apiDef.backend.http.baseUrl;
+          const baseUrl = apiDef.backend.http.baseUrl;
           if (typeof baseUrl == 'object') {
             // If baseUrl is obtained via Cloud Formation's intrinsic function syntax (!Ref or Fn::ImportValue)
             if (baseUrl['Fn::ImportValue']) {
               this.provider = this.serverless.getProvider('aws');
-              let baseUrlResolved = await utils.resolveCfImportValue(
+              const baseUrlResolved = await utils.resolveCfImportValue(
                 this.provider,
                 baseUrl['Fn::ImportValue']
               );
@@ -259,11 +259,11 @@ class Serverless_WSO2_APIM {
 
   async detectProductVersion() {
     const wso2APIM = this.serverless.service.custom.wso2apim;
-    let url = `https://${wso2APIM.host}:${wso2APIM.port}/services/Version`;
-    let config = {
+    const url = `https://${wso2APIM.host}:${wso2APIM.port}/services/Version`;
+    const config = {
       httpsAgent: new https.Agent({
-        rejectUnauthorized: false
-      })
+        rejectUnauthorized: false,
+      }),
     };
     return axios.get(url, config);
   }
@@ -317,7 +317,7 @@ class Serverless_WSO2_APIM {
 
     this.cache.deploymentStatus = [];
     // Loops thru each api definition found in serverless configuration
-    for (let apiDef of apiDefs) {
+    for (const apiDef of apiDefs) {
       try {
         // Check if API is already deployed using the following combination:
         // It takes the form of <APIName>___<Version>___<RootContext>
@@ -336,7 +336,7 @@ class Serverless_WSO2_APIM {
         if (data.list.length > 0) {
           data.list.forEach((deployedAPI) => {
             // Remove /t/* suffix if exists
-            var deployedAPIContext = deployedAPI.context;
+            let deployedAPIContext = deployedAPI.context;
             if (deployedAPIContext.startsWith('/t/')) {
               deployedAPIContext = deployedAPIContext.split(
                 this.cache.tenantSuffix
@@ -367,7 +367,7 @@ class Serverless_WSO2_APIM {
           const apiId = this.cache.deployedAPIs.find(
             (deployedAPI) => deployedAPI.apiClob == apiDefClob
           ).apiId;
-          var invokableAPIURL = null;
+          let invokableAPIURL = null;
 
           // if API is PUBLISHED then retrieve invokable API URL
           try {
@@ -430,8 +430,8 @@ class Serverless_WSO2_APIM {
   }
 
   async detectAndSplitCerts(certChain) {
-    var certs = [];
-    var certOutput;
+    let certs = [];
+    let certOutput;
 
     // if certChain is an object
     if (typeof certChain == 'object') {
@@ -490,7 +490,7 @@ class Serverless_WSO2_APIM {
     // Create individual certificate files under /.serverless directory
     const slsDir = this.serverless.config.servicePath + '/.serverless';
     if (certContent && certContent.length > 0) {
-      let certFile = slsDir + '/' + certAlias + '.cer';
+      const certFile = slsDir + '/' + certAlias + '.cer';
       fs.writeFileSync(certFile, certContent, 'utf8');
     }
   }
@@ -510,7 +510,7 @@ class Serverless_WSO2_APIM {
               '..'
           );
           try {
-            let certs = await this.detectAndSplitCerts(
+            const certs = await this.detectAndSplitCerts(
               apiDef.backend.http.certChain
             );
 
@@ -518,7 +518,7 @@ class Serverless_WSO2_APIM {
             // Create individual certificate files under /.serverless directory
             if (certs && certs.length > 0) {
               for (let j = 0; j < certs.length; j++) {
-                let cert = certs[j];
+                const cert = certs[j];
                 var certAlias;
                 if (this.cache.tenantSuffix) {
                   // certAlias takes the form of <APIName>___<Version>___<index>_at_<tenantSuffix>
@@ -723,7 +723,7 @@ class Serverless_WSO2_APIM {
       // Loop thru this.cache.deploymentStatus array
       // Delete API definitions, if they exist and there are NO active subscriptions/users
       // It does NOT force delete API definitions, if there are any active subscriptions/users
-      for (let api of this.cache.deploymentStatus) {
+      for (const api of this.cache.deploymentStatus) {
         try {
           if (api.apiId) {
             // this.serverless.cli.log(pluginNameSuffix + "Deleting " + api.apiId + "..");

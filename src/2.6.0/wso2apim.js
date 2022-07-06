@@ -27,16 +27,16 @@ async function registerClient(wso2APIM) {
       'clientName': 'serverless-wso2-apim',
       'owner': user,
       'grantType': 'password refresh_token',
-      'saasApp': true
+      'saasApp': true,
     };
     var config = {
       headers: {
         'Authorization': 'Basic ' + authTokenBase64,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
       httpsAgent: new https.Agent({
-        rejectUnauthorized: false
-      })
+        rejectUnauthorized: false,
+      }),
     };
 
     return new Promise((resolve, reject) => {
@@ -67,23 +67,23 @@ async function generateToken(wso2APIM, clientId, clientSecret) {
       'grant_type': 'password',
       'username': user,
       'password': pass,
-      'scope': scope
+      'scope': scope,
     });
     var config = {
       headers: {
         'Authorization': 'Basic ' + authTokenBase64,
-        'Content-Type': 'application/x-www-form-urlencoded'
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
       httpsAgent: new https.Agent({
-        rejectUnauthorized: false
-      })
+        rejectUnauthorized: false,
+      }),
     };
 
     return new Promise((resolve, reject) => {
       axios.post(url, data, config)
         .then((res) => {
           resolve({
-            accessToken: res.data.access_token
+            accessToken: res.data.access_token,
           });
         })
         .catch((err) => {
@@ -104,11 +104,11 @@ async function isAPIDeployed(wso2APIM, accessToken, apiName, apiVersion, apiCont
     url = url + '?' + queryStr;
     let config = {
       headers: {
-        'Authorization': 'Bearer ' + accessToken
+        'Authorization': 'Bearer ' + accessToken,
       },
       httpsAgent: new https.Agent({
-        rejectUnauthorized: false
-      })
+        rejectUnauthorized: false,
+      }),
     };
 
     return new Promise((resolve, reject) => {
@@ -132,11 +132,11 @@ async function isCertUploaded(wso2APIM, accessToken, certAlias) {
     let url = `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/certificates/${certAlias}`;
     let config = {
       headers: {
-        'Authorization': 'Bearer ' + accessToken
+        'Authorization': 'Bearer ' + accessToken,
       },
       httpsAgent: new https.Agent({
-        rejectUnauthorized: false
-      })
+        rejectUnauthorized: false,
+      }),
     };
 
     return new Promise((resolve, reject) => {
@@ -209,19 +209,19 @@ function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
       tiers: ['Unlimited'],
       maxTps: {
         sandbox: (apiDef.maxTps) ? apiDef.maxTps : undefined,
-        production: (apiDef.maxTps) ? apiDef.maxTps : undefined
+        production: (apiDef.maxTps) ? apiDef.maxTps : undefined,
       },
       visibility: apiDef.visibility,
       endpointConfig: JSON.stringify({
         production_endpoints: {
           url: backendBaseUrl,
-          config: null
+          config: null,
         },
         sandbox_endpoints: {
           url: backendBaseUrl,
-          config: null
+          config: null,
         },
-        endpoint_type: (apiDef.backend.endpointType) ? apiDef.backend.endpointType : 'http'
+        endpoint_type: (apiDef.backend.endpointType) ? apiDef.backend.endpointType : 'http',
       }),
       endpointSecurity: null,
       gatewayEnvironments: gatewayEnv,
@@ -234,7 +234,7 @@ function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
         technicalOwnerEmail: ((apiDef.swaggerSpec.info) && (apiDef.swaggerSpec.info.contact) && (apiDef.swaggerSpec.info.contact.email)) ? apiDef.swaggerSpec.info.contact.email : undefined,
         technicalOwner: ((apiDef.swaggerSpec.info) && (apiDef.swaggerSpec.info.contact) && (apiDef.swaggerSpec.info.contact.name)) ? apiDef.swaggerSpec.info.contact.name : undefined,
         businessOwner: ((apiDef.swaggerSpec.info) && (apiDef.swaggerSpec.info.contact) && (apiDef.swaggerSpec.info.contact.name)) ? apiDef.swaggerSpec.info.contact.name : undefined,
-      }
+      },
     };
     if (apiDef.cors) {
       wso2ApiDefinition.corsConfiguration = constructCorsConfiguration(apiDef);
@@ -284,11 +284,11 @@ async function createAPIDef(wso2APIM, accessToken, apiDef) {
     var config = {
       headers: {
         'Authorization': 'Bearer ' + accessToken,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
       httpsAgent: new https.Agent({
-        rejectUnauthorized: false
-      })
+        rejectUnauthorized: false,
+      }),
     };
 
     return new Promise((resolve, reject) => {
@@ -298,7 +298,7 @@ async function createAPIDef(wso2APIM, accessToken, apiDef) {
             apiId: res.data.id,
             apiName: res.data.name,
             apiContext: res.data.context,
-            apiStatus: res.data.status
+            apiStatus: res.data.status,
           });
         })
         .catch((err) => {
@@ -320,15 +320,15 @@ async function publishAPIDef(wso2APIM, accessToken, apiId) {
     var data = {};
     var config = {
       headers: {
-        'Authorization': 'Bearer ' + accessToken
+        'Authorization': 'Bearer ' + accessToken,
       },
       params: {
         'apiId': apiId,
-        'action': 'Publish'
+        'action': 'Publish',
       },
       httpsAgent: new https.Agent({
-        rejectUnauthorized: false
-      })
+        rejectUnauthorized: false,
+      }),
     };
 
     return new Promise((resolve, reject) => {
@@ -353,11 +353,11 @@ async function listInvokableAPIUrl(wso2APIM, accessToken, apiId) {
     let url = `https://${wso2APIM.host}:${wso2APIM.port}/api/am/store/${wso2APIM.versionSlug}/apis/${apiId}`;
     var config = {
       headers: {
-        'Authorization': 'Bearer ' + accessToken
+        'Authorization': 'Bearer ' + accessToken,
       },
       httpsAgent: new https.Agent({
-        rejectUnauthorized: false
-      })
+        rejectUnauthorized: false,
+      }),
     };
 
     return new Promise((resolve, reject) => {
@@ -387,11 +387,11 @@ async function uploadCert(wso2APIM, accessToken, certAlias, cert, backendUrl) {
     var config = {
       headers: {
         'Authorization': 'Bearer ' + accessToken,
-        'Content-Type': 'multipart/form-data'
+        'Content-Type': 'multipart/form-data',
       },
       httpsAgent: new https.Agent({
-        rejectUnauthorized: false
-      })
+        rejectUnauthorized: false,
+      }),
     };
 
     return new Promise((resolve, reject) => {
@@ -422,11 +422,11 @@ async function updateAPIDef(wso2APIM, accessToken, apiDef, apiId) {
     var config = {
       headers: {
         'Authorization': 'Bearer ' + accessToken,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
       httpsAgent: new https.Agent({
-        rejectUnauthorized: false
-      })
+        rejectUnauthorized: false,
+      }),
     };
 
     return new Promise((resolve, reject) => {
@@ -451,11 +451,11 @@ async function removeAPIDef(wso2APIM, accessToken, apiId) {
     let url = `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/apis/${apiId}`;
     let config = {
       headers: {
-        'Authorization': 'Bearer ' + accessToken
+        'Authorization': 'Bearer ' + accessToken,
       },
       httpsAgent: new https.Agent({
-        rejectUnauthorized: false
-      })
+        rejectUnauthorized: false,
+      }),
     };
 
     return new Promise((resolve, reject) => {
@@ -480,11 +480,11 @@ async function removeCert(wso2APIM, accessToken, certAlias) {
     let url = `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/certificates/${certAlias}`;
     let config = {
       headers: {
-        'Authorization': 'Bearer ' + accessToken
+        'Authorization': 'Bearer ' + accessToken,
       },
       httpsAgent: new https.Agent({
-        rejectUnauthorized: false
-      })
+        rejectUnauthorized: false,
+      }),
     };
 
     return new Promise((resolve, reject) => {
@@ -515,11 +515,11 @@ async function updateCert(wso2APIM, accessToken, certAlias, cert) {
     let config = {
       headers: {
         'Authorization': 'Bearer ' + accessToken,
-        'Content-Type': 'multipart/form-data'
+        'Content-Type': 'multipart/form-data',
       },
       httpsAgent: new https.Agent({
-        rejectUnauthorized: false
-      })
+        rejectUnauthorized: false,
+      }),
     };
 
     return new Promise((resolve, reject) => {
@@ -545,11 +545,11 @@ async function listCertInfo(wso2APIM, accessToken, certAlias) {
     let config = {
       headers: {
         'Authorization': 'Bearer ' + accessToken,
-        'Accept': 'application/json'
+        'Accept': 'application/json',
       },
       httpsAgent: new https.Agent({
-        rejectUnauthorized: false
-      })
+        rejectUnauthorized: false,
+      }),
     };
 
     return new Promise((resolve, reject) => {
@@ -578,17 +578,17 @@ async function listCertInfo(wso2APIM, accessToken, certAlias) {
  * @param {*} swaggerSpec 
  * @returns 
  */
- async function upsertSwaggerSpec(wso2APIM, accessToken, apiId, swaggerSpec) {
+async function upsertSwaggerSpec(wso2APIM, accessToken, apiId, swaggerSpec) {
   try {
     const url = `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/apis/${apiId}/swagger`;
     const config = {
       headers: {
         'Authorization': 'Bearer ' + accessToken,
-        'Content-Type': 'multipart/form-data'
+        'Content-Type': 'multipart/form-data',
       },
       httpsAgent: new https.Agent({
-        rejectUnauthorized: false
-      })
+        rejectUnauthorized: false,
+      }),
     };
     
     const data = new FormData();

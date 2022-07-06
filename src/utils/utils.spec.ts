@@ -1,4 +1,4 @@
-const { resolveCfImportValue } = require('./utils');
+import { resolveCfImportValue } from './utils';
 
 describe('resolveCfImportValue', () => {
   let calls = 0;

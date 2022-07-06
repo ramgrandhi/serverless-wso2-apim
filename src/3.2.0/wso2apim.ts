@@ -9,12 +9,12 @@
 // * Use no console.log() at this level, only Promises being returned
 // ----------------
 
-const axios = require('axios');
-const https = require('https');
-const qs = require('qs');
-const FormData = require('form-data');
-const fs = require('fs');
-const utils = require('../utils/utils');
+import axios from 'axios';
+import https from 'https';
+import fs from 'fs';
+import qs from 'qs';
+import FormData from 'form-data';
+import utils from '../utils/utils';
 
 // Parse your swagger online @ https://apitools.dev/swagger-parser/online/
 const parser = require('swagger-parser');
@@ -22,28 +22,29 @@ const parser = require('swagger-parser');
 // Register a new client
 async function registerClient(wso2APIM) {
   try {
-    let url = `https://${wso2APIM.host}:${wso2APIM.port}/client-registration/v0.17/register`;
-    let { user, pass } = wso2APIM;
-    let authToken = user + ':' + pass;
-    let authTokenBase64 = Buffer.from(authToken).toString('base64');
-    var data = {
-      'clientName': 'serverless-wso2-apim',
-      'owner': user,
-      'grantType': 'password refresh_token',
-      'saasApp': true
+    const url = `https://${wso2APIM.host}:${wso2APIM.port}/client-registration/v0.17/register`;
+    const { user, pass } = wso2APIM;
+    const authToken = user + ':' + pass;
+    const authTokenBase64 = Buffer.from(authToken).toString('base64');
+    const data = {
+      clientName: 'serverless-wso2-apim',
+      owner: user,
+      grantType: 'password refresh_token',
+      saasApp: true,
     };
-    var config = {
+    const config = {
       headers: {
-        'Authorization': 'Basic ' + authTokenBase64,
-        'Content-Type': 'application/json'
+        Authorization: 'Basic ' + authTokenBase64,
+        'Content-Type': 'application/json',
       },
       httpsAgent: new https.Agent({
-        rejectUnauthorized: false
-      })
+        rejectUnauthorized: false,
+      }),
     };
 
     return new Promise((resolve, reject) => {
-      axios.post(url, data, config)
+      axios
+        .post(url, data, config)
         .then((res) => {
           resolve(res.data);
         })
@@ -52,42 +53,42 @@ async function registerClient(wso2APIM) {
           reject(err);
         });
     });
-  }
-  catch (err) {
+  } catch (err) {
     utils.renderError(err);
   }
 }
 
-
 // Generate a new token
 async function generateToken(wso2APIM, clientId, clientSecret) {
   try {
-    let url = `https://${wso2APIM.host}:${wso2APIM.port}/oauth2/token`;
-    let { user, pass } = wso2APIM;
-    let scope = 'apim:api_create apim:api_view apim:api_publish apim:api_delete';
-    let authToken = clientId + ':' + clientSecret;
-    let authTokenBase64 = Buffer.from(authToken).toString('base64');
-    var data = qs.stringify({
-      'grant_type': 'password',
-      'username': user,
-      'password': pass,
-      'scope': scope
+    const url = `https://${wso2APIM.host}:${wso2APIM.port}/oauth2/token`;
+    const { user, pass } = wso2APIM;
+    const scope =
+      'apim:api_create apim:api_view apim:api_publish apim:api_delete';
+    const authToken = clientId + ':' + clientSecret;
+    const authTokenBase64 = Buffer.from(authToken).toString('base64');
+    const data = qs.stringify({
+      grant_type: 'password',
+      username: user,
+      password: pass,
+      scope: scope,
     });
-    var config = {
+    const config = {
       headers: {
-        'Authorization': 'Basic ' + authTokenBase64,
-        'Content-Type': 'application/x-www-form-urlencoded'
+        Authorization: 'Basic ' + authTokenBase64,
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
       httpsAgent: new https.Agent({
-        rejectUnauthorized: false
-      })
+        rejectUnauthorized: false,
+      }),
     };
 
     return new Promise((resolve, reject) => {
-      axios.post(url, data, config)
+      axios
+        .post(url, data, config)
         .then((res) => {
           resolve({
-            accessToken: res.data.access_token
+            accessToken: res.data.access_token,
           });
         })
         .catch((err) => {
@@ -95,28 +96,40 @@ async function generateToken(wso2APIM, clientId, clientSecret) {
           reject(err);
         });
     });
-  }
-  catch (err) {
+  } catch (err) {
     utils.renderError(err);
   }
 }
 
-async function isAPIDeployed(wso2APIM, accessToken, apiName, apiVersion, apiContext) {
+async function isAPIDeployed(
+  wso2APIM,
+  accessToken,
+  apiName,
+  apiVersion,
+  apiContext
+) {
   try {
     let url = `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/apis`;
-    let queryStr = 'query=name:' + apiName + ' version:' + apiVersion + ' context:' + apiContext;
+    const queryStr =
+      'query=name:' +
+      apiName +
+      ' version:' +
+      apiVersion +
+      ' context:' +
+      apiContext;
     url = url + '?' + queryStr;
-    let config = {
+    const config = {
       headers: {
-        'Authorization': 'Bearer ' + accessToken
+        Authorization: 'Bearer ' + accessToken,
       },
       httpsAgent: new https.Agent({
-        rejectUnauthorized: false
-      })
+        rejectUnauthorized: false,
+      }),
     };
 
     return new Promise((resolve, reject) => {
-      axios.get(url, config)
+      axios
+        .get(url, config)
         .then((res) => {
           resolve(res.data);
         })
@@ -125,26 +138,26 @@ async function isAPIDeployed(wso2APIM, accessToken, apiName, apiVersion, apiCont
           reject(err);
         });
     });
-  }
-  catch (err) {
+  } catch (err) {
     utils.renderError(err);
   }
 }
 
 async function isCertUploaded(wso2APIM, accessToken, certAlias) {
   try {
-    let url = `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/certificates/${certAlias}`;
-    let config = {
+    const url = `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/certificates/${certAlias}`;
+    const config = {
       headers: {
-        'Authorization': 'Bearer ' + accessToken
+        Authorization: 'Bearer ' + accessToken,
       },
       httpsAgent: new https.Agent({
-        rejectUnauthorized: false
-      })
+        rejectUnauthorized: false,
+      }),
     };
 
     return new Promise((resolve, reject) => {
-      axios.get(url, config)
+      axios
+        .get(url, config)
         .then((res) => {
           resolve(res.data);
         })
@@ -156,8 +169,7 @@ async function isCertUploaded(wso2APIM, accessToken, certAlias) {
           reject(err);
         });
     });
-  }
-  catch (err) {
+  } catch (err) {
     utils.renderError(err);
   }
 }
@@ -177,22 +189,34 @@ async function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
     else if (apiDef.backend.jms) {
       if (apiDef.backend.jms.destination) {
         backendBaseUrl = ['jms:', apiDef.backend.jms.destination].join('/');
-        backendBaseUrl = [backendBaseUrl, qs.stringify(apiDef.backend.jms.parameters, { encode: false })].join('?');
+        backendBaseUrl = [
+          backendBaseUrl,
+          qs.stringify(apiDef.backend.jms.parameters, { encode: false }),
+        ].join('?');
       }
       backendType = 'HTTP';
     }
 
     // Construct mediation policies
-    var mediationPolicies = [];
+    const mediationPolicies = [];
     if (apiDef.mediationPolicies) {
       if (apiDef.mediationPolicies.in) {
-        mediationPolicies.push({ 'name': apiDef.mediationPolicies.in, 'type': 'in' });
+        mediationPolicies.push({
+          name: apiDef.mediationPolicies.in,
+          type: 'in',
+        });
       }
       if (apiDef.mediationPolicies.out) {
-        mediationPolicies.push({ 'name': apiDef.mediationPolicies.out, 'type': 'out' });
+        mediationPolicies.push({
+          name: apiDef.mediationPolicies.out,
+          type: 'out',
+        });
       }
       if (apiDef.mediationPolicies.fault) {
-        mediationPolicies.push({ 'name': apiDef.mediationPolicies.fault, 'type': 'fault' });
+        mediationPolicies.push({
+          name: apiDef.mediationPolicies.fault,
+          type: 'fault',
+        });
       }
     }
 
@@ -203,7 +227,7 @@ async function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
       context: apiDef.rootContext,
       version: apiDef.version,
       operations: await constructAPIOperations(apiDef.swaggerSpec),
-      lifeCycleStatus: 'CREATED', 
+      lifeCycleStatus: 'CREATED',
       isDefaultVersion: false,
       enableStore: true,
       type: backendType,
@@ -213,30 +237,56 @@ async function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
       apiThrottlingPolicy: 'Unlimited',
       securityScheme: ['oauth2'],
       maxTps: {
-        production: (apiDef.maxTps) ? apiDef.maxTps : undefined
+        production: apiDef.maxTps ? apiDef.maxTps : undefined,
       },
       visibility: apiDef.visibility,
       endpointConfig: {
         production_endpoints: {
-          url: backendBaseUrl            },
-        sandbox_endpoints: {
-          url: backendBaseUrl
+          url: backendBaseUrl,
         },
-        endpoint_type: (apiDef.backend.endpointType) ? apiDef.backend.endpointType : 'http'
+        sandbox_endpoints: {
+          url: backendBaseUrl,
+        },
+        endpoint_type: apiDef.backend.endpointType
+          ? apiDef.backend.endpointType
+          : 'http',
       },
       endpointImplementationType: 'ENDPOINT',
       endpointSecurity: null,
-      gatewayEnvironments: [ gatewayEnv ],
+      gatewayEnvironments: [gatewayEnv],
       mediationPolicies: mediationPolicies,
-      additionalProperties: ((apiDef.apiProperties) && (Object.keys(apiDef.apiProperties).length > 0)) ? apiDef.apiProperties : undefined,
+      additionalProperties:
+        apiDef.apiProperties && Object.keys(apiDef.apiProperties).length > 0
+          ? apiDef.apiProperties
+          : undefined,
       subscriptionAvailability: 'CURRENT_TENANT',
       subscriptionAvailableTenants: [],
       businessInformation: {
-        businessOwnerEmail: ((apiDef.swaggerSpec.info) && (apiDef.swaggerSpec.info.contact) && (apiDef.swaggerSpec.info.contact.email)) ? apiDef.swaggerSpec.info.contact.email : undefined,
-        technicalOwnerEmail: ((apiDef.swaggerSpec.info) && (apiDef.swaggerSpec.info.contact) && (apiDef.swaggerSpec.info.contact.email)) ? apiDef.swaggerSpec.info.contact.email : undefined,
-        technicalOwner: ((apiDef.swaggerSpec.info) && (apiDef.swaggerSpec.info.contact) && (apiDef.swaggerSpec.info.contact.name)) ? apiDef.swaggerSpec.info.contact.name : undefined,
-        businessOwner: ((apiDef.swaggerSpec.info) && (apiDef.swaggerSpec.info.contact) && (apiDef.swaggerSpec.info.contact.name)) ? apiDef.swaggerSpec.info.contact.name : undefined,
-      }
+        businessOwnerEmail:
+          apiDef.swaggerSpec.info &&
+          apiDef.swaggerSpec.info.contact &&
+          apiDef.swaggerSpec.info.contact.email
+            ? apiDef.swaggerSpec.info.contact.email
+            : undefined,
+        technicalOwnerEmail:
+          apiDef.swaggerSpec.info &&
+          apiDef.swaggerSpec.info.contact &&
+          apiDef.swaggerSpec.info.contact.email
+            ? apiDef.swaggerSpec.info.contact.email
+            : undefined,
+        technicalOwner:
+          apiDef.swaggerSpec.info &&
+          apiDef.swaggerSpec.info.contact &&
+          apiDef.swaggerSpec.info.contact.name
+            ? apiDef.swaggerSpec.info.contact.name
+            : undefined,
+        businessOwner:
+          apiDef.swaggerSpec.info &&
+          apiDef.swaggerSpec.info.contact &&
+          apiDef.swaggerSpec.info.contact.name
+            ? apiDef.swaggerSpec.info.contact.name
+            : undefined,
+      },
     };
     if (apiDef.cors) {
       wso2ApiDefinition.corsConfiguration = constructCorsConfiguration(apiDef);
@@ -246,8 +296,7 @@ async function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
     backendType = '';
 
     return wso2ApiDefinition;
-  }
-  catch (err) {
+  } catch (err) {
     utils.renderError(err);
   }
 }
@@ -278,17 +327,17 @@ function constructCorsConfiguration(apiDef) {
 }
 
 async function constructAPIOperations(apiDef) {
-  var wso2Operations = [];
-  let swaggerObj = await parser.dereference(apiDef);
+  const wso2Operations = [];
+  const swaggerObj = await parser.dereference(apiDef);
 
   // Traverse through paths
-  for (var pathObj in swaggerObj.paths) {
+  for (const pathObj in swaggerObj.paths) {
     if (Object.prototype.hasOwnProperty.call(swaggerObj.paths, pathObj)) {
       // Traverse through verbs
-      for (var verbObj in swaggerObj.paths[pathObj]) {
+      for (const verbObj in swaggerObj.paths[pathObj]) {
         // Traverse through verb properties
-        var authType = undefined;
-        for (var verbProp in swaggerObj.paths[pathObj][verbObj]) {
+        let authType = undefined;
+        for (const verbProp in swaggerObj.paths[pathObj][verbObj]) {
           if (verbProp.toLowerCase() === 'x-auth-type') {
             authType = swaggerObj.paths[pathObj][verbObj][verbProp];
           }
@@ -296,8 +345,8 @@ async function constructAPIOperations(apiDef) {
         wso2Operations.push({
           target: pathObj,
           verb: verbObj,
-          authType: (authType) ? authType : 'Any',
-          throttlingPolicy: 'Unlimited'
+          authType: authType ? authType : 'Any',
+          throttlingPolicy: 'Unlimited',
         });
       }
     }
@@ -310,40 +359,38 @@ async function constructAPIOperations(apiDef) {
 async function createAPIDef(wso2APIM, accessToken, apiDef) {
   try {
     let url = `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/apis`;
-    let { user, gatewayEnv } = wso2APIM;
-    var data = await constructAPIDef(user, gatewayEnv, apiDef);
+    const { user, gatewayEnv } = wso2APIM;
+    const data = await constructAPIDef(user, gatewayEnv, apiDef);
 
     // TODO - dynamically retrieve swaggerSpec version
-    let queryStr = 'openAPIVersion=V3';
+    const queryStr = 'openAPIVersion=V3';
     url = url + '?' + queryStr;
-    var config = {
+    const config = {
       headers: {
-        'Authorization': 'Bearer ' + accessToken,
-        'Content-Type': 'application/json'
+        Authorization: 'Bearer ' + accessToken,
+        'Content-Type': 'application/json',
       },
       httpsAgent: new https.Agent({
-        rejectUnauthorized: false
-      })
+        rejectUnauthorized: false,
+      }),
     };
 
     return new Promise((resolve, reject) => {
-      axios.post(url, data, config)
+      axios
+        .post(url, data, config)
         .then((res) => {
           resolve({
             apiId: res.data.id,
             apiName: res.data.name,
             apiContext: res.data.context,
-            apiStatus: res.data.status
+            apiStatus: res.data.status,
           });
         })
         .catch((err) => {
-          reject(
-            utils.renderError(err)
-          );
+          reject(utils.renderError(err));
         });
     });
-  }
-  catch (err) {
+  } catch (err) {
     utils.renderError(err);
   }
 }
@@ -351,23 +398,24 @@ async function createAPIDef(wso2APIM, accessToken, apiDef) {
 // Publishes API definition
 async function publishAPIDef(wso2APIM, accessToken, apiId) {
   try {
-    let url = `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/apis/change-lifecycle`;
-    var data = {};
-    var config = {
+    const url = `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/apis/change-lifecycle`;
+    const data = {};
+    const config = {
       headers: {
-        'Authorization': 'Bearer ' + accessToken
+        Authorization: 'Bearer ' + accessToken,
       },
       params: {
-        'apiId': apiId,
-        'action': 'Publish'
+        apiId: apiId,
+        action: 'Publish',
       },
       httpsAgent: new https.Agent({
-        rejectUnauthorized: false
-      })
+        rejectUnauthorized: false,
+      }),
     };
 
     return new Promise((resolve, reject) => {
-      axios.post(url, data, config)
+      axios
+        .post(url, data, config)
         .then((res) => {
           resolve(res);
         })
@@ -376,8 +424,7 @@ async function publishAPIDef(wso2APIM, accessToken, apiId) {
           reject(err);
         });
     });
-  }
-  catch (err) {
+  } catch (err) {
     utils.renderError(err);
   }
 }
@@ -385,18 +432,19 @@ async function publishAPIDef(wso2APIM, accessToken, apiId) {
 // Retrieves invokable API endpoint
 async function listInvokableAPIUrl(wso2APIM, accessToken, apiId) {
   try {
-    let url = `https://${wso2APIM.host}:${wso2APIM.port}/api/am/store/${wso2APIM.versionSlug}/apis/${apiId}`;
-    var config = {
+    const url = `https://${wso2APIM.host}:${wso2APIM.port}/api/am/store/${wso2APIM.versionSlug}/apis/${apiId}`;
+    const config = {
       headers: {
-        'Authorization': 'Bearer ' + accessToken
+        Authorization: 'Bearer ' + accessToken,
       },
       httpsAgent: new https.Agent({
-        rejectUnauthorized: false
-      })
+        rejectUnauthorized: false,
+      }),
     };
 
     return new Promise((resolve, reject) => {
-      axios.get(url, config)
+      axios
+        .get(url, config)
         .then((res) => {
           resolve(res.data);
         })
@@ -405,33 +453,32 @@ async function listInvokableAPIUrl(wso2APIM, accessToken, apiId) {
           reject(err);
         });
     });
-  }
-  catch (err) {
+  } catch (err) {
     utils.renderError(err);
   }
 }
 
-
 // Uploads backend certificate
 async function uploadCert(wso2APIM, accessToken, certAlias, cert, backendUrl) {
   try {
-    let url = `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/endpoint-certificates`;
-    var data = new FormData();
+    const url = `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/endpoint-certificates`;
+    const data = new FormData();
     data.append('certificate', fs.createReadStream(cert));
     data.append('alias', certAlias);
     data.append('endpoint', backendUrl);
-    var config = {
+    const config = {
       headers: {
-        'Authorization': 'Bearer ' + accessToken,
-        'Content-Type': 'multipart/form-data'
+        Authorization: 'Bearer ' + accessToken,
+        'Content-Type': 'multipart/form-data',
       },
       httpsAgent: new https.Agent({
-        rejectUnauthorized: false
-      })
+        rejectUnauthorized: false,
+      }),
     };
 
     return new Promise((resolve, reject) => {
-      axios.post(url, data, config)
+      axios
+        .post(url, data, config)
         .then((res) => {
           resolve(res);
         })
@@ -443,8 +490,7 @@ async function uploadCert(wso2APIM, accessToken, certAlias, cert, backendUrl) {
           reject(err);
         });
     });
-  }
-  catch (err) {
+  } catch (err) {
     utils.renderError(err);
   }
 }
@@ -452,21 +498,22 @@ async function uploadCert(wso2APIM, accessToken, certAlias, cert, backendUrl) {
 // Updates API definition
 async function updateAPIDef(wso2APIM, accessToken, apiDef, apiId) {
   try {
-    let url = `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/apis/${apiId}`;
-    let { user, gatewayEnv } = wso2APIM;
-    var data = await constructAPIDef(user, gatewayEnv, apiDef, apiId);
-    var config = {
+    const url = `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/apis/${apiId}`;
+    const { user, gatewayEnv } = wso2APIM;
+    const data = await constructAPIDef(user, gatewayEnv, apiDef, apiId);
+    const config = {
       headers: {
-        'Authorization': 'Bearer ' + accessToken,
-        'Content-Type': 'application/json'
+        Authorization: 'Bearer ' + accessToken,
+        'Content-Type': 'application/json',
       },
       httpsAgent: new https.Agent({
-        rejectUnauthorized: false
-      })
+        rejectUnauthorized: false,
+      }),
     };
 
     return new Promise((resolve, reject) => {
-      axios.put(url, data, config)
+      axios
+        .put(url, data, config)
         .then((res) => {
           resolve(res.data);
         })
@@ -475,8 +522,7 @@ async function updateAPIDef(wso2APIM, accessToken, apiDef, apiId) {
           reject(err);
         });
     });
-  }
-  catch (err) {
+  } catch (err) {
     utils.renderError(err);
   }
 }
@@ -484,18 +530,19 @@ async function updateAPIDef(wso2APIM, accessToken, apiDef, apiId) {
 // Removes API definition (if possible)
 async function removeAPIDef(wso2APIM, accessToken, apiId) {
   try {
-    let url = `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/apis/${apiId}`;
-    let config = {
+    const url = `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/apis/${apiId}`;
+    const config = {
       headers: {
-        'Authorization': 'Bearer ' + accessToken
+        Authorization: 'Bearer ' + accessToken,
       },
       httpsAgent: new https.Agent({
-        rejectUnauthorized: false
-      })
+        rejectUnauthorized: false,
+      }),
     };
 
     return new Promise((resolve, reject) => {
-      axios.delete(url, config)
+      axios
+        .delete(url, config)
         .then((res) => {
           resolve(res.data);
         })
@@ -504,8 +551,7 @@ async function removeAPIDef(wso2APIM, accessToken, apiId) {
           reject(err);
         });
     });
-  }
-  catch (err) {
+  } catch (err) {
     utils.renderError(err);
   }
 }
@@ -513,18 +559,19 @@ async function removeAPIDef(wso2APIM, accessToken, apiId) {
 // Removes backend certificate
 async function removeCert(wso2APIM, accessToken, certAlias) {
   try {
-    let url = `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/certificates/${certAlias}`;
-    let config = {
+    const url = `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/certificates/${certAlias}`;
+    const config = {
       headers: {
-        'Authorization': 'Bearer ' + accessToken
+        Authorization: 'Bearer ' + accessToken,
       },
       httpsAgent: new https.Agent({
-        rejectUnauthorized: false
-      })
+        rejectUnauthorized: false,
+      }),
     };
 
     return new Promise((resolve, reject) => {
-      axios.delete(url, config)
+      axios
+        .delete(url, config)
         .then((res) => {
           resolve(res);
         })
@@ -536,31 +583,30 @@ async function removeCert(wso2APIM, accessToken, certAlias) {
           reject(err);
         });
     });
-  }
-  catch (err) {
+  } catch (err) {
     utils.renderError(err);
   }
 }
 
-
 // Updates backend certificate
 async function updateCert(wso2APIM, accessToken, certAlias, cert) {
   try {
-    let url = `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/endpoint-certificates/${certAlias}`;
-    var data = new FormData();
+    const url = `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/endpoint-certificates/${certAlias}`;
+    const data = new FormData();
     data.append('certificate', fs.createReadStream(cert));
-    let config = {
+    const config = {
       headers: {
-        'Authorization': 'Bearer ' + accessToken,
-        'Content-Type': 'multipart/form-data'
+        Authorization: 'Bearer ' + accessToken,
+        'Content-Type': 'multipart/form-data',
       },
       httpsAgent: new https.Agent({
-        rejectUnauthorized: false
-      })
+        rejectUnauthorized: false,
+      }),
     };
 
     return new Promise((resolve, reject) => {
-      axios.put(url, data, config)
+      axios
+        .put(url, data, config)
         .then((res) => {
           resolve(res);
         })
@@ -569,8 +615,7 @@ async function updateCert(wso2APIM, accessToken, certAlias, cert) {
           reject(err);
         });
     });
-  }
-  catch (err) {
+  } catch (err) {
     utils.renderError(err);
   }
 }
@@ -578,19 +623,20 @@ async function updateCert(wso2APIM, accessToken, certAlias, cert) {
 // Lists certificate information (like validFrom, validTo, subject etc)
 async function listCertInfo(wso2APIM, accessToken, certAlias) {
   try {
-    let url = `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/certificates/${certAlias}`;
-    let config = {
+    const url = `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/certificates/${certAlias}`;
+    const config = {
       headers: {
-        'Authorization': 'Bearer ' + accessToken,
-        'Accept': 'application/json'
+        Authorization: 'Bearer ' + accessToken,
+        Accept: 'application/json',
       },
       httpsAgent: new https.Agent({
-        rejectUnauthorized: false
-      })
+        rejectUnauthorized: false,
+      }),
     };
 
     return new Promise((resolve, reject) => {
-      axios.get(url, config)
+      axios
+        .get(url, config)
         .then((res) => {
           resolve(res.data);
         })
@@ -599,8 +645,7 @@ async function listCertInfo(wso2APIM, accessToken, certAlias) {
           reject(err);
         });
     });
-  }
-  catch (err) {
+  } catch (err) {
     utils.renderError(err);
   }
 }
@@ -608,39 +653,36 @@ async function listCertInfo(wso2APIM, accessToken, certAlias) {
 /**
  * Upsert the swagger spec of the wso2 api
  * see https://apim.docs.wso2.com/en/3.2.0/develop/product-apis/publisher-apis/publisher-v1/publisher-v1/#tag/APIs/paths/~1apis~1{apiId}~1swagger/put for documentation
- * @param {*} wso2APIM 
- * @param {*} accessToken 
- * @param {*} apiId 
- * @param {*} swaggerSpec 
- * @returns 
+ * @param {*} wso2APIM
+ * @param {*} accessToken
+ * @param {*} apiId
+ * @param {*} swaggerSpec
+ * @returns
  */
- async function upsertSwaggerSpec(wso2APIM, accessToken, apiId, swaggerSpec) {
+async function upsertSwaggerSpec(wso2APIM, accessToken, apiId, swaggerSpec) {
   try {
     const url = `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/apis/${apiId}/swagger`;
     const config = {
       headers: {
-        'Authorization': 'Bearer ' + accessToken,
-        'Content-Type': 'multipart/form-data'
+        Authorization: 'Bearer ' + accessToken,
+        'Content-Type': 'multipart/form-data',
       },
       httpsAgent: new https.Agent({
-        rejectUnauthorized: false
-      })
+        rejectUnauthorized: false,
+      }),
     };
-    
+
     const data = new FormData();
     data.append('apiDefinition', JSON.stringify(swaggerSpec));
 
-    return axios.put(url, data, config)
-      .then((_) => undefined); // eat the http response, not needed outside of this api layer
-  }
-  catch (err) {
+    return axios.put(url, data, config).then((_) => undefined); // eat the http response, not needed outside of this api layer
+  } catch (err) {
     utils.renderError(err);
     throw err;
   }
 }
 
-
-module.exports = {
+export {
   registerClient,
   generateToken,
   isAPIDeployed,
