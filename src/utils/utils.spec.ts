@@ -1,4 +1,5 @@
 import { resolveCfImportValue } from './utils';
+import {} from './utils';
 
 describe('resolveCfImportValue', () => {
   let calls = 0;

@@ -65,7 +65,8 @@
     "serverless-deployment-bucket": "^1.4.1",
     "serverless-localstack": "^0.4.30",
     "split-ca": "^1.0.1",
-    "ts-jest": "^28.0.5"
+    "ts-jest": "^28.0.5",
+    "typescript": "^4.7.4"
   },
   "dependencies": {
     "axios": "^0.24.0",
