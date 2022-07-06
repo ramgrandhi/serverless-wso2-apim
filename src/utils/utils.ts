@@ -1,4 +1,4 @@
-function renderError(err) {
+export function renderError(err) {
   if (err.response) {
     console.log({
       response: err.response.data,
@@ -19,11 +19,11 @@ function renderError(err) {
   }
 }
 
-async function goToSleep(milliS) {
+export async function goToSleep(milliS) {
   return new Promise((resolve) => setTimeout(resolve, milliS));
 }
 
-function resolveCfImportValue(provider, name, params = {}) {
+export function resolveCfImportValue(provider, name, params = {}) {
   return provider
     .request('CloudFormation', 'listExports', params)
     .then((result) => {
@@ -39,5 +39,3 @@ function resolveCfImportValue(provider, name, params = {}) {
       return null;
     });
 }
-
-export { renderError, goToSleep, resolveCfImportValue };

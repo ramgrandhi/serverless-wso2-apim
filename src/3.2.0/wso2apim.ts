@@ -14,7 +14,7 @@ import https from 'https';
 import fs from 'fs';
 import qs from 'qs';
 import FormData from 'form-data';
-import utils from '../utils/utils';
+import * as utils from '../utils/utils';
 
 // Parse your swagger online @ https://apitools.dev/swagger-parser/online/
 const parser = require('swagger-parser');
@@ -289,7 +289,8 @@ async function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
       },
     };
     if (apiDef.cors) {
-      wso2ApiDefinition.corsConfiguration = constructCorsConfiguration(apiDef);
+      (wso2ApiDefinition as any).corsConfiguration =
+        constructCorsConfiguration(apiDef);
     }
 
     backendBaseUrl = '';
@@ -360,7 +361,7 @@ async function createAPIDef(wso2APIM, accessToken, apiDef) {
   try {
     let url = `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/apis`;
     const { user, gatewayEnv } = wso2APIM;
-    const data = await constructAPIDef(user, gatewayEnv, apiDef);
+    const data = await constructAPIDef(user, gatewayEnv, apiDef, null);
 
     // TODO - dynamically retrieve swaggerSpec version
     const queryStr = 'openAPIVersion=V3';

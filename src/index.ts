@@ -9,14 +9,24 @@ const pluginNameSuffix = '[serverless-wso2-apim] ';
 const wso2ApimVersionsSupported = ['2.6.0', '3.2.0'];
 const versionSlugsSupported = {
   '2.6.0': {
-    'versionSlug': 'v0.14',
+    versionSlug: 'v0.14',
   },
   '3.2.0': {
-    'versionSlug': 'v1.2',
+    versionSlug: 'v1.2',
   },
 };
 
 class Serverless_WSO2_APIM {
+  private cache: Record<any, any>;
+  private serverless;
+  private options;
+  private cmd;
+  private commands;
+  private hooks;
+  private wso2APIM;
+  private apiDefs;
+  private provider;
+
   constructor(serverless, options) {
     this.cache = {};
 
@@ -29,9 +39,7 @@ class Serverless_WSO2_APIM {
         commands: {
           apidefs: {
             usage: 'Deletes API definitions in WSO2 API Manager.',
-            lifecycleEvents: [
-              'removeAPIDefs',
-            ],
+            lifecycleEvents: ['removeAPIDefs'],
           },
         },
       },
@@ -75,7 +83,7 @@ class Serverless_WSO2_APIM {
     ) {
       this.serverless.cli.log(
         pluginNameSuffix +
-        'Configuration is disabled globally, Skipping deployment.. OK'
+          'Configuration is disabled globally, Skipping deployment.. OK'
       );
       return;
     }
@@ -94,7 +102,7 @@ class Serverless_WSO2_APIM {
     ) {
       this.serverless.cli.log(
         pluginNameSuffix +
-        'Configuration is disabled globally, Skipping retrieval.. OK'
+          'Configuration is disabled globally, Skipping retrieval.. OK'
       );
       return;
     }
@@ -111,7 +119,7 @@ class Serverless_WSO2_APIM {
     ) {
       this.serverless.cli.log(
         pluginNameSuffix +
-        'Configuration is disabled globally, Skipping deletion.. OK'
+          'Configuration is disabled globally, Skipping deletion.. OK'
       );
       return;
     }
@@ -130,7 +138,7 @@ class Serverless_WSO2_APIM {
       chain.indexOf('-BEGIN CERTIFICATE-') < 0
     ) {
       throw Error(
-        'Incompatible certificate format, make sure it\'s base64 encoded..'
+        "Incompatible certificate format, make sure it's base64 encoded.."
       );
     }
     chain = chain.split(split);
@@ -157,22 +165,26 @@ class Serverless_WSO2_APIM {
       if (wso2APIM.enabled === false) {
         this.serverless.cli.log(
           pluginNameSuffix +
-          'Configuration is disabled globally, Skipping validation.. OK'
+            'Configuration is disabled globally, Skipping validation.. OK'
         );
         return;
       }
-      
+
       // Key value checks, with corresponding error messages
       const conditionsArray = [
-        ((typeof wso2APIM.enabled === 'undefined') || (typeof wso2APIM.enabled === 'boolean')),
-        ((wso2APIM.host) && (wso2APIM.host.length > 0)),
-        ((wso2APIM.port) && (wso2APIM.port > 0)),
-        ((wso2APIM.user) && (wso2APIM.user.length > 0)),
-        ((wso2APIM.pass) && (wso2APIM.pass.length > 0)),
-        ((wso2APIM.gatewayEnv) && (wso2APIM.gatewayEnv.length > 0)),
-        (wso2APIM.apidefs.length > 0),
-        (wso2APIM.apidefs.every(def => typeof def.cors === 'undefined' ||
-          (typeof def.cors.credentials === 'undefined' || typeof def.cors.credentials === 'boolean'))
+        typeof wso2APIM.enabled === 'undefined' ||
+          typeof wso2APIM.enabled === 'boolean',
+        wso2APIM.host && wso2APIM.host.length > 0,
+        wso2APIM.port && wso2APIM.port > 0,
+        wso2APIM.user && wso2APIM.user.length > 0,
+        wso2APIM.pass && wso2APIM.pass.length > 0,
+        wso2APIM.gatewayEnv && wso2APIM.gatewayEnv.length > 0,
+        wso2APIM.apidefs.length > 0,
+        wso2APIM.apidefs.every(
+          (def) =>
+            typeof def.cors === 'undefined' ||
+            typeof def.cors.credentials === 'undefined' ||
+            typeof def.cors.credentials === 'boolean'
         ),
       ];
       const messagesArray = [
@@ -187,32 +199,39 @@ class Serverless_WSO2_APIM {
       ];
 
       if (conditionsArray.indexOf(false) !== -1) {
-        throw new Error(`${messagesArray[Number(conditionsArray.indexOf(false))]}`);
+        throw new Error(
+          `${messagesArray[Number(conditionsArray.indexOf(false))]}`
+        );
       }
 
       // Detect WSO2 API Manager product version to use correct management APIs
       const { data } = await this.detectProductVersion();
-      if ((data) && (data.includes('WSO2 API Manager-'))) {
-        this.cache.wso2apimVersion = data.split('WSO2 API Manager-')[1].split('</')[0];
+      if (data && data.includes('WSO2 API Manager-')) {
+        this.cache.wso2apimVersion = data
+          .split('WSO2 API Manager-')[1]
+          .split('</')[0];
         if (wso2ApimVersionsSupported.includes(this.cache.wso2apimVersion)) {
           this.serverless.cli.log(
-            pluginNameSuffix + 'Auto-detected WSO2 API Manager version.. ' + this.cache.wso2apimVersion
+            pluginNameSuffix +
+              'Auto-detected WSO2 API Manager version.. ' +
+              this.cache.wso2apimVersion
           );
           wso2apim = require('./' + this.cache.wso2apimVersion + '/wso2apim');
-          wso2APIM.versionSlug = versionSlugsSupported[this.cache.wso2apimVersion].versionSlug;
+          wso2APIM.versionSlug =
+            versionSlugsSupported[this.cache.wso2apimVersion].versionSlug;
+        } else {
+          throw new Error(
+            'Incompatible WSO2 API Manager version.. ' +
+              this.cache.wso2apimVersion
+          );
         }
-        else {
-          throw new Error('Incompatible WSO2 API Manager version.. ' + this.cache.wso2apimVersion);
-        }
-      }
-      else {
+      } else {
         throw new Error('Unable to detect WSO2 API Manager version.. ');
       }
       this.serverless.cli.log(
         pluginNameSuffix + 'Validating configuration.. OK'
       );
-    }
-    catch (err) {
+    } catch (err) {
       utils.renderError(err);
       this.serverless.cli.log(
         pluginNameSuffix + 'Validating configuration.. NOT OK'
@@ -240,15 +259,19 @@ class Serverless_WSO2_APIM {
                 baseUrl['Fn::ImportValue']
               );
               if (baseUrlResolved)
-                this.serverless.service.custom.wso2apim.apidefs[idx].backend.http.baseUrl = baseUrlResolved;
+                this.serverless.service.custom.wso2apim.apidefs[
+                  idx
+                ].backend.http.baseUrl = baseUrlResolved;
               else
-                throw new Error('Unable to resolve external references for.. ' + baseUrl['Fn::ImportValue']);
+                throw new Error(
+                  'Unable to resolve external references for.. ' +
+                    baseUrl['Fn::ImportValue']
+                );
             }
           }
         }
       }
-    }
-    catch (err) {
+    } catch (err) {
       utils.renderError(err);
       this.serverless.cli.log(
         pluginNameSuffix + 'Resolving external references.. NOT OK'
@@ -382,8 +405,7 @@ class Serverless_WSO2_APIM {
               });
               if (invokableAPIURLObj[0].environmentURLs) {
                 invokableAPIURL = invokableAPIURLObj[0].environmentURLs.https;
-              }
-              else if (invokableAPIURLObj[0].URLs) {
+              } else if (invokableAPIURLObj[0].URLs) {
                 invokableAPIURL = invokableAPIURLObj[0].URLs.https;
               }
             }
@@ -652,8 +674,15 @@ class Serverless_WSO2_APIM {
           }
 
           // now update the swagger spec of the API
-          this.serverless.cli.log(`${pluginNameSuffix}Upserting Swagger spec for ${api.apiName}..`);
-          await wso2apim.upsertSwaggerSpec(wso2APIM, this.cache.accessToken, apiId, apiDefs[i].swaggerSpec);
+          this.serverless.cli.log(
+            `${pluginNameSuffix}Upserting Swagger spec for ${api.apiName}..`
+          );
+          await wso2apim.upsertSwaggerSpec(
+            wso2APIM,
+            this.cache.accessToken,
+            apiId,
+            apiDefs[i].swaggerSpec
+          );
           this.serverless.cli.log(`${pluginNameSuffix}Upserting.. OK`);
         } catch (err) {
           this.serverless.cli.log(
@@ -770,7 +799,10 @@ class Serverless_WSO2_APIM {
                 );
               } catch (err) {
                 // Ignore Certificate-not-found-for-that-Alias error gracefully
-                if ((err.response.data && err.response.data.code != '404') || (err.response.status != '404')) {
+                if (
+                  (err.response.data && err.response.data.code != '404') ||
+                  err.response.status != '404'
+                ) {
                   this.serverless.cli.log(
                     pluginNameSuffix +
                       'Deleting certificate #' +
