@@ -28,18 +28,18 @@ describe('E2E on WSO2 API Manager', () => {
                   WSO2_PASS: 'admin',
                   WSO2_ENV: 'Production and Sandbox',
                   TEST_ID: testCase.split('-').map(a => a[0]).join('-'),
-                  ...process.env
-                }
+                  ...process.env,
+                },
               }
             );
 
             if (testCase.split('-')[0] === 'valid') {
-              console.log("Running.. ", chalk.bold.underline(`🔆 ${wso2ApimVersion}/${testCase}`), "\n\n", procDeploy.output.toString());
+              console.log('Running.. ', chalk.bold.underline(`🔆 ${wso2ApimVersion}/${testCase}`), '\n\n', procDeploy.output.toString());
               expect(procDeploy.status).toBe(0);
               expect(procDeploy.output.toString()).toEqual(expect.not.stringContaining('NOT OK'));
             }
             else if (testCase.split('-')[0] === 'invalid') {
-              console.log("Running.. ", chalk.bold.underline(`🌧 ${wso2ApimVersion}/${testCase}`), "\n\n", procDeploy.output.toString());
+              console.log('Running.. ', chalk.bold.underline(`🌧 ${wso2ApimVersion}/${testCase}`), '\n\n', procDeploy.output.toString());
               expect(procDeploy.output.toString().includes('NOT OK'));
             }
 
@@ -59,16 +59,16 @@ describe('E2E on WSO2 API Manager', () => {
                   WSO2_PASS: 'admin',
                   WSO2_ENV: 'Production and Sandbox',
                   TEST_ID: testCase.split('-').map(a => a[0]).join('-'),
-                  ...process.env
-                }
+                  ...process.env,
+                },
               }
             );
 
             if (testCase.split('-')[0] === 'valid') {
-              console.log("Cleaning up... ", chalk.bold.underline(`🔆 ${wso2ApimVersion}/${testCase}`), "\n\n", procRemove.output.toString());
+              console.log('Cleaning up... ', chalk.bold.underline(`🔆 ${wso2ApimVersion}/${testCase}`), '\n\n', procRemove.output.toString());
             }
             else if (testCase.split('-')[0] === 'invalid') {
-              console.log("Cleaning up... ", chalk.bold.underline(`🌧 ${wso2ApimVersion}/${testCase}`), "\n\n", procRemove.output.toString());
+              console.log('Cleaning up... ', chalk.bold.underline(`🌧 ${wso2ApimVersion}/${testCase}`), '\n\n', procRemove.output.toString());
             }
             const isTestCaseWithInvalidConfig = testCase.split('-')[0] === 'invalid' && procRemove.output.toString().includes('Validating configuration.. NOT OK');
             if (!isTestCaseWithInvalidConfig) {

@@ -6,11 +6,12 @@
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "test:unit": "jest \"^(.*/)*(.*\\.)*(spec)\\.js$\" --verbose --collectCoverage",
+    "test:unit": "jest \"^(.*/)*(.*\\.)*(spec)\\.ts$\" --verbose --collectCoverage",
     "test:e2e:setup": "yarn test:e2e:destroy && concurrently \"yarn start:wso2-2.6.0\" \"yarn start:wso2-3.2.0\" \"yarn start:localstack\"",
     "test:e2e": "jest e2e --verbose",
     "test:e2e:destroy": "yarn stop:wso2-2.6.0 && yarn stop:wso2-3.2.0 && yarn stop:localstack",
     "test": "yarn test:unit",
+    "ts:build": "tsc --build",
     "start:wso2-2.6.0": "docker run --name api-manager-260 -p 127.0.0.1:8260:8243 -p 127.0.0.1:9260:9443 --rm wso2/wso2am:2.6.0",
     "start:wso2-3.2.0": "docker run --name api-manager-320 -p 127.0.0.1:8320:8243 -p 127.0.0.1:9320:9443 --rm wso2/wso2am:3.2.0",
     "start:localstack": "docker run --name localstack -p 127.0.0.1:4566:4566 -p 127.0.0.1:4571:4571 --rm localstack/localstack",
@@ -42,6 +43,10 @@
     "serverless"
   ],
   "devDependencies": {
+    "@types/jest": "^28.1.4",
+    "@types/node": "^16.10.3",
+    "@typescript-eslint/eslint-plugin": "^5.30.5",
+    "@typescript-eslint/parser": "^5.30.5",
     "axios": "^0.24.0",
     "babel-eslint": "^10.1.0",
     "chalk": "^4.1.0",
@@ -49,16 +54,19 @@
     "concurrently": "^6.0.0",
     "eslint": "^7.20.0",
     "eslint-plugin-jest": "^24.1.5",
+    "eslint-plugin-node": "^11.1.0",
     "form-data": "^4.0.0",
     "fs": "^0.0.2",
     "https": "^1.0.0",
-    "jest": "^26.6.3",
+    "jest": "^28.1.2",
     "qs": "^6.10.2",
     "release": "^6.3.0",
     "serverless": "^1.75.1",
     "serverless-deployment-bucket": "^1.4.1",
     "serverless-localstack": "^0.4.30",
-    "split-ca": "^1.0.1"
+    "split-ca": "^1.0.1",
+    "ts-jest": "^28.0.5",
+    "typescript": "^4.7.4"
   },
   "dependencies": {
     "axios": "^0.24.0",
@@ -71,6 +79,13 @@
   },
   "jest": {
     "coverageDirectory": "./coverage/",
-    "collectCoverage": true
+    "collectCoverage": true,
+    "globals": {
+      "jest": true
+    },
+    "testEnvironment": "node",
+    "transform": {
+      "^.+\\.ts$": "ts-jest"
+    }
   }
 }

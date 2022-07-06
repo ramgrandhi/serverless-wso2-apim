@@ -1,4 +1,4 @@
-const {
+import {
   registerClient,
   generateToken,
   isAPIDeployed,
@@ -13,10 +13,10 @@ const {
   upsertSwaggerSpec,
   updateAPIDef,
   removeAPIDef,
-  listInvokableAPIUrl
-} = require('./wso2apim');
-const axios = require('axios');
-const qs = require('qs');
+  listInvokableAPIUrl,
+} from './wso2apim';
+import axios from 'axios';
+import qs from 'qs';
 
 afterEach(() => {
   jest.clearAllMocks();
@@ -47,44 +47,43 @@ const wso2APIM = {
       backend: {
         http: {
           baseUrl: 'https://backend.url',
-          certChain: 'file://xxx.cer'
-        }
+          certChain: 'file://xxx.cer',
+        },
       },
-      tags: [ 'awesomeness', 'myawesomeapi'],
+      tags: ['awesomeness', 'myawesomeapi'],
       maxTps: 999,
       swaggerSpec: {
-        'openapi': '3.0.0',
-        'info': {
-          'title': 'MyAwesomeAPI',
-          'version': 'v1',
-          'contact': {
-            'name': 'MyTeam',
-            'email': 'myteam@myteam.com'
-          }
+        openapi: '3.0.0',
+        info: {
+          title: 'MyAwesomeAPI',
+          version: 'v1',
+          contact: {
+            name: 'MyTeam',
+            email: 'myteam@myteam.com',
+          },
         },
-        'paths': {
+        paths: {
           '/*': {
-            'post': {
-              'responses': {
+            post: {
+              responses: {
                 '201': {
-                  'description': 'Created'
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  ]
+                  description: 'Created',
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  ],
 };
 
 const apiId = '123456789';
 
 describe('wso2apim-3.2.0', () => {
-
   describe('registerClient()', () => {
     it('should handle a successful response', async () => {
-      axios.post.mockImplementationOnce(() =>
+      (axios.post as jest.Mock).mockImplementationOnce(() =>
         Promise.resolve({
           data: {
             clientId: 'foo',
@@ -113,9 +112,7 @@ describe('wso2apim-3.2.0', () => {
     });
 
     it('should handle a faulty response', async () => {
-      axios.post.mockImplementationOnce(() =>
-        Promise.reject()
-      );
+      (axios.post as jest.Mock).mockImplementationOnce(() => Promise.reject());
 
       expect(registerClient(wso2APIM)).rejects.toThrow();
     });
@@ -123,11 +120,10 @@ describe('wso2apim-3.2.0', () => {
 
   describe('generateToken()', () => {
     it('should handle a successful response', async () => {
-
-      axios.post.mockImplementationOnce(() =>
+      (axios.post as jest.Mock).mockImplementationOnce(() =>
         Promise.resolve({
           data: {
-            access_token: 'xxx'
+            access_token: 'xxx',
           },
         })
       );
@@ -137,10 +133,11 @@ describe('wso2apim-3.2.0', () => {
       expect(axios.post).toHaveBeenCalledWith(
         `https://${wso2APIM.host}:${wso2APIM.port}/oauth2/token`,
         qs.stringify({
-          'grant_type': 'password',
-          'username': wso2APIM.user,
-          'password': wso2APIM.pass,
-          'scope': 'apim:api_create apim:api_view apim:api_publish apim:api_delete'
+          grant_type: 'password',
+          username: wso2APIM.user,
+          password: wso2APIM.pass,
+          scope:
+            'apim:api_create apim:api_view apim:api_publish apim:api_delete',
         }),
         expect.objectContaining({})
       );
@@ -151,9 +148,7 @@ describe('wso2apim-3.2.0', () => {
     });
 
     it('should handle a faulty response', async () => {
-      axios.post.mockImplementationOnce(() =>
-        Promise.reject()
-      );
+      (axios.post as jest.Mock).mockImplementationOnce(() => Promise.reject());
 
       expect(generateToken(wso2APIM, 'foo123', 'xxxyyyzzz')).rejects.toThrow();
     });
@@ -161,8 +156,13 @@ describe('wso2apim-3.2.0', () => {
 
   describe('isAPIDeployed()', () => {
     it('should handle a successful response', async () => {
-
-      const response = await isAPIDeployed(wso2APIM, 'xxx', wso2APIM.apidefs[0].name, wso2APIM.apidefs[0].version, wso2APIM.apidefs[0].rootContext);
+      const response = await isAPIDeployed(
+        wso2APIM,
+        'xxx',
+        wso2APIM.apidefs[0].name,
+        wso2APIM.apidefs[0].version,
+        wso2APIM.apidefs[0].rootContext
+      );
 
       expect(axios.get).toHaveBeenCalledWith(
         `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/apis?query=name:${wso2APIM.apidefs[0].name} version:${wso2APIM.apidefs[0].version} context:${wso2APIM.apidefs[0].rootContext}`,
@@ -177,19 +177,22 @@ describe('wso2apim-3.2.0', () => {
     });
 
     it('should handle a faulty response', async () => {
-      axios.get.mockImplementationOnce(() =>
-        Promise.reject()
-      );
+      (axios.get as jest.Mock).mockImplementationOnce(() => Promise.reject());
 
       expect(
-        isAPIDeployed(wso2APIM, 'xxx', wso2APIM.apidefs[0].name, wso2APIM.apidefs[0].version, wso2APIM.apidefs[0].rootContext)
+        isAPIDeployed(
+          wso2APIM,
+          'xxx',
+          wso2APIM.apidefs[0].name,
+          wso2APIM.apidefs[0].version,
+          wso2APIM.apidefs[0].rootContext
+        )
       ).rejects.toThrow();
     });
   });
 
   describe('isCertUploaded()', () => {
     it('should handle a successful response', async () => {
-
       const response = await isCertUploaded(wso2APIM, 'xxx', 'alias');
 
       expect(axios.get).toHaveBeenCalledWith(
@@ -205,34 +208,25 @@ describe('wso2apim-3.2.0', () => {
     });
 
     it('should handle a faulty response', async () => {
-      axios.get.mockImplementationOnce(() =>
-        Promise.reject()
-      );
+      (axios.get as jest.Mock).mockImplementationOnce(() => Promise.reject());
 
-      expect(
-        isCertUploaded(wso2APIM, 'xxx', 'alias')
-      ).rejects.toThrow();
+      expect(isCertUploaded(wso2APIM, 'xxx', 'alias')).rejects.toThrow();
     });
   });
 
   describe('createAPIDef()', () => {
     it('should handle a successful response', async () => {
-
-      axios.post.mockImplementationOnce(() =>
+      (axios.post as jest.Mock).mockImplementationOnce(() =>
         Promise.resolve({
           data: {
             id: apiId,
             name: wso2APIM.apidefs[0].name,
             context: wso2APIM.apidefs[0].rootContext,
-            status: 'CREATED'
-          }
+            status: 'CREATED',
+          },
         })
       );
-      const response = await createAPIDef(
-        wso2APIM,
-        'xxx',
-        wso2APIM.apidefs[0]
-      );
+      const response = await createAPIDef(wso2APIM, 'xxx', wso2APIM.apidefs[0]);
 
       expect(axios.post).toHaveBeenCalledWith(
         `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/apis?openAPIVersion=V3`,
@@ -250,71 +244,57 @@ describe('wso2apim-3.2.0', () => {
         apiId,
         apiName: wso2APIM.apidefs[0].name,
         apiContext: wso2APIM.apidefs[0].rootContext,
-        apiStatus: 'CREATED'
+        apiStatus: 'CREATED',
       });
     });
 
     it('should handle a faulty response', async () => {
-      axios.post.mockImplementationOnce(() =>
-        Promise.reject()
-      );
+      (axios.post as jest.Mock).mockImplementationOnce(() => Promise.reject());
 
-      expect(createAPIDef(wso2APIM, 'xxx', wso2APIM.apidefs[0])).rejects.toThrow();
+      expect(
+        createAPIDef(wso2APIM, 'xxx', wso2APIM.apidefs[0])
+      ).rejects.toThrow();
     });
-
   });
 
   describe('publishAPIDef()', () => {
     it('should handle a successful response', async () => {
-
-      const response = await publishAPIDef(
-        wso2APIM,
-        'xxx',
-        apiId
-      );
+      const response = await publishAPIDef(wso2APIM, 'xxx', apiId);
 
       expect(axios.post).toHaveBeenCalledWith(
         `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/apis/change-lifecycle`,
         expect.objectContaining({}),
         {
           headers: {
-            Authorization: 'Bearer xxx'
+            Authorization: 'Bearer xxx',
           },
           params: {
-            'apiId': apiId,
-            'action': 'Publish'
+            apiId: apiId,
+            action: 'Publish',
           },
           httpsAgent: expect.objectContaining({}),
         }
       );
 
-      expect(response.data).toEqual('foo');
+      expect((response as Record<any, any>).data).toEqual('foo');
     });
 
     it('should handle a faulty response', async () => {
-      axios.post.mockImplementationOnce(() =>
-        Promise.reject()
-      );
+      (axios.post as jest.Mock).mockImplementationOnce(() => Promise.reject());
 
       expect(publishAPIDef(wso2APIM, 'xxx', apiId)).rejects.toThrow();
     });
-
   });
 
   describe('listInvokableAPIUrl()', () => {
     it('should handle a successful response', async () => {
-
-      const response = await listInvokableAPIUrl(
-        wso2APIM,
-        'xxx',
-        apiId
-      );
+      const response = await listInvokableAPIUrl(wso2APIM, 'xxx', apiId);
 
       expect(axios.get).toHaveBeenCalledWith(
         `https://${wso2APIM.host}:${wso2APIM.port}/api/am/store/${wso2APIM.versionSlug}/apis/${apiId}`,
         {
           headers: {
-            Authorization: 'Bearer xxx'
+            Authorization: 'Bearer xxx',
           },
           httpsAgent: expect.objectContaining({}),
         }
@@ -324,18 +304,14 @@ describe('wso2apim-3.2.0', () => {
     });
 
     it('should handle a faulty response', async () => {
-      axios.get.mockImplementationOnce(() =>
-        Promise.reject()
-      );
+      (axios.get as jest.Mock).mockImplementationOnce(() => Promise.reject());
 
       expect(listInvokableAPIUrl(wso2APIM, 'xxx', apiId)).rejects.toThrow();
     });
-
   });
 
   describe('uploadCert()', () => {
     it('should handle a successful response', async () => {
-
       const response = await uploadCert(
         wso2APIM,
         'xxx',
@@ -344,23 +320,26 @@ describe('wso2apim-3.2.0', () => {
         wso2APIM.apidefs[0].backend.http.baseUrl
       );
 
-      expect(response.data).toEqual('foo');
+      expect((response as Record<any, any>).data).toEqual('foo');
     });
 
     it('should handle a faulty response', async () => {
-      axios.post.mockImplementationOnce(() =>
-        Promise.reject()
-      );
+      (axios.post as jest.Mock).mockImplementationOnce(() => Promise.reject());
 
-      expect(uploadCert(wso2APIM, 'xxx', 'alias', wso2APIM.apidefs[0].backend.http.certChain, wso2APIM.apidefs[0].backend.http.baseUrl)).rejects.toThrow();
+      expect(
+        uploadCert(
+          wso2APIM,
+          'xxx',
+          'alias',
+          wso2APIM.apidefs[0].backend.http.certChain,
+          wso2APIM.apidefs[0].backend.http.baseUrl
+        )
+      ).rejects.toThrow();
     });
-
   });
 
   describe('updateAPIDef()', () => {
-
     it('should handle a successful response', async () => {
-
       const response = await updateAPIDef(
         wso2APIM,
         'xxx',
@@ -383,23 +362,17 @@ describe('wso2apim-3.2.0', () => {
     });
 
     it('should handle a faulty response', async () => {
-      axios.put.mockImplementationOnce(() =>
-        Promise.reject()
-      );
+      (axios.put as jest.Mock).mockImplementationOnce(() => Promise.reject());
 
-      expect(updateAPIDef(wso2APIM, 'xxx', wso2APIM.apidefs[0], apiId)).rejects.toThrow();
+      expect(
+        updateAPIDef(wso2APIM, 'xxx', wso2APIM.apidefs[0], apiId)
+      ).rejects.toThrow();
     });
-
   });
 
   describe('removeAPIDef()', () => {
     it('should handle a successful response', async () => {
-
-      const response = await removeAPIDef(
-        wso2APIM,
-        'xxx',
-        apiId
-      );
+      const response = await removeAPIDef(wso2APIM, 'xxx', apiId);
 
       expect(axios.delete).toHaveBeenCalledWith(
         `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/apis/${apiId}`,
@@ -408,28 +381,23 @@ describe('wso2apim-3.2.0', () => {
             Authorization: 'Bearer xxx',
           },
           httpsAgent: expect.objectContaining({}),
-        });
+        }
+      );
       expect(response).toEqual('foo');
     });
 
     it('should handle a faulty response', async () => {
-      axios.delete.mockImplementationOnce(() =>
+      (axios.delete as jest.Mock).mockImplementationOnce(() =>
         Promise.reject()
       );
 
       expect(removeAPIDef(wso2APIM, 'xxx', apiId)).rejects.toThrow();
     });
-
   });
 
   describe('removeCert()', () => {
     it('should handle a successful response', async () => {
-
-      const response = await removeCert(
-        wso2APIM,
-        'xxx',
-        'alias'
-      );
+      const response = await removeCert(wso2APIM, 'xxx', 'alias');
 
       expect(axios.delete).toHaveBeenCalledWith(
         `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/certificates/alias`,
@@ -438,24 +406,22 @@ describe('wso2apim-3.2.0', () => {
             Authorization: 'Bearer xxx',
           },
           httpsAgent: expect.objectContaining({}),
-        });
-      expect(response.data).toEqual('foo');
+        }
+      );
+      expect((response as Record<any, any>).data).toEqual('foo');
     });
 
     it('should handle a faulty response', async () => {
-      axios.delete.mockImplementationOnce(() =>
+      (axios.delete as jest.Mock).mockImplementationOnce(() =>
         Promise.reject()
       );
 
       expect(removeCert(wso2APIM, 'xxx', 'alias')).rejects.toThrow();
     });
-
   });
 
   describe('updateCert()', () => {
-
     it('should handle a successful response', async () => {
-
       const response = await updateCert(
         wso2APIM,
         'xxx',
@@ -474,34 +440,33 @@ describe('wso2apim-3.2.0', () => {
           httpsAgent: expect.objectContaining({}),
         }
       );
-      expect(response.data).toEqual('foo');
+      expect((response as Record<any, any>).data).toEqual('foo');
     });
 
     it('should handle a faulty response', async () => {
-      axios.put.mockImplementationOnce(() =>
-        Promise.reject()
-      );
+      (axios.put as jest.Mock).mockImplementationOnce(() => Promise.reject());
 
-      expect(updateCert(wso2APIM, 'xxx', 'alias', wso2APIM.apidefs[0].backend.http.certChain)).rejects.toThrow();
+      expect(
+        updateCert(
+          wso2APIM,
+          'xxx',
+          'alias',
+          wso2APIM.apidefs[0].backend.http.certChain
+        )
+      ).rejects.toThrow();
     });
-
   });
 
   describe('listCertInfo()', () => {
     it('should handle a successful response', async () => {
-
-      const response = await listCertInfo(
-        wso2APIM,
-        'xxx',
-        'alias'
-      );
+      const response = await listCertInfo(wso2APIM, 'xxx', 'alias');
 
       expect(axios.get).toHaveBeenCalledWith(
         `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/certificates/alias`,
         {
           headers: {
             Authorization: 'Bearer xxx',
-            Accept: 'application/json'
+            Accept: 'application/json',
           },
           httpsAgent: expect.objectContaining({}),
         }
@@ -511,85 +476,133 @@ describe('wso2apim-3.2.0', () => {
     });
 
     it('should handle a faulty response', async () => {
-      axios.get.mockImplementationOnce(() =>
-        Promise.reject()
-      );
+      (axios.get as jest.Mock).mockImplementationOnce(() => Promise.reject());
 
       expect(listCertInfo(wso2APIM, 'xxx', 'alias')).rejects.toThrow();
     });
-
   });
 
-  describe("upsertSwaggerSpec()", () => {
-    it("should handle a successful response", async () => {
-      const response = await upsertSwaggerSpec(wso2APIM, "xxx", "id001", wso2APIM.apidefs[0].swaggerSpec);
+  describe('upsertSwaggerSpec()', () => {
+    it('should handle a successful response', async () => {
+      const response = await upsertSwaggerSpec(
+        wso2APIM,
+        'xxx',
+        'id001',
+        wso2APIM.apidefs[0].swaggerSpec
+      );
 
       expect(axios.put).toHaveBeenCalledWith(
         `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/apis/id001/swagger`,
         expect.objectContaining({}),
         {
           headers: {
-            Authorization: "Bearer xxx",
-            "Content-Type": "multipart/form-data"
+            Authorization: 'Bearer xxx',
+            'Content-Type': 'multipart/form-data',
           },
-          httpsAgent: expect.objectContaining({})
+          httpsAgent: expect.objectContaining({}),
         }
       );
     });
 
-      it("should handle a faulty response", async () => {
-        axios.put.mockImplementationOnce(() => Promise.reject());
-        expect(upsertSwaggerSpec(wso2APIM, "xxx", "id001", wso2APIM.apidefs[0].swaggerSpec)).rejects.toThrow();
+    it('should handle a faulty response', async () => {
+      (axios.put as jest.Mock).mockImplementationOnce(() => Promise.reject());
+      expect(
+        upsertSwaggerSpec(
+          wso2APIM,
+          'xxx',
+          'id001',
+          wso2APIM.apidefs[0].swaggerSpec
+        )
+      ).rejects.toThrow();
     });
   });
 
   describe('cors configuration', () => {
-
     it('no cors', async () => {
-      const apiDef = await constructAPIDef(wso2APIM.user, wso2APIM.gatewayEnv, wso2APIM.apidefs[0]);
+      const apiDef = await constructAPIDef(
+        wso2APIM.user,
+        wso2APIM.gatewayEnv,
+        wso2APIM.apidefs[0],
+        null
+      );
 
-      expect(apiDef.corsConfiguration).toBeUndefined();
+      expect((apiDef as any).corsConfiguration).toBeUndefined();
     });
 
     it('only origin', async () => {
-      const config = {...wso2APIM, apidefs: [{...wso2APIM.apidefs[0], cors: {
-        origins: ['https://www.example.com']
-      }}]};
+      const config = {
+        ...wso2APIM,
+        apidefs: [
+          {
+            ...wso2APIM.apidefs[0],
+            cors: {
+              origins: ['https://www.example.com'],
+            },
+          },
+        ],
+      };
 
-      const apiDef = await constructAPIDef(config.user, config.gatewayEnv, config.apidefs[0]);
+      const apiDef = await constructAPIDef(
+        config.user,
+        config.gatewayEnv,
+        config.apidefs[0],
+        null
+      );
 
-      expect(apiDef.corsConfiguration).toEqual({
+      expect((apiDef as any).corsConfiguration).toEqual({
         corsConfigurationEnabled: true,
-        accessControlAllowOrigins: [ 'https://www.example.com' ],
+        accessControlAllowOrigins: ['https://www.example.com'],
         accessControlAllowCredentials: false,
         accessControlAllowHeaders: [
           'Authorization',
           'Access-Control-Allow-Origin',
           'Content-Type',
-          'SOAPAction'
+          'SOAPAction',
         ],
-        accessControlAllowMethods: [ 'GET', 'PUT', 'POST', 'DELETE', 'PATCH', 'OPTIONS' ]
+        accessControlAllowMethods: [
+          'GET',
+          'PUT',
+          'POST',
+          'DELETE',
+          'PATCH',
+          'OPTIONS',
+        ],
       });
     });
 
     it('fully specified', async () => {
-      const config = {...wso2APIM, apidefs: [{...wso2APIM.apidefs[0], cors: {
-        origins: ['https://www.example.com', 'https://www.example.org'],
-        credentials: true,
-        headers: ['Authorization', 'x-custom'],
-        methods: ['GET']
-      }}]};
+      const config = {
+        ...wso2APIM,
+        apidefs: [
+          {
+            ...wso2APIM.apidefs[0],
+            cors: {
+              origins: ['https://www.example.com', 'https://www.example.org'],
+              credentials: true,
+              headers: ['Authorization', 'x-custom'],
+              methods: ['GET'],
+            },
+          },
+        ],
+      };
 
-      const apiDef = await constructAPIDef(config.user, config.gatewayEnv, config.apidefs[0]);
+      const apiDef = await constructAPIDef(
+        config.user,
+        config.gatewayEnv,
+        config.apidefs[0],
+        null
+      );
 
-      expect(apiDef.corsConfiguration).toEqual({
+      expect((apiDef as any).corsConfiguration).toEqual({
         corsConfigurationEnabled: true,
-        accessControlAllowOrigins: [ 'https://www.example.com', 'https://www.example.org' ],
+        accessControlAllowOrigins: [
+          'https://www.example.com',
+          'https://www.example.org',
+        ],
         accessControlAllowCredentials: true,
         accessControlAllowHeaders: ['Authorization', 'x-custom'],
-        accessControlAllowMethods: ['GET']
+        accessControlAllowMethods: ['GET'],
       });
     });
   });
-  
 });
