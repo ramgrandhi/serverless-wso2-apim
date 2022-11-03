@@ -196,17 +196,17 @@ async function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
       }
     }
     let securityScheme = [];
-
-    if (apiDef.securitySchemes.mutualSsl.enabled === true) {
+    console.log('securityScheme', securityScheme);
+    if (apiDef.securitySchemes && apiDef.securitySchemes.mutualSsl && apiDef.securitySchemes.mutualSsl.enabled === true) {
       securityScheme.push('mutualssl');
       securityScheme.push('mutualssl_mandatory');
     }
-    if(apiDef.securitySchemes.oauth2 && apiDef.securitySchemes.oauth2.enabled === false) {
-      return;
+    if(apiDef.securitySchemes && apiDef.securitySchemes.oauth2 && apiDef.securitySchemes.oauth2.enabled === false) {
+      //do nothing
     } else {
       securityScheme.push('oauth2');
     }
-
+    console.log('securityScheme', securityScheme);
     const wso2ApiDefinition = {
       id: apiId,
       name: apiDef.name,
@@ -323,6 +323,7 @@ async function createAPIDef(wso2APIM, accessToken, apiDef) {
     let url = `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/apis`;
     let { user, gatewayEnv } = wso2APIM;
     var data = await constructAPIDef(user, gatewayEnv, apiDef);
+    
 
     // TODO - dynamically retrieve swaggerSpec version
     let queryStr = 'openAPIVersion=V3';
@@ -633,14 +634,12 @@ async function uploadClientCert(wso2APIM, accessToken, certAlias, cert, apiId) {
         rejectUnauthorized: false
       })
     };
-    console.log('posting...');
     return new Promise((resolve, reject) => {
       axios.post(url, data, config)
         .then((res) => {
           resolve(res);
         })
         .catch((err) => {
-          console.log('err inside');
           // Ignore Certificate-exists-for-that-Alias error gracefully
           if (err.response.data.code != '409') {
             utils.renderError(err);
@@ -650,7 +649,6 @@ async function uploadClientCert(wso2APIM, accessToken, certAlias, cert, apiId) {
     });
   }
   catch (err) {
-    console.log('err outside');
     utils.renderError(err);
   }
 }
@@ -775,7 +773,9 @@ async function removeClientCert(wso2APIM, accessToken, certAlias, apiId) {
     data.append('apiDefinition', JSON.stringify(swaggerSpec));
 
     return axios.put(url, data, config)
-      .then((_) => undefined); // eat the http response, not needed outside of this api layer
+      .then((_) => undefined).catch((err) => {
+        utils.renderError(err);
+      }); // eat the http response, not needed outside of this api layer
   }
   catch (err) {
     utils.renderError(err);

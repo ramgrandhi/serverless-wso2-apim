@@ -4,6 +4,7 @@ const utils = require('./utils/utils');
 const axios = require('axios');
 const https = require('https');
 const fs = require('fs');
+const semver = require('semver');
 const pluginNameSuffix = '[serverless-wso2-apim] ';
 
 const wso2ApimVersionsSupported = ['2.6.0', '3.2.0'];
@@ -190,7 +191,6 @@ class Serverless_WSO2_APIM {
       ];
 
       if (conditionsArrayGeneric.indexOf(false) !== -1) {
-        console.log(messagesArrayGeneric[Number(conditionsArrayGeneric.indexOf(false))]);
         throw new Error(`${messagesArrayGeneric[Number(conditionsArrayGeneric.indexOf(false))]}`);
       }
 
@@ -213,18 +213,17 @@ class Serverless_WSO2_APIM {
         throw new Error('Unable to detect WSO2 API Manager version.. ');
       }
       const conditionsArraySpecific = [
-        (this.cache.wso2apimVersion === '3.2.0' && (wso2APIM.apidefs.every(def => def.securitySchemes && 
-          (def.securitySchemes.mutualSsl && def.securitySchemes.mutualSsl.enabled && def.securitySchemes.mutualSsl.clientCert) || 
-          (def.securitySchemes.oauth2 && typeof def.securitySchemes.oauth2.enabled === 'undefined' || 
-          def.securitySchemes.oauth2 && typeof def.securitySchemes.oauth2.enabled === 'boolean'))
-        ))
+        ((semver.lt(this.cache.wso2apimVersion, '3.2.0') && (wso2APIM.apidefs.every(def => typeof def.securitySchemes === 'undefined'))) || 
+        (semver.gte(this.cache.wso2apimVersion, '3.2.0') && (wso2APIM.apidefs.every(def => typeof def.securitySchemes === 'undefined' || 
+        (def.securitySchemes && def.securitySchemes.mutualSsl && def.securitySchemes.mutualSsl.enabled && def.securitySchemes.mutualSsl.clientCert) || 
+        (def.securitySchemes && def.securitySchemes.oauth2 && typeof def.securitySchemes.oauth2.enabled === 'boolean'))
+        )))
       ];
       const messagesArraySpecific = [
         'Unsupported WSO2 version or invalid values supplied to `custom.wso2apim.securitySchemes`'
       ];
 
       if (conditionsArraySpecific.indexOf(false) !== -1) {
-        console.log(messagesArraySpecific[Number(conditionsArraySpecific.indexOf(false))]);
         throw new Error(`${messagesArraySpecific[Number(conditionsArraySpecific.indexOf(false))]}`);
       }
       this.serverless.cli.log(
@@ -624,11 +623,9 @@ class Serverless_WSO2_APIM {
     const slsDir = this.serverless.config.servicePath + '/.serverless';
     try {
       // Loops thru each api definition found in serverless configuration
-      console.log('this.cache.deploymentStatus');
       for (const [, apiDef] of apiDefs.entries()) {
         const apiId = this.cache.deploymentStatus.find(deployedApi => deployedApi.apiConext === apiDef.apiContext).apiId;
-        console.log('apiIdConext', apiId);
-        if (apiDef.securitySchemes.mutualSsl && apiDef.securitySchemes.mutualSsl.clientCert && apiId) {
+        if (apiDef.securitySchemes && apiDef.securitySchemes.mutualSsl && apiDef.securitySchemes.mutualSsl.clientCert && apiId) {
           this.serverless.cli.log(
             pluginNameSuffix +
               'Uploading / Updating client certificates for ' +
@@ -663,12 +660,9 @@ class Serverless_WSO2_APIM {
                   // certAlias takes the form of <APIName>___<Version>___<index>
                   certAlias ='ClientCert' + '___' + apiDef.name + '___' + apiDef.version + '___' + j;
                 }
-                console.log('save...');
                 await this.saveCert(cert.toString(), certAlias);
-                console.log('save done...!');
                 // Upload Cert to WSO2 API Manager
                 try {
-                  console.log('upload...');
                   await wso2apim.uploadClientCert(
                     wso2APIM,
                     this.cache.accessToken,
@@ -679,10 +673,8 @@ class Serverless_WSO2_APIM {
                   this.serverless.cli.log(
                     pluginNameSuffix + 'Uploading client certificate #' + j + ' .. OK'
                   );
-                  console.log('upload done...!');
                   await utils.goToSleep(1000);
                 } catch (err) {
-                  console.log('err1', err);
                   // If Certificate-exists-for-that-Alias error occurs.. then update it.
                   if (err.response.data && err.response.data.code == '409') {
                     await wso2apim.updateClientCert(
@@ -717,7 +709,6 @@ class Serverless_WSO2_APIM {
               );
             }
           } catch (err) {
-            console.log('err2', err);
             if (err.response.data && err.response.data.code != '409') {
               this.serverless.cli.log(
                 pluginNameSuffix +
@@ -730,7 +721,6 @@ class Serverless_WSO2_APIM {
         }
       }
     } catch (err) {
-      console.log('err3', err);
       throw new Error(err);
     }
   }
@@ -747,7 +737,6 @@ class Serverless_WSO2_APIM {
     try {
       // By calling listAPIDefs(), we are re-collecting the current deployment status in WSO2 API Manager into this.cache.deploymentStatus
       await this.listAPIDefs();
-      
       // Loop thru this.cache.deploymentStatus array
       // Create API definitions, if they do not exist
       // Update API definitions, if they exist

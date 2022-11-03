@@ -83,8 +83,8 @@ describe('E2E on WSO2 API Manager', () => {
           else {
             console.log(chalk.bold(`--- Skipping ${wso2ApimVersion}/${testCase}`));
           }
+        } 
       }
-    }
     });
   });
 });
