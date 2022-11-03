@@ -213,14 +213,14 @@ class Serverless_WSO2_APIM {
         throw new Error('Unable to detect WSO2 API Manager version.. ');
       }
       const conditionsArraySpecific = [
-        ((semver.lt(this.cache.wso2apimVersion, '3.2.0') && (wso2APIM.apidefs.every(def => typeof def.securitySchemes === 'undefined'))) || 
-        (semver.gte(this.cache.wso2apimVersion, '3.2.0') && (wso2APIM.apidefs.every(def => typeof def.securitySchemes === 'undefined' || 
-        (def.securitySchemes && def.securitySchemes.mutualSsl && def.securitySchemes.mutualSsl.enabled && def.securitySchemes.mutualSsl.clientCert) || 
-        (def.securitySchemes && def.securitySchemes.oauth2 && typeof def.securitySchemes.oauth2.enabled === 'boolean'))
+        ((semver.lt(this.cache.wso2apimVersion, '3.2.0') && (wso2APIM.apidefs.every(def => typeof def.securityScheme === 'undefined'))) || 
+        (semver.gte(this.cache.wso2apimVersion, '3.2.0') && (wso2APIM.apidefs.every(def => typeof def.securityScheme === 'undefined' || 
+        (def.securityScheme && def.securityScheme.mutualssl && def.securityScheme.mutualssl.enabled && def.securityScheme.mutualssl.clientCert) || 
+        (def.securityScheme && def.securityScheme.oauth2 && typeof def.securityScheme.oauth2.enabled === 'boolean'))
         )))
       ];
       const messagesArraySpecific = [
-        'Unsupported WSO2 version or invalid values supplied to `custom.wso2apim.securitySchemes`'
+        'Unsupported WSO2 version or invalid values supplied to `custom.wso2apim.securityScheme`'
       ];
 
       if (conditionsArraySpecific.indexOf(false) !== -1) {
@@ -625,7 +625,7 @@ class Serverless_WSO2_APIM {
       // Loops thru each api definition found in serverless configuration
       for (const [, apiDef] of apiDefs.entries()) {
         const apiId = this.cache.deploymentStatus.find(deployedApi => deployedApi.apiConext === apiDef.apiContext).apiId;
-        if (apiDef.securitySchemes && apiDef.securitySchemes.mutualSsl && apiDef.securitySchemes.mutualSsl.clientCert && apiId) {
+        if (apiDef.securityScheme && apiDef.securityScheme.mutualssl && apiDef.securityScheme.mutualssl.clientCert && apiId) {
           this.serverless.cli.log(
             pluginNameSuffix +
               'Uploading / Updating client certificates for ' +
@@ -635,7 +635,7 @@ class Serverless_WSO2_APIM {
           
           try {
             let certs = await this.detectAndSplitCerts(
-              apiDef.securitySchemes.mutualSsl.clientCert
+              apiDef.securityScheme.mutualssl.clientCert
             );
 
             // Loop thru all certificates, e.g. Leaf cert, Intermediary CA, Root CA etc

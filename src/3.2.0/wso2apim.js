@@ -197,11 +197,11 @@ async function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
     }
     let securityScheme = [];
     console.log('securityScheme', securityScheme);
-    if (apiDef.securitySchemes && apiDef.securitySchemes.mutualSsl && apiDef.securitySchemes.mutualSsl.enabled === true) {
+    if (apiDef.securityScheme && apiDef.securityScheme.mutualssl && apiDef.securityScheme.mutualssl.enabled === true) {
       securityScheme.push('mutualssl');
       securityScheme.push('mutualssl_mandatory');
     }
-    if(apiDef.securitySchemes && apiDef.securitySchemes.oauth2 && apiDef.securitySchemes.oauth2.enabled === false) {
+    if(apiDef.securityScheme && apiDef.securityScheme.oauth2 && apiDef.securityScheme.oauth2.enabled === false) {
       //do nothing
     } else {
       securityScheme.push('oauth2');

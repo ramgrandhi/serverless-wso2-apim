@@ -26,8 +26,8 @@ custom:
         rootContext: /${env:TEST_ID}-1
         version: "v1"
         visibility: "PRIVATE"
-        securitySchemes:
-          mutualSsl:
+        securityScheme:
+          mutualssl:
             enabled: true
         backend:
           http:
