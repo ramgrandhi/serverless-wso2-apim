@@ -7,9 +7,13 @@ const {
   publishAPIDef,
   constructAPIDef,
   uploadCert,
+  uploadClientCert,
   updateCert,
+  updateClientCert,
   removeCert,
+  removeClientCert,
   listCertInfo,
+  listClientCertInfo,
   upsertSwaggerSpec,
   updateAPIDef,
   removeAPIDef,
@@ -48,6 +52,12 @@ const wso2APIM = {
         http: {
           baseUrl: 'https://backend.url',
           certChain: 'file://xxx.cer'
+        }
+      },
+      securityScheme: {
+        mutualssl: {
+          enabled: true,
+          clientCert: 'file://xxx.cer'
         }
       },
       tags: [ 'awesomeness', 'myawesomeapi'],
@@ -357,6 +367,30 @@ describe('wso2apim-3.2.0', () => {
 
   });
 
+  describe('uploadClientCert()', () => {
+    it('should handle a successful response', async () => {
+
+      const response = await uploadClientCert(
+        wso2APIM,
+        'xxx',
+        'alias',
+        wso2APIM.apidefs[0].securityScheme.mutualssl.clientCert,
+        '123'
+      );
+
+      expect(response.data).toEqual('foo');
+    });
+
+    it('should handle a faulty response', async () => {
+      axios.post.mockImplementationOnce(() =>
+        Promise.reject()
+      );
+
+      expect(uploadClientCert(wso2APIM, 'xxx', 'alias', wso2APIM.apidefs[0].backend.http.certChain, wso2APIM.apidefs[0].securityScheme.mutualssl.clientCert,'123')).rejects.toThrow();
+    });
+
+  });
+
   describe('updateAPIDef()', () => {
 
     it('should handle a successful response', async () => {
@@ -483,6 +517,42 @@ describe('wso2apim-3.2.0', () => {
       );
 
       expect(updateCert(wso2APIM, 'xxx', 'alias', wso2APIM.apidefs[0].backend.http.certChain)).rejects.toThrow();
+    });
+
+  });
+
+  describe('updateClientCert()', () => {
+
+    it('should handle a successful response', async () => {
+
+      const response = await updateClientCert(
+        wso2APIM,
+        'xxx',
+        'alias',
+        wso2APIM.apidefs[0].securityScheme.mutualssl.clientCert,
+        '123'
+      );
+
+      expect(axios.put).toHaveBeenCalledWith(
+        `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/apis/123/client-certificates/alias`,
+        expect.objectContaining({}),
+        {
+          headers: {
+            Authorization: 'Bearer xxx',
+            'Content-Type': 'multipart/form-data',
+          },
+          httpsAgent: expect.objectContaining({}),
+        }
+      );
+      expect(response.data).toEqual('foo');
+    });
+
+    it('should handle a faulty response', async () => {
+      axios.put.mockImplementationOnce(() =>
+        Promise.reject()
+      );
+
+      expect(updateCert(wso2APIM, 'xxx', 'alias', wso2APIM.apidefs[0].securityScheme.mutualssl.clientCert, '123')).rejects.toThrow();
     });
 
   });
