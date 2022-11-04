@@ -84,48 +84,6 @@ const wso2APIM = {
           }
         }
       }
-    },
-    {
-      name: 'MyAwesomeAPI',
-      description: 'My Awesome API',
-      rootContext: '/myawesomeapi',
-      version: 'v1',
-      visibility: 'PUBLIC',
-      backend: {
-        http: {
-          baseUrl: 'https://backend.url',
-          certChain: 'file://xxx.cer'
-        }
-      },
-      securityScheme: {
-        oauth2: {
-          enabled: false
-        }
-      },
-      tags: [ 'awesomeness', 'myawesomeapi'],
-      maxTps: 999,
-      swaggerSpec: {
-        'openapi': '3.0.0',
-        'info': {
-          'title': 'MyAwesomeAPI',
-          'version': 'v1',
-          'contact': {
-            'name': 'MyTeam',
-            'email': 'myteam@myteam.com'
-          }
-        },
-        'paths': {
-          '/*': {
-            'post': {
-              'responses': {
-                '201': {
-                  'description': 'Created'
-                }
-              }
-            }
-          }
-        }
-      }
     }
   ]
 };
@@ -625,7 +583,7 @@ describe('wso2apim-3.2.0', () => {
         Promise.reject()
       );
 
-      expect(updateCert(wso2APIM, 'xxx', 'alias', wso2APIM.apidefs[0].securityScheme.mutualssl.clientCert, '123')).rejects.toThrow();
+      expect(updateClientCert(wso2APIM, 'xxx', 'alias', wso2APIM.apidefs[0].securityScheme.mutualssl.clientCert, '123')).rejects.toThrow();
     });
 
   });
