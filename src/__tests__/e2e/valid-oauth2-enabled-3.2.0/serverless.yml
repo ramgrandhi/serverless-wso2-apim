@@ -1,0 +1,85 @@
+service: serverless-wso2-apim
+provider:
+  name: aws
+  stackName: ${env:STACK_NAME}
+  deploymentBucket:
+    name: ${env:TEST_ID_NORMALIZED}
+plugins:
+  - serverless-localstack
+  - serverless-deployment-bucket
+  - "../../../../../src"
+
+#⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇ Modify the configuration below to suit your test case.
+#⬇⬇⬇ START HERE ⬇⬇⬇⬇ Help: https://github.com/ramgrandhi/serverless-wso2-apim#configuration-reference
+#⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇ For a full list of env vars that you can use, refer `src/__tests__/e2e/e2e.test.js`
+custom:
+  wso2apim:
+    enabled: true
+    host: ${env:WSO2_HOST}
+    port: ${env:WSO2_PORT}
+    user: ${env:WSO2_USER}
+    pass: ${env:WSO2_PASS}
+    gatewayEnv: ${env:WSO2_ENV}
+    apidefs:
+      - name: ${env:TEST_ID}-1
+        description: ${env:TEST_ID}-1
+        rootContext: /${env:TEST_ID}-1
+        version: "v1"
+        visibility: "PRIVATE"
+        SecurityScheme:
+          oauth2:
+            enabled: true
+        backend:
+          http:
+            baseUrl: "https://baseUrl"
+        maxTps: 10
+        tags:
+          - ${env:TEST_ID}-1
+        swaggerSpec:
+          swagger: "2.0"
+          info:
+            title: ${env:TEST_ID}-1
+            version: "v1"
+            contact:
+              name: ${env:TEST_ID}-1
+              email: ${env:TEST_ID}-1
+          paths:
+            /*:
+              post:
+                responses:
+                  "201":
+                    description: Created
+                x-auth-type: "None"
+      # - name: ${env:TEST_ID}-2
+      #   description: ${env:TEST_ID}-2
+      #   rootContext: /${env:TEST_ID}-2
+      #   version: "1"
+      #   visibility: "PUBLIC"
+      #   backend:
+      #     http:
+      #       baseUrl: "https://baseUrl"
+      #   maxTps: 10
+      #   tags:
+      #     - ${env:TEST_ID}-2
+      #   swaggerSpec:
+      #     openapi: 3.0.0
+      #     info:
+      #       title: ${env:TEST_ID}-2
+      #       version: "1"
+      #       contact:
+      #         name: ${env:TEST_ID}-2
+      #         email: ${env:TEST_ID}-2
+      #     paths:
+      #       /*:
+      #         post:
+      #           responses:
+      #             "201":
+      #               description: Created
+      #           x-auth-type: "None"
+
+# Optionally, add your other AWS provider-specific resources below.
+# Make sure there is at least one resource listed below, otherwise stack deployment would fail.
+resources:
+  Resources:
+    Topic:
+      Type: AWS::SNS::Topic

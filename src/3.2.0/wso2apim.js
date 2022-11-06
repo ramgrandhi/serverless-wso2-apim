@@ -195,7 +195,18 @@ async function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
         mediationPolicies.push({ 'name': apiDef.mediationPolicies.fault, 'type': 'fault' });
       }
     }
-
+    let securityScheme = [];
+    console.log('securityScheme', securityScheme);
+    if (apiDef.securityScheme && apiDef.securityScheme.mutualssl && apiDef.securityScheme.mutualssl.enabled === true) {
+      securityScheme.push('mutualssl');
+      securityScheme.push('mutualssl_mandatory');
+    }
+    if(apiDef.securityScheme && apiDef.securityScheme.oauth2 && apiDef.securityScheme.oauth2.enabled === false) {
+      //do nothing
+    } else {
+      securityScheme.push('oauth2');
+    }
+    console.log('securityScheme', securityScheme);
     const wso2ApiDefinition = {
       id: apiId,
       name: apiDef.name,
@@ -211,7 +222,7 @@ async function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
       tags: [...apiDef.tags, 'serverless-wso2-apim'],
       policies: ['Unlimited'],
       apiThrottlingPolicy: 'Unlimited',
-      securityScheme: ['oauth2'],
+      securityScheme,
       maxTps: {
         production: (apiDef.maxTps) ? apiDef.maxTps : undefined
       },
@@ -312,6 +323,7 @@ async function createAPIDef(wso2APIM, accessToken, apiDef) {
     let url = `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/apis`;
     let { user, gatewayEnv } = wso2APIM;
     var data = await constructAPIDef(user, gatewayEnv, apiDef);
+    
 
     // TODO - dynamically retrieve swaggerSpec version
     let queryStr = 'openAPIVersion=V3';
@@ -605,6 +617,136 @@ async function listCertInfo(wso2APIM, accessToken, certAlias) {
   }
 }
 
+// Uploads client certificate
+async function uploadClientCert(wso2APIM, accessToken, certAlias, cert, apiId) {
+  try {
+    let url = `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/apis/${apiId}/client-certificates`;
+    var data = new FormData();
+    data.append('certificate', fs.createReadStream(cert));
+    data.append('alias', certAlias);
+    data.append('tier', 'unlimited');
+    var config = {
+      headers: {
+        'Authorization': 'Bearer ' + accessToken,
+        'Content-Type': 'multipart/form-data'
+      },
+      httpsAgent: new https.Agent({
+        rejectUnauthorized: false
+      })
+    };
+    return new Promise((resolve, reject) => {
+      axios.post(url, data, config)
+        .then((res) => {
+          resolve(res);
+        })
+        .catch((err) => {
+          // Ignore Certificate-exists-for-that-Alias error gracefully
+          if (err.response.data.code != '409') {
+            utils.renderError(err);
+          }
+          reject(err);
+        });
+    });
+  }
+  catch (err) {
+    utils.renderError(err);
+  }
+}
+
+// Lists certificate information (like validFrom, validTo, subject etc)
+async function listClientCertInfo(wso2APIM, accessToken, certAlias, apiId) {
+  try {
+    let url = `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/apis/${apiId}/client-certificates/${certAlias}`;
+    let config = {
+      headers: {
+        'Authorization': 'Bearer ' + accessToken,
+        'Accept': 'application/json'
+      },
+      httpsAgent: new https.Agent({
+        rejectUnauthorized: false
+      })
+    };
+
+    return new Promise((resolve, reject) => {
+      axios.get(url, config)
+        .then((res) => {
+          resolve(res.data);
+        })
+        .catch((err) => {
+          utils.renderError(err);
+          reject(err);
+        });
+    });
+  }
+  catch (err) {
+    utils.renderError(err);
+  }
+}
+
+// Updates client certificate
+async function updateClientCert(wso2APIM, accessToken, certAlias, cert, apiId) {
+  try {
+    let url = `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/apis/${apiId}/client-certificates/${certAlias}`;
+    var data = new FormData();
+    data.append('certificate', fs.createReadStream(cert));
+    let config = {
+      headers: {
+        'Authorization': 'Bearer ' + accessToken,
+        'Content-Type': 'multipart/form-data'
+      },
+      httpsAgent: new https.Agent({
+        rejectUnauthorized: false
+      })
+    };
+
+    return new Promise((resolve, reject) => {
+      axios.put(url, data, config)
+        .then((res) => {
+          resolve(res);
+        })
+        .catch((err) => {
+          utils.renderError(err);
+          reject(err);
+        });
+    });
+  }
+  catch (err) {
+    utils.renderError(err);
+  }
+}
+
+// Removes Client certificate
+async function removeClientCert(wso2APIM, accessToken, certAlias, apiId) {
+  try {
+    let url = `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/apis/${apiId}/client-certificates/${certAlias}`;
+    let config = {
+      headers: {
+        'Authorization': 'Bearer ' + accessToken
+      },
+      httpsAgent: new https.Agent({
+        rejectUnauthorized: false
+      })
+    };
+
+    return new Promise((resolve, reject) => {
+      axios.delete(url, config)
+        .then((res) => {
+          resolve(res);
+        })
+        .catch((err) => {
+          // Ignore Certificate-not-found-for-that-Alias error gracefully
+          if (err.response.status != '404') {
+            utils.renderError(err);
+          }
+          reject(err);
+        });
+    });
+  }
+  catch (err) {
+    utils.renderError(err);
+  }
+}
+
 /**
  * Upsert the swagger spec of the wso2 api
  * see https://apim.docs.wso2.com/en/3.2.0/develop/product-apis/publisher-apis/publisher-v1/publisher-v1/#tag/APIs/paths/~1apis~1{apiId}~1swagger/put for documentation
@@ -631,7 +773,9 @@ async function listCertInfo(wso2APIM, accessToken, certAlias) {
     data.append('apiDefinition', JSON.stringify(swaggerSpec));
 
     return axios.put(url, data, config)
-      .then((_) => undefined); // eat the http response, not needed outside of this api layer
+      .then((_) => undefined).catch((err) => {
+        utils.renderError(err);
+      }); // eat the http response, not needed outside of this api layer
   }
   catch (err) {
     utils.renderError(err);
@@ -651,6 +795,10 @@ module.exports = {
   uploadCert,
   updateCert,
   removeCert,
+  uploadClientCert,
+  listClientCertInfo,
+  updateClientCert,
+  removeClientCert,
   listCertInfo,
   updateAPIDef,
   removeAPIDef,
