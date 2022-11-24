@@ -485,6 +485,12 @@ class Serverless_WSO2_APIM {
 
         return certs;
       }
+      // If certChain is provided as a full-text certificate chain
+      else if (certChain.startsWith('-----BEGIN CERTIFICATE-----')) {
+        certs = await this.splitCertChain(certChain);
+
+        return certs;
+      }
       // If certChain is provided as an AWS ACM ARN
       else if (certChain.startsWith('arn:aws:acm:')) {
         this.provider = this.serverless.getProvider('aws');
@@ -552,6 +558,8 @@ class Serverless_WSO2_APIM {
                   // certAlias takes the form of <APIName>___<Version>___<index>
                   certAlias = apiDef.name + '___' + apiDef.version + '___' + j;
                 }
+                // Trim certAlias to 45 characters, max. supported by WSO2
+                certAlias = certAlias.substring(0, 44);
                 await this.saveCert(cert.toString(), certAlias);
 
                 // Upload Cert to WSO2 API Manager
@@ -645,7 +653,7 @@ class Serverless_WSO2_APIM {
                 let cert = certs[j];
                 var certAlias;
                 if (this.cache.tenantSuffix) {
-                  // certAlias takes the form of <APIName>___<Version>___<index>_at_<tenantSuffix>
+                  // certAlias takes the form of ClientCert___<APIName>___<Version>___<index>_at_<tenantSuffix>
                   certAlias =
                     'ClientCert' +
                     '___' +
@@ -657,9 +665,11 @@ class Serverless_WSO2_APIM {
                     '_at_' +
                     this.cache.tenantSuffix;
                 } else {
-                  // certAlias takes the form of <APIName>___<Version>___<index>
+                  // certAlias takes the form of ClientCert___<APIName>___<Version>___<index>
                   certAlias ='ClientCert' + '___' + apiDef.name + '___' + apiDef.version + '___' + j;
                 }
+                // Trim certAlias to 45 characters, max. supported by WSO2
+                certAlias = certAlias.substring(0, 44);
                 await this.saveCert(cert.toString(), certAlias);
                 // Upload Cert to WSO2 API Manager
                 try {
@@ -668,7 +678,7 @@ class Serverless_WSO2_APIM {
                     this.cache.accessToken,
                     certAlias,
                     slsDir + '/' + certAlias + '.cer',
-                    this.apiId // How do we get the apiId?
+                    apiId
                   );
                   this.serverless.cli.log(
                     pluginNameSuffix + 'Uploading client certificate #' + j + ' .. OK'
@@ -676,13 +686,13 @@ class Serverless_WSO2_APIM {
                   await utils.goToSleep(1000);
                 } catch (err) {
                   // If Certificate-exists-for-that-Alias error occurs.. then update it.
-                  if (err.response.data && err.response.data.code == '409') {
+                  if (err.response && err.response.status == '409') {
                     await wso2apim.updateClientCert(
                       wso2APIM,
                       this.cache.accessToken,
                       certAlias,
                       slsDir + '/' + certAlias + '.cer',
-                      '' // How do we get the apiId?
+                      apiId
                     );
                     this.serverless.cli.log(
                       pluginNameSuffix + 'Updating client certificate #' + j + ' .. OK'

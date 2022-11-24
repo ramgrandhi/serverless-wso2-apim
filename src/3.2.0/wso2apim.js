@@ -196,7 +196,6 @@ async function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
       }
     }
     let securityScheme = [];
-    console.log('securityScheme', securityScheme);
     if (apiDef.securityScheme && apiDef.securityScheme.mutualssl && apiDef.securityScheme.mutualssl.enabled === true) {
       securityScheme.push('mutualssl');
       securityScheme.push('mutualssl_mandatory');
@@ -206,7 +205,6 @@ async function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
     } else {
       securityScheme.push('oauth2');
     }
-    console.log('securityScheme', securityScheme);
     const wso2ApiDefinition = {
       id: apiId,
       name: apiDef.name,
@@ -625,6 +623,7 @@ async function uploadClientCert(wso2APIM, accessToken, certAlias, cert, apiId) {
     data.append('certificate', fs.createReadStream(cert));
     data.append('alias', certAlias);
     data.append('tier', 'unlimited');
+
     var config = {
       headers: {
         'Authorization': 'Bearer ' + accessToken,
