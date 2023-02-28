@@ -26,7 +26,7 @@ custom:
         rootContext: /${env:TEST_ID}-1
         version: "v1"
         subscriberVisibility: "PUBLIC"
-        publisherVisibilityControl: "NONE"
+        publisherVisibility: "PRIVATE"
         backend:
           http:
             baseUrl: "https://baseUrl"

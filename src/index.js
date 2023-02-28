@@ -180,8 +180,8 @@ class Serverless_WSO2_APIM {
         (wso2APIM.apidefs.every(def => (!def.subscriberVisibility ||
           def.subscriberVisibility !== 'RESTRICTED' || (Array.isArray(def.subscriberVisibilityRoles) && def.subscriberVisibilityRoles.length > 0)))
         ),
-        (wso2APIM.apidefs.every(def => (!def.publisherVisibilityControl ||
-          def.publisherVisibilityControl !== 'RESTRICTED' || (Array.isArray(def.publisherVisibilityControlRoles) && def.publisherVisibilityControlRoles.length > 0)))
+        (wso2APIM.apidefs.every(def => (!def.publisherVisibility ||
+          def.publisherVisibility !== 'RESTRICTED' || (Array.isArray(def.publisherVisibilityRoles) && def.publisherVisibilityRoles.length > 0)))
         )
       ];
       
@@ -195,7 +195,7 @@ class Serverless_WSO2_APIM {
         'No API definitions supplied `custom.wso2apim.apidefs`',
         'Invalid value assigned to `custom.wso2apim.apiDefs[i].cors.credentials`',
         'Invalid value assigned to `custom.wso2apim.subscriberVisibilityRoles`',
-        'Invalid value assigned to `custom.wso2apim.publisherVisibilityControlRoles`'
+        'Invalid value assigned to `custom.wso2apim.publisherVisibilityRoles`'
       ];
 
       if (conditionsArrayGeneric.indexOf(false) !== -1) {

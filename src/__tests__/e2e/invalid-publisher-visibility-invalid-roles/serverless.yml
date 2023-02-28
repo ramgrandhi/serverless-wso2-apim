@@ -28,8 +28,8 @@ custom:
         subscriberVisibility: "RESTRICTED"
         subscriberVisibilityRoles:
           - "admin"
-        publisherVisibilityControl: "RESTRICTED"
-        publisherVisibilityControlRoles: "admin"
+        publisherVisibility: "RESTRICTED"
+        publisherVisibilityRoles: "admin"
         backend:
           http:
             baseUrl: "https://baseUrl"

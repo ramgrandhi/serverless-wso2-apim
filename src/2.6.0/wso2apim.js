@@ -242,11 +242,11 @@ function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
     if (apiDef.subscriberVisibilityRoles) {
       wso2ApiDefinition.visibleRoles = apiDef.subscriberVisibilityRoles;
     }
-    if (apiDef.publisherVisibilityControl) {
-      wso2ApiDefinition.accessControl = apiDef.publisherVisibilityControl;
+    if (apiDef.publisherVisibility) {
+      wso2ApiDefinition.accessControl = apiDef.publisherVisibility === 'PRIVATE' ? 'NONE' : apiDef.publisherVisibility;
     }
-    if (apiDef.publisherVisibilityControlRoles) {
-      wso2ApiDefinition.accessControlRoles = apiDef.publisherVisibilityControlRoles;
+    if (apiDef.publisherVisibilityRoles) {
+      wso2ApiDefinition.accessControlRoles = apiDef.publisherVisibilityRoles;
     }
 
     backendBaseUrl = '';
