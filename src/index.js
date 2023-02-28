@@ -177,6 +177,12 @@ class Serverless_WSO2_APIM {
         (wso2APIM.apidefs.every(def => typeof def.cors === 'undefined' ||
           (typeof def.cors.credentials === 'undefined' || typeof def.cors.credentials === 'boolean'))
         ),
+        (wso2APIM.apidefs.every(def => (!def.subscriberVisibility ||
+          def.subscriberVisibility !== 'RESTRICTED' || (Array.isArray(def.subscriberVisibilityRoles) && def.subscriberVisibilityRoles.length > 0)))
+        ),
+        (wso2APIM.apidefs.every(def => (!def.publisherVisibility ||
+          def.publisherVisibility !== 'RESTRICTED' || (Array.isArray(def.publisherVisibilityRoles) && def.publisherVisibilityRoles.length > 0)))
+        )
       ];
       
       const messagesArrayGeneric = [
@@ -187,7 +193,9 @@ class Serverless_WSO2_APIM {
         'Invalid value assigned to `custom.wso2apim.pass`',
         'Invalid value assigned to `custom.wso2apim.gatewayEnv`',
         'No API definitions supplied `custom.wso2apim.apidefs`',
-        'Invalid value assigned to `custom.wso2apim.apiDefs[i].cors.credentials`'
+        'Invalid value assigned to `custom.wso2apim.apiDefs[i].cors.credentials`',
+        'Invalid value assigned to `custom.wso2apim.subscriberVisibilityRoles`',
+        'Invalid value assigned to `custom.wso2apim.publisherVisibilityRoles`'
       ];
 
       if (conditionsArrayGeneric.indexOf(false) !== -1) {

@@ -211,7 +211,7 @@ function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
         sandbox: (apiDef.maxTps) ? apiDef.maxTps : undefined,
         production: (apiDef.maxTps) ? apiDef.maxTps : undefined
       },
-      visibility: apiDef.visibility,
+      visibility: apiDef.subscriberVisibility || apiDef.visibility,
       endpointConfig: JSON.stringify({
         production_endpoints: {
           url: backendBaseUrl,
@@ -238,6 +238,15 @@ function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
     };
     if (apiDef.cors) {
       wso2ApiDefinition.corsConfiguration = constructCorsConfiguration(apiDef);
+    }
+    if (apiDef.subscriberVisibilityRoles) {
+      wso2ApiDefinition.visibleRoles = apiDef.subscriberVisibilityRoles;
+    }
+    if (apiDef.publisherVisibility) {
+      wso2ApiDefinition.accessControl = apiDef.publisherVisibility === 'PRIVATE' ? 'NONE' : apiDef.publisherVisibility;
+    }
+    if (apiDef.publisherVisibilityRoles) {
+      wso2ApiDefinition.accessControlRoles = apiDef.publisherVisibilityRoles;
     }
 
     backendBaseUrl = '';
@@ -578,7 +587,7 @@ async function listCertInfo(wso2APIM, accessToken, certAlias) {
  * @param {*} swaggerSpec 
  * @returns 
  */
- async function upsertSwaggerSpec(wso2APIM, accessToken, apiId, swaggerSpec) {
+async function upsertSwaggerSpec(wso2APIM, accessToken, apiId, swaggerSpec) {
   try {
     const url = `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/apis/${apiId}/swagger`;
     const config = {

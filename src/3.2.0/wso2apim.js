@@ -224,7 +224,7 @@ async function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
       maxTps: {
         production: (apiDef.maxTps) ? apiDef.maxTps : undefined
       },
-      visibility: apiDef.visibility,
+      visibility: apiDef.subscriberVisibility || apiDef.visibility,
       endpointConfig: {
         production_endpoints: {
           url: backendBaseUrl            },
@@ -249,6 +249,15 @@ async function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
     };
     if (apiDef.cors) {
       wso2ApiDefinition.corsConfiguration = constructCorsConfiguration(apiDef);
+    }
+    if (apiDef.subscriberVisibilityRoles) {
+      wso2ApiDefinition.visibleRoles = apiDef.subscriberVisibilityRoles;
+    }
+    if (apiDef.publisherVisibility) {
+      wso2ApiDefinition.accessControl = apiDef.publisherVisibility === 'PRIVATE' ? 'NONE' : apiDef.publisherVisibility;
+    }
+    if (apiDef.publisherVisibilityRoles) {
+      wso2ApiDefinition.accessControlRoles = apiDef.publisherVisibilityRoles;
     }
 
     backendBaseUrl = '';
