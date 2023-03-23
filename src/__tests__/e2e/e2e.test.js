@@ -2,7 +2,7 @@ const fs = require('fs');
 const chalk = require('chalk');
 const { spawnSync } = require('child_process');
 
-const wso2ApimVersionsSupported = ['3.2.0'];
+const wso2ApimVersionsSupported = ['2.6.0', '3.2.0'];
 
 describe('E2E on WSO2 API Manager', () => {
   wso2ApimVersionsSupported.forEach(wso2ApimVersion => {
