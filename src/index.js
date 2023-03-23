@@ -178,10 +178,22 @@ class Serverless_WSO2_APIM {
           (typeof def.cors.credentials === 'undefined' || typeof def.cors.credentials === 'boolean'))
         ),
         (wso2APIM.apidefs.every(def => (!def.subscriberVisibility ||
+          ['RESTRICTED', 'PRIVATE', 'PUBLIC'].includes(def.subscriberVisibility)))
+        ),
+        (wso2APIM.apidefs.every(def => (!def.subscriberVisibility ||
           def.subscriberVisibility !== 'RESTRICTED' || (Array.isArray(def.subscriberVisibilityRoles) && def.subscriberVisibilityRoles.length > 0)))
+        ),
+        (wso2APIM.apidefs.every(def => (!def.subscriberVisibilityRoles ||
+          def.subscriberVisibility === 'RESTRICTED'))
+        ),
+        (wso2APIM.apidefs.every(def => (!def.publisherVisibility ||
+          ['RESTRICTED', 'PRIVATE'].includes(def.publisherVisibility)))
         ),
         (wso2APIM.apidefs.every(def => (!def.publisherVisibility ||
           def.publisherVisibility !== 'RESTRICTED' || (Array.isArray(def.publisherVisibilityRoles) && def.publisherVisibilityRoles.length > 0)))
+        ),
+        (wso2APIM.apidefs.every(def => (!def.publisherVisibilityRoles ||
+          def.publisherVisibility === 'RESTRICTED'))
         )
       ];
       
@@ -194,8 +206,12 @@ class Serverless_WSO2_APIM {
         'Invalid value assigned to `custom.wso2apim.gatewayEnv`',
         'No API definitions supplied `custom.wso2apim.apidefs`',
         'Invalid value assigned to `custom.wso2apim.apiDefs[i].cors.credentials`',
+        'Invalid value assigned to `custom.wso2apim.subscriberVisibility`',
         'Invalid value assigned to `custom.wso2apim.subscriberVisibilityRoles`',
-        'Invalid value assigned to `custom.wso2apim.publisherVisibilityRoles`'
+        'Value for `custom.wso2apim.subscriberVisibilityRoles` not applicable',
+        'Invalid value assigned to `custom.wso2apim.publisherVisibility`',
+        'Invalid value assigned to `custom.wso2apim.publisherVisibilityRoles`',
+        'Value for `custom.wso2apim.publisherVisibilityRoles` not applicable'
       ];
 
       if (conditionsArrayGeneric.indexOf(false) !== -1) {

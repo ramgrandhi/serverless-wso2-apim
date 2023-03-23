@@ -2,7 +2,7 @@ const fs = require('fs');
 const chalk = require('chalk');
 const { spawnSync } = require('child_process');
 
-const wso2ApimVersionsSupported = ['2.6.0', '3.2.0'];
+const wso2ApimVersionsSupported = ['3.2.0'];
 
 describe('E2E on WSO2 API Manager', () => {
   wso2ApimVersionsSupported.forEach(wso2ApimVersion => {
@@ -43,7 +43,7 @@ describe('E2E on WSO2 API Manager', () => {
               }
               else if (testCase.split('-')[0] === 'invalid') {
                 console.log("Running.. ", chalk.bold.underline(`🌧 ${wso2ApimVersion}/${testCase}`), "\n\n", procDeploy.output.toString());
-                expect(procDeploy.output.toString().includes('NOT OK'));
+                expect(procDeploy.output.toString()).toMatch(/NOT OK/);
               }
 
               const procRemove = spawnSync('sls',

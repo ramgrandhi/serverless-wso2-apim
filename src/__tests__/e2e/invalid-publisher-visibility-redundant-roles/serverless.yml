@@ -26,6 +26,10 @@ custom:
         rootContext: /${env:TEST_ID}-1
         version: "1"
         subscriberVisibility: "RESTRICTED"
+        subscriberVisibilityRoles:
+          - "admin"
+        publisherVisibility: "PRIVATE"
+        publisherVisibilityRoles: "admin"
         backend:
           http:
             baseUrl: "https://baseUrl"

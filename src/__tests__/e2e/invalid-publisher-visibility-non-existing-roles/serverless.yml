@@ -12,6 +12,9 @@ plugins:
 #⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇ Modify the configuration below to suit your test case.
 #⬇⬇⬇ START HERE ⬇⬇⬇⬇ Help: https://github.com/ramgrandhi/serverless-wso2-apim#configuration-reference
 #⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇ For a full list of env vars that you can use, refer `src/__tests__/e2e/e2e.test.js`
+#
+# Version 2.6.0 accepts non-existing roles, so this test-case only applies to 3.2.0
+#
 custom:
   wso2apim:
     enabled: true
@@ -25,7 +28,10 @@ custom:
         description: ${env:TEST_ID}-1
         rootContext: /${env:TEST_ID}-1
         version: "1"
-        subscriberVisibility: "RESTRICTED"
+        publisherVisibility: "RESTRICTED"
+        publisherVisibilityRoles:
+          - "admin"
+          - "non-existing-role"
         backend:
           http:
             baseUrl: "https://baseUrl"
