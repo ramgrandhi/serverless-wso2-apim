@@ -45,5 +45,6 @@ c. Check if the following URLs are accessible from your browser. You should see 
 
 d. Start regression tests.
     
-> `yarn test:e2e`
+> `yarn test:e2e` - This will run all the E2E tests.
+> `yarn test:e2e <test case>` - This will only run a specific test case matching the directory name under `__tests__/e2e`.
 
