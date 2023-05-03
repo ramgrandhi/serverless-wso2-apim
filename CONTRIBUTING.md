@@ -34,7 +34,16 @@ a. Start the following docker containers separately in multiple terminals.
 
 > `docker run --name localstack -p 127.0.0.1:4566:4566 -p 127.0.0.1:4571:4571 --rm localstack/localstack`
 
-b. Start regression tests.
+b. Check your `/etc/hosts` file for the following entry. If missing, add it and save.
+
+> `127.0.0.1 localhost`
+
+c. Check if the following URLs are accessible from your browser. You should see something load up.
+
+> https://127.0.0.1:9260/services/Version
+> https://127.0.0.1:9320/services/Version
+
+d. Start regression tests.
     
 > `yarn test:e2e`
 
