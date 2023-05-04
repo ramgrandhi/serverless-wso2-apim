@@ -13,19 +13,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Install Node14 and Test
+      - name: Install Node16 and Test
         run: |
           curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
           export NVM_DIR="$HOME/.nvm"
           [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
           [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
           nvm --version
-          nvm install 14
+          nvm install 16
           node --version
 
           yarn install
 
-          nvm alias default 14
+          nvm alias default 16
           node --version
 
           yarn test:unit
@@ -45,19 +45,19 @@ jobs:
         uses: kibertoad/wait-action@1.0.1
         with:
           time: "60s"
-      - name: Install Node14 and Test
+      - name: Install Node16 and Test
         run: |
           curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
           export NVM_DIR="$HOME/.nvm"
           [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
           [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
           nvm --version
-          nvm install 14
+          nvm install 16
           node --version
 
           yarn install
 
-          nvm alias default 14
+          nvm alias default 16
           node --version
 
           yarn test:e2e
