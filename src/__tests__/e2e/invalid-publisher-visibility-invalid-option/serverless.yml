@@ -25,7 +25,7 @@ custom:
         description: ${env:TEST_ID}-1
         rootContext: /${env:TEST_ID}-1
         version: "1"
-        subscriberVisibility: "RESTRICTED"
+        publisherVisibility: "PRIVAT"
         backend:
           http:
             baseUrl: "https://baseUrl"
@@ -41,12 +41,11 @@ custom:
               name: ${env:TEST_ID}-1
               email: ${env:TEST_ID}-1
           paths:
-            /*:
-              post:
-                responses:
-                  "201":
-                    description: Created
-                x-auth-type: "None"
+            post:
+              responses:
+                "201":
+                  description: Created
+              x-auth-type: "None"
 
 # Optionally, add your other AWS provider-specific resources below.
 # Make sure there is at least one resource listed below, otherwise stack deployment would fail.
