@@ -774,10 +774,10 @@ describe('wso2apim-3.2.0', () => {
       );
 
       expect(apiDef.businessInformation).toEqual({
-        technicalOwnerEmail: undefined,
-        businessOwnerEmail: undefined,
-        technicalOwner: undefined,
-        businessOwner: undefined,
+        technicalOwnerEmail: 'myteam@myteam.com',
+        businessOwnerEmail: 'myteam@myteam.com',
+        technicalOwner: 'MyTeam',
+        businessOwner: 'MyTeam',
       });
     });
   });

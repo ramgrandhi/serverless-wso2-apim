@@ -613,10 +613,10 @@ describe('wso2apim-2.6.0', () => {
       );
 
       expect(apiDef.businessInformation).toEqual({
-        technicalOwnerEmail: undefined,
-        businessOwnerEmail: undefined,
-        technicalOwner: undefined,
-        businessOwner: undefined,
+        technicalOwnerEmail: 'myteam@myteam.com',
+        businessOwnerEmail: 'myteam@myteam.com',
+        technicalOwner: 'MyTeam',
+        businessOwner: 'MyTeam',
       });
     });
   });
