@@ -655,26 +655,26 @@ describe('wso2apim-3.2.0', () => {
 
   });
 
-  describe("upsertSwaggerSpec()", () => {
-    it("should handle a successful response", async () => {
-      const response = await upsertSwaggerSpec(wso2APIM, "xxx", "id001", wso2APIM.apidefs[0].swaggerSpec);
+  describe('upsertSwaggerSpec()', () => {
+    it('should handle a successful response', async () => {
+      const response = await upsertSwaggerSpec(wso2APIM, 'xxx', 'id001', wso2APIM.apidefs[0].swaggerSpec);
 
       expect(axios.put).toHaveBeenCalledWith(
         `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/apis/id001/swagger`,
         expect.objectContaining({}),
         {
           headers: {
-            Authorization: "Bearer xxx",
-            "Content-Type": "multipart/form-data"
+            Authorization: 'Bearer xxx',
+            'Content-Type': 'multipart/form-data'
           },
           httpsAgent: expect.objectContaining({})
         }
       );
     });
 
-      it("should handle a faulty response", async () => {
-        axios.put.mockImplementationOnce(() => Promise.reject());
-        expect(upsertSwaggerSpec(wso2APIM, "xxx", "id001", wso2APIM.apidefs[0].swaggerSpec)).rejects.toThrow();
+    it('should handle a faulty response', async () => {
+      axios.put.mockImplementationOnce(() => Promise.reject());
+      expect(upsertSwaggerSpec(wso2APIM, 'xxx', 'id001', wso2APIM.apidefs[0].swaggerSpec)).rejects.toThrow();
     });
   });
 
@@ -726,5 +726,60 @@ describe('wso2apim-3.2.0', () => {
       });
     });
   });
-  
+
+  describe('business information', () => {
+    it('businessInformation provided', async () => {
+      const config = {
+        ...wso2APIM,
+        apidefs: [
+          {
+            ...wso2APIM.apidefs[0],
+            businessInformation: {
+              technicalOwnerEmail: 'technical@email.com',
+              businessOwnerEmail: 'business@email.com',
+              technicalOwner: 'NL NN/Techical/Owner',
+              businessOwner: 'NL NN/Business/Owner',
+            },
+          },
+        ],
+      };
+
+      const apiDef = await constructAPIDef(
+        config.user,
+        config.gatewayEnv,
+        config.apidefs[0]
+      );
+
+      expect(apiDef.businessInformation).toEqual({
+        technicalOwnerEmail: 'technical@email.com',
+        businessOwnerEmail: 'business@email.com',
+        technicalOwner: 'NL NN/Techical/Owner',
+        businessOwner: 'NL NN/Business/Owner',
+      });
+    });
+    it('businessInformation not provided', async () => {
+      const config = {
+        ...wso2APIM,
+        apidefs: [
+          {
+            ...wso2APIM.apidefs[0]
+          },
+        ],
+      };
+
+      const apiDef = await constructAPIDef(
+        config.user,
+        config.gatewayEnv,
+        config.apidefs[0]
+      );
+
+      expect(apiDef.businessInformation).toEqual({
+        technicalOwnerEmail: undefined,
+        businessOwnerEmail: undefined,
+        technicalOwner: undefined,
+        businessOwner: undefined,
+      });
+    });
+  });
+
 });
