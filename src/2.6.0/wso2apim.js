@@ -229,7 +229,12 @@ function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
       additionalProperties: ((apiDef.apiProperties) && (Object.keys(apiDef.apiProperties).length > 0)) ? apiDef.apiProperties : undefined,
       subscriptionAvailability: 'current_tenant',
       subscriptionAvailableTenants: [],
-      businessInformation: {
+      businessInformation: apiDef.businessInformation ? {
+        businessOwnerEmail: apiDef.businessInformation.businessOwnerEmail,
+        technicalOwnerEmail: apiDef.businessInformation.technicalOwnerEmail,
+        technicalOwner: apiDef.businessInformation.technicalOwner,
+        businessOwner: apiDef.businessInformation.businessOwner
+      } : {
         businessOwnerEmail: ((apiDef.swaggerSpec.info) && (apiDef.swaggerSpec.info.contact) && (apiDef.swaggerSpec.info.contact.email)) ? apiDef.swaggerSpec.info.contact.email : undefined,
         technicalOwnerEmail: ((apiDef.swaggerSpec.info) && (apiDef.swaggerSpec.info.contact) && (apiDef.swaggerSpec.info.contact.email)) ? apiDef.swaggerSpec.info.contact.email : undefined,
         technicalOwner: ((apiDef.swaggerSpec.info) && (apiDef.swaggerSpec.info.contact) && (apiDef.swaggerSpec.info.contact.name)) ? apiDef.swaggerSpec.info.contact.name : undefined,
@@ -251,7 +256,7 @@ function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
 
     backendBaseUrl = '';
     backendType = '';
-      
+
     return wso2ApiDefinition;
   }
   catch (err) {
@@ -581,11 +586,11 @@ async function listCertInfo(wso2APIM, accessToken, certAlias) {
 /**
  * Upsert the swagger spec of the wso2 api
  * see https://docs.wso2.com/display/AM260/apidocs/publisher/#!/operations#APIIndividual#apisApiIdSwaggerPut
- * @param {*} wso2APIM 
- * @param {*} accessToken 
- * @param {*} apiId 
- * @param {*} swaggerSpec 
- * @returns 
+ * @param {*} wso2APIM
+ * @param {*} accessToken
+ * @param {*} apiId
+ * @param {*} swaggerSpec
+ * @returns
  */
 async function upsertSwaggerSpec(wso2APIM, accessToken, apiId, swaggerSpec) {
   try {
@@ -599,7 +604,7 @@ async function upsertSwaggerSpec(wso2APIM, accessToken, apiId, swaggerSpec) {
         rejectUnauthorized: false
       })
     };
-    
+
     const data = new FormData();
     data.append('apiDefinition', JSON.stringify(swaggerSpec));
 

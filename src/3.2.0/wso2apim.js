@@ -212,7 +212,7 @@ async function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
       context: apiDef.rootContext,
       version: apiDef.version,
       operations: await constructAPIOperations(apiDef.swaggerSpec),
-      lifeCycleStatus: 'CREATED', 
+      lifeCycleStatus: 'CREATED',
       isDefaultVersion: false,
       enableStore: true,
       type: backendType,
@@ -240,7 +240,12 @@ async function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
       additionalProperties: ((apiDef.apiProperties) && (Object.keys(apiDef.apiProperties).length > 0)) ? apiDef.apiProperties : undefined,
       subscriptionAvailability: 'CURRENT_TENANT',
       subscriptionAvailableTenants: [],
-      businessInformation: {
+      businessInformation: apiDef.businessInformation ? {
+        businessOwnerEmail: apiDef.businessInformation.businessOwnerEmail,
+        technicalOwnerEmail: apiDef.businessInformation.technicalOwnerEmail,
+        technicalOwner: apiDef.businessInformation.technicalOwner,
+        businessOwner: apiDef.businessInformation.businessOwner
+      } : {
         businessOwnerEmail: ((apiDef.swaggerSpec.info) && (apiDef.swaggerSpec.info.contact) && (apiDef.swaggerSpec.info.contact.email)) ? apiDef.swaggerSpec.info.contact.email : undefined,
         technicalOwnerEmail: ((apiDef.swaggerSpec.info) && (apiDef.swaggerSpec.info.contact) && (apiDef.swaggerSpec.info.contact.email)) ? apiDef.swaggerSpec.info.contact.email : undefined,
         technicalOwner: ((apiDef.swaggerSpec.info) && (apiDef.swaggerSpec.info.contact) && (apiDef.swaggerSpec.info.contact.name)) ? apiDef.swaggerSpec.info.contact.name : undefined,
@@ -330,7 +335,7 @@ async function createAPIDef(wso2APIM, accessToken, apiDef) {
     let url = `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/apis`;
     let { user, gatewayEnv } = wso2APIM;
     var data = await constructAPIDef(user, gatewayEnv, apiDef);
-    
+
 
     // TODO - dynamically retrieve swaggerSpec version
     let queryStr = 'openAPIVersion=V3';
@@ -758,11 +763,11 @@ async function removeClientCert(wso2APIM, accessToken, certAlias, apiId) {
 /**
  * Upsert the swagger spec of the wso2 api
  * see https://apim.docs.wso2.com/en/3.2.0/develop/product-apis/publisher-apis/publisher-v1/publisher-v1/#tag/APIs/paths/~1apis~1{apiId}~1swagger/put for documentation
- * @param {*} wso2APIM 
- * @param {*} accessToken 
- * @param {*} apiId 
- * @param {*} swaggerSpec 
- * @returns 
+ * @param {*} wso2APIM
+ * @param {*} accessToken
+ * @param {*} apiId
+ * @param {*} swaggerSpec
+ * @returns
  */
  async function upsertSwaggerSpec(wso2APIM, accessToken, apiId, swaggerSpec) {
   try {
@@ -776,7 +781,7 @@ async function removeClientCert(wso2APIM, accessToken, certAlias, apiId) {
         rejectUnauthorized: false
       })
     };
-    
+
     const data = new FormData();
     data.append('apiDefinition', JSON.stringify(swaggerSpec));
 
