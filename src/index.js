@@ -173,6 +173,9 @@ class Serverless_WSO2_APIM {
         ((wso2APIM.user) && (wso2APIM.user.length > 0)),
         ((wso2APIM.pass) && (wso2APIM.pass.length > 0)),
         ((wso2APIM.gatewayEnv) && (wso2APIM.gatewayEnv.length > 0)),
+        wso2APIM.hangTimeBeforeUpsertingSwagger
+          ? ((typeof wso2APIM.hangTimeBeforeUpsertingSwagger === 'number') && (wso2APIM.hangTimeBeforeUpsertingSwagger > 0))
+          : true,
         (wso2APIM.apidefs.length > 0),
         (wso2APIM.apidefs.every(def => typeof def.cors === 'undefined' ||
           (typeof def.cors.credentials === 'undefined' || typeof def.cors.credentials === 'boolean'))
@@ -204,6 +207,7 @@ class Serverless_WSO2_APIM {
         'Invalid value assigned to `custom.wso2apim.user`',
         'Invalid value assigned to `custom.wso2apim.pass`',
         'Invalid value assigned to `custom.wso2apim.gatewayEnv`',
+        'Invalid value assigned to `custom.wso2apim.hangTimeBeforeUpsertingSwagger`',
         'No API definitions supplied `custom.wso2apim.apidefs`',
         'Invalid value assigned to `custom.wso2apim.apiDefs[i].cors.credentials`',
         'Invalid value assigned to `custom.wso2apim.subscriberVisibility`',
@@ -807,6 +811,11 @@ class Serverless_WSO2_APIM {
             this.serverless.cli.log(
               pluginNameSuffix + 'Creating ' + api.apiName + '.. OK'
             );
+          }
+
+          if (wso2APIM.hangTimeBeforeUpsertingSwagger) {
+            this.serverless.cli.log(`${pluginNameSuffix}Hanging for 30s before upserting swagger ${api.apiName}..`);
+            utils.goToSleep(wso2APIM.hangTimeBeforeUpsertingSwagger * 1000);
           }
 
           // now update the swagger spec of the API

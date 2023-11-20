@@ -144,6 +144,7 @@ Serverless Framework plugin to manage APIs on [WSO2 API Manager](https://wso2.co
 > | `user`       | Username with an optional tenant symbol.                                                                                              |            `user@tenant` |
 > | `pass`       | Password, supports [Serverless Variables](https://www.serverless.com/framework/docs/providers/aws/guide/variables/) syntax.           |                    `xxx` |
 > | `gatewayEnv` | Target gateway environment, as configured in your WSO2 installation.                                                                  | `Production and Sandbox` |
+> | `hangTimeBeforeUpsertingSwagger` | The time in seconds to wait before upserting the swagger specs                                                    |                     `30` |
 >
 > <br>
 
