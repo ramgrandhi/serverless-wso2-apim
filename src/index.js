@@ -173,8 +173,8 @@ class Serverless_WSO2_APIM {
         ((wso2APIM.user) && (wso2APIM.user.length > 0)),
         ((wso2APIM.pass) && (wso2APIM.pass.length > 0)),
         ((wso2APIM.gatewayEnv) && (wso2APIM.gatewayEnv.length > 0)),
-        wso2APIM.hangTimeBeforeUpsertingSwagger
-          ? ((typeof wso2APIM.hangTimeBeforeUpsertingSwagger === 'number') && (wso2APIM.hangTimeBeforeUpsertingSwagger > 0))
+        wso2APIM.hangSecondsBeforeUpsertingSwagger
+          ? ((typeof wso2APIM.hangSecondsBeforeUpsertingSwagger === 'number') && (wso2APIM.hangSecondsBeforeUpsertingSwagger > 0))
           : true,
         (wso2APIM.apidefs.length > 0),
         (wso2APIM.apidefs.every(def => typeof def.cors === 'undefined' ||
@@ -207,7 +207,7 @@ class Serverless_WSO2_APIM {
         'Invalid value assigned to `custom.wso2apim.user`',
         'Invalid value assigned to `custom.wso2apim.pass`',
         'Invalid value assigned to `custom.wso2apim.gatewayEnv`',
-        'Invalid value assigned to `custom.wso2apim.hangTimeBeforeUpsertingSwagger`',
+        'Invalid value assigned to `custom.wso2apim.hangSecondsBeforeUpsertingSwagger`',
         'No API definitions supplied `custom.wso2apim.apidefs`',
         'Invalid value assigned to `custom.wso2apim.apiDefs[i].cors.credentials`',
         'Invalid value assigned to `custom.wso2apim.subscriberVisibility`',
@@ -813,11 +813,11 @@ class Serverless_WSO2_APIM {
             );
           }
 
-          if (wso2APIM.hangTimeBeforeUpsertingSwagger) {
+          if (wso2APIM.hangSecondsBeforeUpsertingSwagger) {
             this.serverless.cli.log(
-              `${pluginNameSuffix}Hanging for ${wso2APIM.hangTimeBeforeUpsertingSwagger}s before upserting swagger ${api.apiName}..`
+              `${pluginNameSuffix}Hanging for ${wso2APIM.hangSecondsBeforeUpsertingSwagger}s before upserting swagger ${api.apiName}..`
             );
-            utils.goToSleep(wso2APIM.hangTimeBeforeUpsertingSwagger * 1000);
+            utils.goToSleep(wso2APIM.hangSecondsBeforeUpsertingSwagger * 1000);
           }
 
           // now update the swagger spec of the API
