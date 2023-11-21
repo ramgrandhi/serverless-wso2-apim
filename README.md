@@ -148,6 +148,11 @@ Serverless Framework plugin to manage APIs on [WSO2 API Manager](https://wso2.co
 >
 > <br>
 
+#### Why `hangSecondsBeforeUpsertingSwagger`?
+
+In some complex/distributed WSO2 setups it may take a while to synchronize the API definitions. When upserting the swagger right after the API def update, it will override the common data between them (e.g. CORS Headers) with the outdated API definitions.
+When that happens, adding a hang time in between helps updating both the API definitions & the swagger successfully.
+
 > ### **`custom.wso2apim.apidefs.<Your-API>.*`**
 >
 > | Parameter                                 | What?                                                                                                                                                                                                                                                                                                                       |                                                                               Usage Example |
