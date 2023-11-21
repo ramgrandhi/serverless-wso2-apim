@@ -814,7 +814,9 @@ class Serverless_WSO2_APIM {
           }
 
           if (wso2APIM.hangTimeBeforeUpsertingSwagger) {
-            this.serverless.cli.log(`${pluginNameSuffix}Hanging for 30s before upserting swagger ${api.apiName}..`);
+            this.serverless.cli.log(
+              `${pluginNameSuffix}Hanging for ${wso2APIM.hangTimeBeforeUpsertingSwagger}s before upserting swagger ${api.apiName}..`
+            );
             utils.goToSleep(wso2APIM.hangTimeBeforeUpsertingSwagger * 1000);
           }
 
