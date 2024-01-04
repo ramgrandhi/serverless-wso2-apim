@@ -13,7 +13,7 @@ const versionSlugsSupported = {
     'versionSlug': 'v0.14'
   },
   '3.2.0': {
-    'versionSlug': 'v1.2'
+    'versionSlug': 'v1'
   }
 };
 
