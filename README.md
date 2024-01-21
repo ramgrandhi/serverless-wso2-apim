@@ -144,8 +144,14 @@ Serverless Framework plugin to manage APIs on [WSO2 API Manager](https://wso2.co
 > | `user`       | Username with an optional tenant symbol.                                                                                              |            `user@tenant` |
 > | `pass`       | Password, supports [Serverless Variables](https://www.serverless.com/framework/docs/providers/aws/guide/variables/) syntax.           |                    `xxx` |
 > | `gatewayEnv` | Target gateway environment, as configured in your WSO2 installation.                                                                  | `Production and Sandbox` |
+> | `hangSecondsBeforeUpsertingSwagger` | The time in seconds to wait before upserting the swagger specs (Optional)                                      |                     `30` |
 >
 > <br>
+
+#### Why `hangSecondsBeforeUpsertingSwagger`?
+
+In some complex/distributed WSO2 setups it may take a while to synchronize the API definitions. When upserting the swagger right after the API def update, it will override the common data between them (e.g. CORS Headers) with the outdated API definitions.
+When that happens, adding a hang time in between helps updating both the API definitions & the swagger successfully.
 
 > ### **`custom.wso2apim.apidefs.<Your-API>.*`**
 >
