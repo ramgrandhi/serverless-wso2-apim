@@ -11,6 +11,7 @@
     "test:e2e": "jest e2e --verbose",
     "test:e2e:destroy": "yarn stop:wso2-2.6.0 && yarn stop:wso2-3.2.0 && yarn stop:localstack",
     "test": "yarn test:unit",
+    "test:watch": "yarn test --watch",
     "start:wso2-2.6.0": "docker run --name api-manager-260 -p 127.0.0.1:8260:8243 -p 127.0.0.1:9260:9443 --rm wso2/wso2am:2.6.0",
     "start:wso2-3.2.0": "docker run --name api-manager-320 -p 127.0.0.1:8320:8243 -p 127.0.0.1:9320:9443 --rm wso2/wso2am:3.2.0",
     "start:localstack": "docker run --name localstack -p 127.0.0.1:4566:4566 -p 127.0.0.1:4571:4571 --rm localstack/localstack:1.4",
@@ -67,6 +68,9 @@
   },
   "jest": {
     "coverageDirectory": "./coverage/",
-    "collectCoverage": true
+    "collectCoverage": true,
+    "watchPathIgnorePatterns": [
+      "<rootDir>/jest.json"
+    ]
   }
 }
