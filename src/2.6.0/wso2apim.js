@@ -617,6 +617,33 @@ async function upsertSwaggerSpec(wso2APIM, accessToken, apiId, swaggerSpec) {
   }
 }
 
+/**
+ * Retrieves the API Definition saved at the WSO2 platform
+ *
+ * @param {*} wso2APIM
+ * @param {string} accessToken
+ * @param {string} apiId
+ * @returns {*}
+ */
+async function getApiDef(wso2APIM, accessToken, apiId) {
+  const url = `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/apis/${apiId}`;
+
+  try {
+    const result = await axios.get(url, {
+      headers: {
+        'Authorization': 'Bearer ' + accessToken
+      },
+      httpsAgent: new https.Agent({
+        rejectUnauthorized: false
+      })
+    });
+
+    return result.data;
+  } catch (err) {
+    utils.renderError(err);
+    throw err;
+  }
+}
 
 module.exports = {
   registerClient,
@@ -634,4 +661,5 @@ module.exports = {
   removeAPIDef,
   listInvokableAPIUrl,
   upsertSwaggerSpec,
+  getApiDef,
 };

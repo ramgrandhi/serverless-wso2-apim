@@ -14,6 +14,7 @@ const {
   updateAPIDef,
   removeAPIDef,
   listInvokableAPIUrl,
+  getApiDef,
 } = require('./wso2apim');
 const axios = require('axios');
 const qs = require('qs');
@@ -630,6 +631,28 @@ describe('wso2apim-2.6.0', () => {
         technicalOwner: undefined,
         businessOwner: undefined,
       });
+    });
+  });
+
+  describe('getApiDef()', () => {
+    it('should handle a successful response', async () => {
+      const response = await getApiDef(wso2APIM, 'xxx', 'alias');
+
+      expect(axios.get).toHaveBeenCalledWith(
+        `${publisherBaseUrl}/apis/alias`,
+        {
+          headers: {
+            Authorization: 'Bearer xxx',
+          },
+          httpsAgent: expect.objectContaining({}),
+        }
+      );
+      expect(response).toEqual('foo');
+    });
+
+    it('should handle a faulty response', async () => {
+      axios.get.mockRejectedValueOnce(defaultFaulty);
+      await expect(getApiDef(wso2APIM, 'xxx', 'alias')).rejects.toEqual(defaultFaulty);
     });
   });
 });
