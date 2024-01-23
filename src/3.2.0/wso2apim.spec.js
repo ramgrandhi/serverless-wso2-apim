@@ -90,6 +90,18 @@ const wso2APIM = {
 
 const apiId = '123456789';
 
+const baseUrl = `https://${wso2APIM.host}:${wso2APIM.port}`;
+const publisherBaseUrl = `${baseUrl}/api/am/publisher/${wso2APIM.versionSlug}`;
+const storeBaseUrl = `${baseUrl}/api/am/store/${wso2APIM.versionSlug}`;
+
+const defaultFaulty = {
+  response: {
+    data: { message: 'failed' },
+    status: 500,
+    headers: {},
+  },
+};
+
 describe('wso2apim-3.2.0', () => {
 
   describe('registerClient()', () => {
@@ -106,7 +118,7 @@ describe('wso2apim-3.2.0', () => {
       const response = await registerClient(wso2APIM);
 
       expect(axios.post).toHaveBeenCalledWith(
-        `https://${wso2APIM.host}:${wso2APIM.port}/client-registration/v0.17/register`,
+        `${baseUrl}/client-registration/v0.17/register`,
         {
           clientName: 'serverless-wso2-apim',
           owner: wso2APIM.user,
@@ -123,11 +135,9 @@ describe('wso2apim-3.2.0', () => {
     });
 
     it('should handle a faulty response', async () => {
-      axios.post.mockImplementationOnce(() =>
-        Promise.reject()
-      );
+      axios.post.mockRejectedValueOnce(defaultFaulty);
 
-      expect(registerClient(wso2APIM)).rejects.toThrow();
+      await expect(registerClient(wso2APIM)).rejects.toEqual(defaultFaulty);
     });
   });
 
@@ -145,7 +155,7 @@ describe('wso2apim-3.2.0', () => {
       const response = await generateToken(wso2APIM, 'foo123', 'xxxyyyzzz');
 
       expect(axios.post).toHaveBeenCalledWith(
-        `https://${wso2APIM.host}:${wso2APIM.port}/oauth2/token`,
+        `${baseUrl}/oauth2/token`,
         qs.stringify({
           'grant_type': 'password',
           'username': wso2APIM.user,
@@ -161,11 +171,9 @@ describe('wso2apim-3.2.0', () => {
     });
 
     it('should handle a faulty response', async () => {
-      axios.post.mockImplementationOnce(() =>
-        Promise.reject()
-      );
+      axios.post.mockRejectedValueOnce(defaultFaulty);
 
-      expect(generateToken(wso2APIM, 'foo123', 'xxxyyyzzz')).rejects.toThrow();
+      await expect(generateToken(wso2APIM, 'foo123', 'xxxyyyzzz')).rejects.toEqual(defaultFaulty);
     });
   });
 
@@ -175,7 +183,7 @@ describe('wso2apim-3.2.0', () => {
       const response = await isAPIDeployed(wso2APIM, 'xxx', wso2APIM.apidefs[0].name, wso2APIM.apidefs[0].version, wso2APIM.apidefs[0].rootContext);
 
       expect(axios.get).toHaveBeenCalledWith(
-        `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/apis?query=name:${wso2APIM.apidefs[0].name} version:${wso2APIM.apidefs[0].version} context:${wso2APIM.apidefs[0].rootContext}`,
+        `${publisherBaseUrl}/apis?query=name:${wso2APIM.apidefs[0].name} version:${wso2APIM.apidefs[0].version} context:${wso2APIM.apidefs[0].rootContext}`,
         {
           headers: {
             Authorization: 'Bearer xxx',
@@ -187,13 +195,11 @@ describe('wso2apim-3.2.0', () => {
     });
 
     it('should handle a faulty response', async () => {
-      axios.get.mockImplementationOnce(() =>
-        Promise.reject()
-      );
+      axios.get.mockRejectedValueOnce(defaultFaulty);
 
-      expect(
+      await expect(
         isAPIDeployed(wso2APIM, 'xxx', wso2APIM.apidefs[0].name, wso2APIM.apidefs[0].version, wso2APIM.apidefs[0].rootContext)
-      ).rejects.toThrow();
+      ).rejects.toEqual(defaultFaulty);
     });
   });
 
@@ -203,7 +209,7 @@ describe('wso2apim-3.2.0', () => {
       const response = await isCertUploaded(wso2APIM, 'xxx', 'alias');
 
       expect(axios.get).toHaveBeenCalledWith(
-        `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/certificates/alias`,
+        `${publisherBaseUrl}/certificates/alias`,
         {
           headers: {
             Authorization: 'Bearer xxx',
@@ -215,13 +221,11 @@ describe('wso2apim-3.2.0', () => {
     });
 
     it('should handle a faulty response', async () => {
-      axios.get.mockImplementationOnce(() =>
-        Promise.reject()
-      );
+      axios.get.mockRejectedValueOnce(defaultFaulty);
 
-      expect(
+      await expect(
         isCertUploaded(wso2APIM, 'xxx', 'alias')
-      ).rejects.toThrow();
+      ).rejects.toEqual(defaultFaulty);
     });
   });
 
@@ -245,7 +249,7 @@ describe('wso2apim-3.2.0', () => {
       );
 
       expect(axios.post).toHaveBeenCalledWith(
-        `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/apis?openAPIVersion=V3`,
+        `${publisherBaseUrl}/apis?openAPIVersion=V3`,
         expect.objectContaining({}),
         {
           headers: {
@@ -265,11 +269,9 @@ describe('wso2apim-3.2.0', () => {
     });
 
     it('should handle a faulty response', async () => {
-      axios.post.mockImplementationOnce(() =>
-        Promise.reject()
-      );
+      axios.post.mockRejectedValueOnce(defaultFaulty);
 
-      expect(createAPIDef(wso2APIM, 'xxx', wso2APIM.apidefs[0])).rejects.toThrow();
+      await expect(createAPIDef(wso2APIM, 'xxx', wso2APIM.apidefs[0])).rejects.toBeUndefined();
     });
 
   });
@@ -284,7 +286,7 @@ describe('wso2apim-3.2.0', () => {
       );
 
       expect(axios.post).toHaveBeenCalledWith(
-        `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/apis/change-lifecycle`,
+        `${publisherBaseUrl}/apis/change-lifecycle`,
         expect.objectContaining({}),
         {
           headers: {
@@ -302,11 +304,9 @@ describe('wso2apim-3.2.0', () => {
     });
 
     it('should handle a faulty response', async () => {
-      axios.post.mockImplementationOnce(() =>
-        Promise.reject()
-      );
+      axios.post.mockRejectedValueOnce(defaultFaulty);
 
-      expect(publishAPIDef(wso2APIM, 'xxx', apiId)).rejects.toThrow();
+      await expect(publishAPIDef(wso2APIM, 'xxx', apiId)).rejects.toEqual(defaultFaulty);
     });
 
   });
@@ -321,7 +321,7 @@ describe('wso2apim-3.2.0', () => {
       );
 
       expect(axios.get).toHaveBeenCalledWith(
-        `https://${wso2APIM.host}:${wso2APIM.port}/api/am/store/${wso2APIM.versionSlug}/apis/${apiId}`,
+        `${storeBaseUrl}/apis/${apiId}`,
         {
           headers: {
             Authorization: 'Bearer xxx'
@@ -334,11 +334,9 @@ describe('wso2apim-3.2.0', () => {
     });
 
     it('should handle a faulty response', async () => {
-      axios.get.mockImplementationOnce(() =>
-        Promise.reject()
-      );
+      axios.get.mockRejectedValueOnce(defaultFaulty);
 
-      expect(listInvokableAPIUrl(wso2APIM, 'xxx', apiId)).rejects.toThrow();
+      await expect(listInvokableAPIUrl(wso2APIM, 'xxx', apiId)).rejects.toEqual(defaultFaulty);
     });
 
   });
@@ -358,11 +356,17 @@ describe('wso2apim-3.2.0', () => {
     });
 
     it('should handle a faulty response', async () => {
-      axios.post.mockImplementationOnce(() =>
-        Promise.reject()
-      );
+      axios.post.mockRejectedValueOnce(defaultFaulty);
 
-      expect(uploadCert(wso2APIM, 'xxx', 'alias', wso2APIM.apidefs[0].backend.http.certChain, wso2APIM.apidefs[0].backend.http.baseUrl)).rejects.toThrow();
+      await expect(
+        uploadCert(
+          wso2APIM,
+          'xxx',
+          'alias',
+          wso2APIM.apidefs[0].backend.http.certChain,
+          wso2APIM.apidefs[0].backend.http.baseUrl,
+        ),
+      ).rejects.toEqual(defaultFaulty);
     });
 
   });
@@ -382,11 +386,18 @@ describe('wso2apim-3.2.0', () => {
     });
 
     it('should handle a faulty response', async () => {
-      axios.post.mockImplementationOnce(() =>
-        Promise.reject()
-      );
+      axios.post.mockRejectedValueOnce(defaultFaulty);
 
-      expect(uploadClientCert(wso2APIM, 'xxx', 'alias', wso2APIM.apidefs[0].backend.http.certChain, wso2APIM.apidefs[0].securityScheme.mutualssl.clientCert,'123')).rejects.toThrow();
+      await expect(
+        uploadClientCert(
+          wso2APIM,
+          'xxx',
+          'alias',
+          wso2APIM.apidefs[0].backend.http.certChain,
+          wso2APIM.apidefs[0].securityScheme.mutualssl.clientCert,
+          '123',
+        ),
+      ).rejects.toEqual(defaultFaulty);
     });
 
   });
@@ -403,7 +414,7 @@ describe('wso2apim-3.2.0', () => {
       );
 
       expect(axios.put).toHaveBeenCalledWith(
-        `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/apis/${apiId}`,
+        `${publisherBaseUrl}/apis/${apiId}`,
         expect.objectContaining({}),
         {
           headers: {
@@ -417,11 +428,9 @@ describe('wso2apim-3.2.0', () => {
     });
 
     it('should handle a faulty response', async () => {
-      axios.put.mockImplementationOnce(() =>
-        Promise.reject()
-      );
+      axios.put.mockRejectedValueOnce(defaultFaulty);
 
-      expect(updateAPIDef(wso2APIM, 'xxx', wso2APIM.apidefs[0], apiId)).rejects.toThrow();
+      await expect(updateAPIDef(wso2APIM, 'xxx', wso2APIM.apidefs[0], apiId)).rejects.toEqual(defaultFaulty);
     });
 
   });
@@ -436,7 +445,7 @@ describe('wso2apim-3.2.0', () => {
       );
 
       expect(axios.delete).toHaveBeenCalledWith(
-        `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/apis/${apiId}`,
+        `${publisherBaseUrl}/apis/${apiId}`,
         {
           headers: {
             Authorization: 'Bearer xxx',
@@ -447,11 +456,9 @@ describe('wso2apim-3.2.0', () => {
     });
 
     it('should handle a faulty response', async () => {
-      axios.delete.mockImplementationOnce(() =>
-        Promise.reject()
-      );
+      axios.delete.mockRejectedValueOnce(defaultFaulty);
 
-      expect(removeAPIDef(wso2APIM, 'xxx', apiId)).rejects.toThrow();
+      await expect(removeAPIDef(wso2APIM, 'xxx', apiId)).rejects.toEqual(defaultFaulty);
     });
 
   });
@@ -466,7 +473,7 @@ describe('wso2apim-3.2.0', () => {
       );
 
       expect(axios.delete).toHaveBeenCalledWith(
-        `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/certificates/alias`,
+        `${publisherBaseUrl}/certificates/alias`,
         {
           headers: {
             Authorization: 'Bearer xxx',
@@ -477,11 +484,9 @@ describe('wso2apim-3.2.0', () => {
     });
 
     it('should handle a faulty response', async () => {
-      axios.delete.mockImplementationOnce(() =>
-        Promise.reject()
-      );
+      axios.delete.mockRejectedValueOnce(defaultFaulty);
 
-      expect(removeCert(wso2APIM, 'xxx', 'alias')).rejects.toThrow();
+      await expect(removeCert(wso2APIM, 'xxx', 'alias')).rejects.toEqual(defaultFaulty);
     });
 
   });
@@ -497,7 +502,7 @@ describe('wso2apim-3.2.0', () => {
       );
 
       expect(axios.delete).toHaveBeenCalledWith(
-        `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/apis/123/client-certificates/alias`,
+        `${publisherBaseUrl}/apis/123/client-certificates/alias`,
         {
           headers: {
             Authorization: 'Bearer xxx',
@@ -508,11 +513,9 @@ describe('wso2apim-3.2.0', () => {
     });
 
     it('should handle a faulty response', async () => {
-      axios.delete.mockImplementationOnce(() =>
-        Promise.reject()
-      );
+      axios.delete.mockRejectedValueOnce(defaultFaulty);
 
-      expect(removeClientCert(wso2APIM, 'xxx', 'alias', '123')).rejects.toThrow();
+      await expect(removeClientCert(wso2APIM, 'xxx', 'alias', '123')).rejects.toEqual(defaultFaulty);
     });
 
   });
@@ -529,7 +532,7 @@ describe('wso2apim-3.2.0', () => {
       );
 
       expect(axios.put).toHaveBeenCalledWith(
-        `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/endpoint-certificates/alias`,
+        `${publisherBaseUrl}/endpoint-certificates/alias`,
         expect.objectContaining({}),
         {
           headers: {
@@ -543,11 +546,9 @@ describe('wso2apim-3.2.0', () => {
     });
 
     it('should handle a faulty response', async () => {
-      axios.put.mockImplementationOnce(() =>
-        Promise.reject()
-      );
+      axios.put.mockRejectedValueOnce(defaultFaulty);
 
-      expect(updateCert(wso2APIM, 'xxx', 'alias', wso2APIM.apidefs[0].backend.http.certChain)).rejects.toThrow();
+      await expect(updateCert(wso2APIM, 'xxx', 'alias', wso2APIM.apidefs[0].backend.http.certChain)).rejects.toEqual(defaultFaulty);
     });
 
   });
@@ -565,7 +566,7 @@ describe('wso2apim-3.2.0', () => {
       );
 
       expect(axios.put).toHaveBeenCalledWith(
-        `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/apis/123/client-certificates/alias`,
+        `${publisherBaseUrl}/apis/123/client-certificates/alias`,
         expect.objectContaining({}),
         {
           headers: {
@@ -579,11 +580,17 @@ describe('wso2apim-3.2.0', () => {
     });
 
     it('should handle a faulty response', async () => {
-      axios.put.mockImplementationOnce(() =>
-        Promise.reject()
-      );
+      axios.put.mockRejectedValueOnce(defaultFaulty);
 
-      expect(updateClientCert(wso2APIM, 'xxx', 'alias', wso2APIM.apidefs[0].securityScheme.mutualssl.clientCert, '123')).rejects.toThrow();
+      await expect(
+        updateClientCert(
+          wso2APIM,
+          'xxx',
+          'alias',
+          wso2APIM.apidefs[0].securityScheme.mutualssl.clientCert,
+          '123',
+        ),
+      ).rejects.toEqual(defaultFaulty);
     });
 
   });
@@ -598,7 +605,7 @@ describe('wso2apim-3.2.0', () => {
       );
 
       expect(axios.get).toHaveBeenCalledWith(
-        `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/certificates/alias`,
+        `${publisherBaseUrl}/certificates/alias`,
         {
           headers: {
             Authorization: 'Bearer xxx',
@@ -612,11 +619,9 @@ describe('wso2apim-3.2.0', () => {
     });
 
     it('should handle a faulty response', async () => {
-      axios.get.mockImplementationOnce(() =>
-        Promise.reject()
-      );
+      axios.get.mockRejectedValueOnce(defaultFaulty);
 
-      expect(listCertInfo(wso2APIM, 'xxx', 'alias')).rejects.toThrow();
+      await expect(listCertInfo(wso2APIM, 'xxx', 'alias')).rejects.toEqual(defaultFaulty);
     });
 
   });
@@ -632,7 +637,7 @@ describe('wso2apim-3.2.0', () => {
       );
 
       expect(axios.get).toHaveBeenCalledWith(
-        `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/apis/123/client-certificates/alias`,
+        `${publisherBaseUrl}/apis/123/client-certificates/alias`,
         {
           headers: {
             Authorization: 'Bearer xxx',
@@ -646,21 +651,19 @@ describe('wso2apim-3.2.0', () => {
     });
 
     it('should handle a faulty response', async () => {
-      axios.get.mockImplementationOnce(() =>
-        Promise.reject()
-      );
+      axios.get.mockRejectedValueOnce(defaultFaulty);
 
-      expect(listClientCertInfo(wso2APIM, 'xxx', 'alias', '123')).rejects.toThrow();
+      await expect(listClientCertInfo(wso2APIM, 'xxx', 'alias', '123')).rejects.toEqual(defaultFaulty);
     });
 
   });
 
   describe('upsertSwaggerSpec()', () => {
     it('should handle a successful response', async () => {
-      const response = await upsertSwaggerSpec(wso2APIM, 'xxx', 'id001', wso2APIM.apidefs[0].swaggerSpec);
+      await upsertSwaggerSpec(wso2APIM, 'xxx', 'id001', wso2APIM.apidefs[0].swaggerSpec);
 
       expect(axios.put).toHaveBeenCalledWith(
-        `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/apis/id001/swagger`,
+        `${publisherBaseUrl}/apis/id001/swagger`,
         expect.objectContaining({}),
         {
           headers: {
@@ -673,8 +676,8 @@ describe('wso2apim-3.2.0', () => {
     });
 
     it('should handle a faulty response', async () => {
-      axios.put.mockImplementationOnce(() => Promise.reject());
-      expect(upsertSwaggerSpec(wso2APIM, 'xxx', 'id001', wso2APIM.apidefs[0].swaggerSpec)).rejects.toThrow();
+      axios.put.mockRejectedValueOnce(defaultFaulty);
+      await expect(upsertSwaggerSpec(wso2APIM, 'xxx', 'id001', wso2APIM.apidefs[0].swaggerSpec)).rejects.toEqual(defaultFaulty);
     });
   });
 

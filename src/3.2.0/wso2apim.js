@@ -769,7 +769,7 @@ async function removeClientCert(wso2APIM, accessToken, certAlias, apiId) {
  * @param {*} swaggerSpec
  * @returns
  */
- async function upsertSwaggerSpec(wso2APIM, accessToken, apiId, swaggerSpec) {
+async function upsertSwaggerSpec(wso2APIM, accessToken, apiId, swaggerSpec) {
   try {
     const url = `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/apis/${apiId}/swagger`;
     const config = {
@@ -786,8 +786,9 @@ async function removeClientCert(wso2APIM, accessToken, certAlias, apiId) {
     data.append('apiDefinition', JSON.stringify(swaggerSpec));
 
     return axios.put(url, data, config)
-      .then((_) => undefined).catch((err) => {
+      .then(() => undefined).catch((err) => {
         utils.renderError(err);
+        throw err;
       }); // eat the http response, not needed outside of this api layer
   }
   catch (err) {

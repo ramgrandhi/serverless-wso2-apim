@@ -609,7 +609,7 @@ async function upsertSwaggerSpec(wso2APIM, accessToken, apiId, swaggerSpec) {
     data.append('apiDefinition', JSON.stringify(swaggerSpec));
 
     return axios.put(url, data, config)
-      .then((_) => undefined); // eat the http response, not needed outside of this api layer
+      .then(() => undefined); // eat the http response, not needed outside of this api layer
   }
   catch (err) {
     utils.renderError(err);
