@@ -19,6 +19,7 @@ const {
   removeAPIDef,
   listInvokableAPIUrl,
   getApiDef,
+  checkApiDefIsUpdated,
 } = require('./wso2apim');
 const axios = require('axios');
 const qs = require('qs');
@@ -805,6 +806,79 @@ describe('wso2apim-3.2.0', () => {
     it('should handle a faulty response', async () => {
       axios.get.mockRejectedValueOnce(defaultFaulty);
       await expect(getApiDef(wso2APIM, 'xxx', 'alias')).rejects.toEqual(defaultFaulty);
+    });
+  });
+
+  describe('checkApiDefIsUpdated()', () => {
+    const corsConfiguration = {
+      corsConfigurationEnabled: true,
+      accessControlAllowOrigins: [
+        '*'
+      ],
+      accessControlAllowCredentials: false,
+      accessControlAllowHeaders: [
+        'Authorization',
+        'Access-Control-Allow-Origin',
+        'Content-Type',
+        'SOAPAction',
+        'x-custom-header',
+      ],
+      accessControlAllowMethods: [
+        'GET',
+        'PUT',
+        'POST',
+        'DELETE',
+        'PATCH',
+        'OPTIONS'
+      ]
+    };
+
+    const config = {
+      ...wso2APIM,
+      apidefs: [
+        {
+          ...wso2APIM.apidefs[0],
+          cors: {
+            headers: [
+              'Authorization',
+              'Access-Control-Allow-Origin',
+              'Content-Type',
+              'SOAPAction',
+              'x-custom-header',
+            ],
+          },
+        },
+      ],
+    };
+
+    it('should return truthy when the apidef is updated', async () => {
+      axios.get.mockResolvedValueOnce({
+        data: {
+          ...config.apidefs[0],
+          corsConfiguration,
+        }
+      });
+
+      const response = await checkApiDefIsUpdated(wso2APIM, 'xxx', 'alias', config.apidefs[0]);
+      expect(response).toBeTruthy();
+    });
+
+    it('should return falsy when the apidef is outdated', async () => {
+      axios.get.mockResolvedValueOnce({
+        data: {
+          ...config.apidefs[0],
+          corsConfiguration: {
+            ...corsConfiguration,
+            accessControlAllowHeaders: [
+              ...corsConfiguration.accessControlAllowHeaders,
+              'x-new-custom-header',
+            ],
+          },
+        }
+      });
+
+      const response = await checkApiDefIsUpdated(wso2APIM, 'xxx', 'alias', config.apidefs[0]);
+      expect(response).toBeFalsy();
     });
   });
 });

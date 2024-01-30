@@ -1,4 +1,4 @@
-const { resolveCfImportValue } = require('./utils');
+const { resolveCfImportValue, isEqual } = require('./utils');
 
 describe('resolveCfImportValue', () => {
   let calls = 0;
@@ -49,5 +49,27 @@ describe('resolveCfImportValue', () => {
 
     expect(val).toEqual('C');
     expect(calls).toEqual(2);
+  });
+});
+
+describe('isEqual', () => {
+  const baseObject = {
+    number: 1234,
+    text: 'text',
+    bool: true,
+    array: ['1234', {}, null, undefined]
+  };
+
+  it('should return truthy to equal objects', () => {
+    expect(isEqual(baseObject, baseObject)).toBeTruthy();
+  });
+
+  it('should return falsy to non equal objects', () => {
+    const newObject = {
+      ...baseObject,
+      array: ['1234'],
+    };
+
+    expect(isEqual(baseObject, newObject)).toBeFalsy();
   });
 });

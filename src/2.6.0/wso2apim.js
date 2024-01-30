@@ -645,6 +645,23 @@ async function getApiDef(wso2APIM, accessToken, apiId) {
   }
 }
 
+/**
+ * Check if the API def is up to date
+ *
+ * @param {*} wso2APIM
+ * @param {string} accessToken
+ * @param {string} apiId
+ * @param {Object} apiDef
+ * @returns {boolean}
+ */
+async function checkApiDefIsUpdated(wso2APIM, accessToken, apiId, apiDef) {
+  const newApiDef = constructAPIDef(wso2APIM.user, wso2APIM.gatewayEnv, apiDef, apiId);
+  const currentApiDef = await getApiDef(wso2APIM, accessToken, apiId);
+
+  // TODO: We should test for any intersection data between api definition and swagger specs
+  return utils.isEqual(newApiDef.corsConfiguration, currentApiDef.corsConfiguration);
+}
+
 module.exports = {
   registerClient,
   generateToken,
@@ -662,4 +679,5 @@ module.exports = {
   listInvokableAPIUrl,
   upsertSwaggerSpec,
   getApiDef,
+  checkApiDefIsUpdated,
 };
