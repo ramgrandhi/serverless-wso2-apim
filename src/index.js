@@ -5,6 +5,7 @@ const axios = require('axios');
 const https = require('https');
 const fs = require('fs');
 const semver = require('semver');
+const { retryWithExponentialBackoff } = require('./utils/retryWithExponentialBackoff');
 const pluginNameSuffix = '[serverless-wso2-apim] ';
 
 const wso2ApimVersionsSupported = ['2.6.0', '3.2.0'];
@@ -768,6 +769,60 @@ class Serverless_WSO2_APIM {
       this.cache.tenantSuffix = this.wso2APIM.user.split('@')[1];
     }
 
+    const deployAPiDefs = async (wso2APIM, api, apiDef) => {
+      //Update
+      if (api.apiId !== undefined) {
+        // this.serverless.cli.log(pluginNameSuffix + "Updating " + api.apiName + " (" + api.apiId + ")..");
+        await wso2apim.updateAPIDef(
+          wso2APIM,
+          this.cache.accessToken,
+          apiDef,
+          api.apiId
+        );
+        this.serverless.cli.log(
+          pluginNameSuffix +
+            'Updating ' +
+            api.apiName +
+            ' (' +
+            api.apiId +
+            ').. OK'
+        );
+      } else {
+        //Create
+        const result = await wso2apim.createAPIDef(
+          wso2APIM,
+          this.cache.accessToken,
+          apiDef,
+        );
+        apiId = result.apiId;
+        this.serverless.cli.log(
+          pluginNameSuffix + 'Creating ' + api.apiName + '.. OK'
+        );
+      }
+    };
+
+    const deploySwaggerSpecs = async (wso2APIM, api, apiDef) => {
+      this.serverless.cli.log(`${pluginNameSuffix}Upserting Swagger spec for ${api.apiName}..`);
+      await wso2apim.upsertSwaggerSpec(wso2APIM, this.cache.accessToken, api.apiId, apiDef.swaggerSpec);
+      this.serverless.cli.log(`${pluginNameSuffix}Upserting.. OK`);
+    };
+
+    const deployApiDefAndUpsertSwagger = async (wso2APIM, api, apiDef) => {
+      await deployAPiDefs(wso2APIM, api, apiDef);
+      await deploySwaggerSpecs(wso2APIM, api, apiDef)
+      
+      const apiDefIsUpdated = await wso2apim.checkApiDefIsUpdated(
+        wso2APIM,
+        this.cache.accessToken,
+        api.apiId,
+        apiDef,
+      );
+
+      if (!apiDefIsUpdated) {
+        throw new Error('Api definition is outdated');
+      }
+    };
+
     try {
       // By calling listAPIDefs(), we are re-collecting the current deployment status in WSO2 API Manager into this.cache.deploymentStatus
       await this.listAPIDefs();
@@ -776,43 +831,11 @@ class Serverless_WSO2_APIM {
       // Update API definitions, if they exist
       for (const [i, api] of this.cache.deploymentStatus.entries()) {
         try {
-          let apiId = api.apiId;
-          //Update
-          if (api.apiId !== undefined) {
-            // this.serverless.cli.log(pluginNameSuffix + "Updating " + api.apiName + " (" + api.apiId + ")..");
-            await wso2apim.updateAPIDef(
-              wso2APIM,
-              this.cache.accessToken,
-              apiDefs[i],
-              api.apiId
-            );
-            this.serverless.cli.log(
-              pluginNameSuffix +
-                'Updating ' +
-                api.apiName +
-                ' (' +
-                api.apiId +
-                ').. OK'
-            );
-          }
-          //Create
-          else {
-            // this.serverless.cli.log(pluginNameSuffix + "Creating " + api.apiName + "".."");
-            const result = await wso2apim.createAPIDef(
-              wso2APIM,
-              this.cache.accessToken,
-              apiDefs[i]
-            );
-            apiId = result.apiId;
-            this.serverless.cli.log(
-              pluginNameSuffix + 'Creating ' + api.apiName + '.. OK'
-            );
-          }
-
-          // now update the swagger spec of the API
-          this.serverless.cli.log(`${pluginNameSuffix}Upserting Swagger spec for ${api.apiName}..`);
-          await wso2apim.upsertSwaggerSpec(wso2APIM, this.cache.accessToken, apiId, apiDefs[i].swaggerSpec);
-          this.serverless.cli.log(`${pluginNameSuffix}Upserting.. OK`);
+          await retryWithExponentialBackoff(() => deployApiDefAndUpsertSwagger(wso2APIM, api, apiDefs[i]), {
+            intervalSeconds: 2,
+            maxAttempts: 6,
+            backoffRate: 2,
+          });
         } catch (err) {
           this.serverless.cli.log(
             'Creating / Updating ' +
