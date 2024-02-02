@@ -171,10 +171,8 @@ describe('retryWithExponentialBackoff', () => {
     });
 
     it('should throw error if fn is a promise', async () => {
-      const fn = async () => 'test';
-      const promiseFnCall = fn();
-
-      await expect(retryWithExponentialBackoff(promiseFnCall)).rejects.toEqual(fnError);
+      const testFn = async () => 'test';
+      await expect(retryWithExponentialBackoff(testFn())).rejects.toEqual(fnError);
     });
   });
 });
