@@ -652,10 +652,14 @@ async function getApiDef(wso2APIM, accessToken, apiId) {
  * @param {string} accessToken
  * @param {string} apiId
  * @param {Object} apiDef
- * @returns {boolean}
+ * @returns {Promise<boolean>}
  */
 async function checkApiDefIsUpdated(wso2APIM, accessToken, apiId, apiDef) {
   const newApiDef = constructAPIDef(wso2APIM.user, wso2APIM.gatewayEnv, apiDef, apiId);
+
+  // ? When no cors configuration is set, it applies the default one from wso2
+  if (!newApiDef.corsConfiguration) return true;
+
   const currentApiDef = await getApiDef(wso2APIM, accessToken, apiId);
 
   // TODO: We should test for any intersection data between api definition and swagger specs

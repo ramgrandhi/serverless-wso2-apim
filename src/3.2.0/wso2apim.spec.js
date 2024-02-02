@@ -880,5 +880,10 @@ describe('wso2apim-3.2.0', () => {
       const response = await checkApiDefIsUpdated(wso2APIM, 'xxx', 'alias', config.apidefs[0]);
       expect(response).toBeFalsy();
     });
+
+    it('should return truthy when the there is no cors configuration', async () => {
+      const response = await checkApiDefIsUpdated(wso2APIM, 'xxx', 'alias', wso2APIM.apidefs[0]);
+      expect(response).toBeTruthy();
+    });
   });
 });

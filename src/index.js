@@ -787,6 +787,8 @@ class Serverless_WSO2_APIM {
             api.apiId +
             ').. OK'
         );
+
+        return api.apiId;
       } else {
         //Create
         const result = await wso2apim.createAPIDef(
@@ -794,23 +796,42 @@ class Serverless_WSO2_APIM {
           this.cache.accessToken,
           apiDef,
         );
-        apiId = result.apiId;
         this.serverless.cli.log(
           pluginNameSuffix + 'Creating ' + api.apiName + '.. OK'
         );
+
+        return result.apiId;
       }
     };
 
-    const deploySwaggerSpecs = async (wso2APIM, api, apiDef) => {
-      this.serverless.cli.log(`${pluginNameSuffix}Upserting Swagger spec for ${api.apiName}..`);
-      await wso2apim.upsertSwaggerSpec(wso2APIM, this.cache.accessToken, api.apiId, apiDef.swaggerSpec);
+    const deploySwaggerSpecs = async (wso2APIM, apiName, apiId, apiDef) => {
+      this.serverless.cli.log(`${pluginNameSuffix}Upserting Swagger spec for ${apiName}..`);
+      await wso2apim.upsertSwaggerSpec(wso2APIM, this.cache.accessToken, apiId, apiDef.swaggerSpec);
       this.serverless.cli.log(`${pluginNameSuffix}Upserting.. OK`);
     };
 
-    const deployApiDefAndUpsertSwagger = async (wso2APIM, api, apiDef) => {
-      await deployAPiDefs(wso2APIM, api, apiDef);
-      await deploySwaggerSpecs(wso2APIM, api, apiDef)
-      
+    const deployApiDefAndUpsertSwagger = async (wso2APIM, api, apiDef, attempt) => {
+      const isCreatingApiDef = (api.apiId === undefined);
+
+      try {
+        const apiId = await deployAPiDefs(wso2APIM, api, apiDef);
+        
+        // ? deploy swagger only once
+        if (attempt === 1) {
+          await deploySwaggerSpecs(wso2APIM, api.apiName, apiId, apiDef)
+        }
+      } catch (err) {
+        this.serverless.cli.log(`Creating / Updating ${apiDef.name}.. NOT OK, proceeding further.`);
+
+        // ? do not retry in case of errors in the deployment
+        return;
+      }
+
+      // ? Only check if the apiDef was properly updated when it is an update operation
+      if (isCreatingApiDef) {
+        return;
+      }
+
       const apiDefIsUpdated = await wso2apim.checkApiDefIsUpdated(
         wso2APIM,
         this.cache.accessToken,
@@ -830,19 +851,11 @@ class Serverless_WSO2_APIM {
       // Create API definitions, if they do not exist
       // Update API definitions, if they exist
       for (const [i, api] of this.cache.deploymentStatus.entries()) {
-        try {
-          await retryWithExponentialBackoff(() => deployApiDefAndUpsertSwagger(wso2APIM, api, apiDefs[i]), {
-            intervalSeconds: 2,
-            maxAttempts: 6,
-            backoffRate: 2,
-          });
-        } catch (err) {
-          this.serverless.cli.log(
-            'Creating / Updating ' +
-              `${apiDefs[i].name}` +
-              '.. NOT OK, proceeding further.'
-          );
-        }
+        await retryWithExponentialBackoff(({ attempt }) => deployApiDefAndUpsertSwagger(wso2APIM, api, apiDefs[i], attempt), {
+          intervalSeconds: 2,
+          maxAttempts: 6,
+          backoffRate: 2,
+        });
       }
 
       await utils.goToSleep(3000);

@@ -140,6 +140,18 @@ describe('retryWithExponentialBackoff', () => {
       expect(mockFunction).toHaveBeenCalledTimes(1);
     });
 
+    it('should provide the attempt number to the caller function', async () => {
+      const mockFunction = jest.fn().mockRejectedValue(new Error('Simulated error'));
+
+      await expect(
+        retryWithExponentialBackoff(mockFunction, { backoffRate: 0.01 })
+      ).rejects.toThrow('Simulated error');
+
+      expect(mockFunction).toHaveBeenNthCalledWith(1, { attempt: 1 });
+      expect(mockFunction).toHaveBeenNthCalledWith(2, { attempt: 2 });
+      expect(mockFunction).toHaveBeenNthCalledWith(3, { attempt: 3 });
+    });
+
     it('should be able to execute an async function', async () => {
       const testFn = async (input) => input;
 
@@ -159,7 +171,10 @@ describe('retryWithExponentialBackoff', () => {
     });
 
     it('should throw error if fn is a promise', async () => {
-      await expect(retryWithExponentialBackoff('function')).rejects.toEqual(fnError);
+      const fn = async () => 'test';
+      const promiseFnCall = fn();
+
+      await expect(retryWithExponentialBackoff(promiseFnCall)).rejects.toEqual(fnError);
     });
   });
 });

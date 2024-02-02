@@ -41,9 +41,36 @@ const validateConfig = ({ intervalSeconds, maxAttempts, backoffRate }) => {
 /**
  * Execute a promise and retry with exponential backoff
  * based on the maximum retry attempts it can perform
- * @param {<T>(...params: unknown[]) => Promise<T>} fn function to be executed
+ * @param {<T>({ attempt: number }) => Promise<T>} fn function to be executed
  * @param {Config} configParams retry config
  * @returns Promise<T>
+ * 
+ * @example
+ * async function getFooById(id) {
+ *   const res = await axios.get(`/foo/${id}`);
+ *   return res.data;
+ * }
+ * 
+ * async function main() {
+ *   const simpleRetry = retryWithExponentialBackoff(() => getFooById(1));
+ *   
+ *   const retryWithParams = retryWithExponentialBackoff(
+ *     () => getFooById(1),
+ *     {
+ *       intervalSeconds: 2,
+ *       maxAttempts: 5,
+ *       backoffRate: 1.5,
+ *     },
+ *   );
+ * 
+ *   const retryReceivingAttempts = retryWithExponentialBackoff(({ attempt }) => {
+ *     if (attempt > 1) {
+ *       logger.addLog('failed to fetch foo');
+ *     }
+ * 
+ *     return getFooById(1);
+ *   });
+ * }
  */
 async function retryWithExponentialBackoff(fn, configParams) {
   if (typeof fn !== 'function') {
@@ -58,7 +85,10 @@ async function retryWithExponentialBackoff(fn, configParams) {
 
   const execute = async () => {
     try {
-      return await fn();
+      return await fn({
+        // ? attempt starts with 0 internally, but we want to expose it starting with 1 for better understanding.
+        attempt: attempt + 1
+      });
     } catch (error) {
       const delayMs = intervalMs * (backoffRate ** attempt);
       await goToSleep(delayMs);
