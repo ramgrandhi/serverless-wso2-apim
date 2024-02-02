@@ -851,6 +851,7 @@ class Serverless_WSO2_APIM {
       // Create API definitions, if they do not exist
       // Update API definitions, if they exist
       for (const [i, api] of this.cache.deploymentStatus.entries()) {
+        // ? seconds sleeping on each retry: 2, 4, 8, 16, 32, 64
         await retryWithExponentialBackoff(({ attempt }) => deployApiDefAndUpsertSwagger(wso2APIM, api, apiDefs[i], attempt), {
           intervalSeconds: 2,
           maxAttempts: 6,

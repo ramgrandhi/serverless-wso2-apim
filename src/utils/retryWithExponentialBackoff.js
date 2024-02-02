@@ -52,10 +52,10 @@ const validateConfig = ({ intervalSeconds, maxAttempts, backoffRate }) => {
  * }
  * 
  * async function main() {
- *   const simpleRetry = retryWithExponentialBackoff(() => getFooById(1));
+ *   const simpleRetry = retryWithExponentialBackoff(() => getFooById('uuid'));
  *   
  *   const retryWithParams = retryWithExponentialBackoff(
- *     () => getFooById(1),
+ *     () => getFooById('uuid'),
  *     {
  *       intervalSeconds: 2,
  *       maxAttempts: 5,
@@ -64,11 +64,11 @@ const validateConfig = ({ intervalSeconds, maxAttempts, backoffRate }) => {
  *   );
  * 
  *   const retryReceivingAttempts = retryWithExponentialBackoff(({ attempt }) => {
- *     if (attempt > 1) {
- *       logger.addLog('failed to fetch foo');
+ *     if (attempt === 3) {
+ *       return getFooById('fallback-foo-id');
  *     }
  * 
- *     return getFooById(1);
+ *     return getFooById('uuid');
  *   });
  * }
  */
@@ -86,7 +86,7 @@ async function retryWithExponentialBackoff(fn, configParams) {
   const execute = async () => {
     try {
       return await fn({
-        // ? attempt starts with 0 internally, but we want to expose it starting with 1 for better understanding.
+        // ? attempt starts with 0 internally, but we want to expose it starting with 1 for natural language purpose.
         attempt: attempt + 1
       });
     } catch (error) {
