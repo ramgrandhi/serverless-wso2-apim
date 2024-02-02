@@ -839,13 +839,7 @@ describe('wso2apim-3.2.0', () => {
         {
           ...wso2APIM.apidefs[0],
           cors: {
-            headers: [
-              'Authorization',
-              'Access-Control-Allow-Origin',
-              'Content-Type',
-              'SOAPAction',
-              'x-custom-header',
-            ],
+            headers: corsConfiguration.accessControlAllowHeaders,
           },
         },
       ],
