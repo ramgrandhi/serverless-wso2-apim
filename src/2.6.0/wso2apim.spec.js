@@ -681,6 +681,18 @@ describe('wso2apim-2.6.0', () => {
       ]
     };
 
+    const endpointConfig = {
+      production_endpoints: {
+        url: wso2APIM.apidefs[0].backend.http.baseUrl,
+        config: null,
+      },
+      sandbox_endpoints: {
+        url: wso2APIM.apidefs[0].backend.http.baseUrl,
+        config: null,
+      },
+      endpoint_type: 'http',
+    };
+
     const config = {
       ...wso2APIM,
       apidefs: [
@@ -698,6 +710,7 @@ describe('wso2apim-2.6.0', () => {
         data: {
           ...config.apidefs[0],
           corsConfiguration,
+          endpointConfig: JSON.stringify(endpointConfig),
         }
       });
 
@@ -705,10 +718,11 @@ describe('wso2apim-2.6.0', () => {
       expect(response).toBeTruthy();
     });
 
-    it('should return falsy when the apidef is outdated', async () => {
+    it('should return falsy when the apidef cors configuration is outdated', async () => {
       axios.get.mockResolvedValueOnce({
         data: {
           ...config.apidefs[0],
+          endpointConfig: JSON.stringify(endpointConfig),
           corsConfiguration: {
             ...corsConfiguration,
             accessControlAllowHeaders: [
@@ -723,11 +737,45 @@ describe('wso2apim-2.6.0', () => {
       expect(response).toBeFalsy();
     });
 
-    it('should return truthy when the there is no cors configuration', async () => {
-      const response = await checkApiDefIsUpdated(wso2APIM, 'xxx', 'alias', wso2APIM.apidefs[0]);
+    it('should return falsy when the apidef endpoint configuration is outdated', async () => {
+      axios.get.mockResolvedValueOnce({
+        data: {
+          ...config.apidefs[0],
+          endpointConfig: JSON.stringify({
+            ...endpointConfig,
+            production_endpoints: {
+              baseUrl: 'https://new-backend.url'
+            }
+          }),
+        }
+      });
 
-      expect(response).toBeTruthy();
-      expect(axios.get).not.toHaveBeenCalled();
+      const response = await checkApiDefIsUpdated(wso2APIM, 'xxx', 'alias', config.apidefs[0]);
+      expect(response).toBeFalsy();
+    });
+
+    it('should return falsy when the apidef endpoint and cors configurations are outdated', async () => {
+      axios.get.mockResolvedValueOnce({
+        data: {
+          ...config.apidefs[0],
+          corsConfiguration: {
+            ...corsConfiguration,
+            accessControlAllowHeaders: [
+              ...corsConfiguration.accessControlAllowHeaders,
+              'x-new-custom-header',
+            ],
+          },
+          endpointConfig: JSON.stringify({
+            ...endpointConfig,
+            production_endpoints: {
+              baseUrl: 'https://new-backend.url'
+            }
+          }),
+        }
+      });
+
+      const response = await checkApiDefIsUpdated(wso2APIM, 'xxx', 'alias', config.apidefs[0]);
+      expect(response).toBeFalsy();
     });
   });
 });

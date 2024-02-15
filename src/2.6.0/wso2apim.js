@@ -15,6 +15,7 @@ const qs = require('qs');
 const FormData = require('form-data');
 const fs = require('fs');
 const utils = require('../utils/utils');
+const isEqual = require('lodash.isequal');
 
 // Register a new client
 async function registerClient(wso2APIM) {
@@ -647,6 +648,7 @@ async function getApiDef(wso2APIM, accessToken, apiId) {
 
 /**
  * Check if the API def is up to date
+ * Returns `true` when the data is up to date
  *
  * @param {*} wso2APIM
  * @param {string} accessToken
@@ -656,14 +658,19 @@ async function getApiDef(wso2APIM, accessToken, apiId) {
  */
 async function checkApiDefIsUpdated(wso2APIM, accessToken, apiId, apiDef) {
   const newApiDef = constructAPIDef(wso2APIM.user, wso2APIM.gatewayEnv, apiDef, apiId);
-
-  // ? When no cors configuration is set, it applies the default one from wso2
-  if (!newApiDef.corsConfiguration) return true;
-
   const currentApiDef = await getApiDef(wso2APIM, accessToken, apiId);
 
+  // ? When no cors configuration is set, it applies the default one from wso2
+  const hasCorsConfiguration = !!newApiDef.corsConfiguration;
+
+  const equivalenceCheckMatrix = [
+    // ? endpointConfig is a string in this version, so it should always match each other directly
+    newApiDef.endpointConfig === currentApiDef.endpointConfig,
+    ...hasCorsConfiguration ? [isEqual(newApiDef.corsConfiguration, currentApiDef.corsConfiguration)] : [],
+  ];
+
   // TODO: We should test for any intersection data between api definition and swagger specs
-  return utils.isEqual(newApiDef.corsConfiguration, currentApiDef.corsConfiguration);
+  return equivalenceCheckMatrix.every(Boolean);
 }
 
 module.exports = {

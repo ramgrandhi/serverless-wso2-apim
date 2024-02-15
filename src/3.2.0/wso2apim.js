@@ -15,6 +15,7 @@ const qs = require('qs');
 const FormData = require('form-data');
 const fs = require('fs');
 const utils = require('../utils/utils');
+const isEqual = require('lodash.isequal');
 
 // Parse your swagger online @ https://apitools.dev/swagger-parser/online/
 const parser = require('swagger-parser');
@@ -227,7 +228,8 @@ async function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
       visibility: apiDef.subscriberVisibility || apiDef.visibility,
       endpointConfig: {
         production_endpoints: {
-          url: backendBaseUrl            },
+          url: backendBaseUrl
+        },
         sandbox_endpoints: {
           url: backendBaseUrl
         },
@@ -827,6 +829,7 @@ async function getApiDef(wso2APIM, accessToken, apiId) {
 
 /**
  * Check if the API def is up to date
+ * Returns `true` when the data is up to date
  *
  * @param {*} wso2APIM
  * @param {string} accessToken
@@ -839,12 +842,17 @@ async function checkApiDefIsUpdated(wso2APIM, accessToken, apiId, apiDef) {
     constructAPIDef(wso2APIM.user, wso2APIM.gatewayEnv, apiDef, apiId),
     getApiDef(wso2APIM, accessToken, apiId)
   ]);
-  
+
   // ? When no cors configuration is set, it applies the default one from wso2
-  if (!newApiDef.corsConfiguration) return true;
+  const hasCorsConfiguration = !!newApiDef.corsConfiguration;
+
+  const equivalenceCheckMatrix = [
+    isEqual(newApiDef.endpointConfig, currentApiDef.endpointConfig),
+    ...hasCorsConfiguration ? [isEqual(newApiDef.corsConfiguration, currentApiDef.corsConfiguration)] : [],
+  ];
 
   // TODO: We should test for any intersection data between api definition and swagger specs
-  return utils.isEqual(newApiDef.corsConfiguration, currentApiDef.corsConfiguration);
+  return equivalenceCheckMatrix.every(Boolean);
 }
 
 module.exports = {
