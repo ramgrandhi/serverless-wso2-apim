@@ -932,6 +932,7 @@ describe('wso2apim-3.2.0', () => {
       axios.get.mockResolvedValueOnce({
         data: {
           ...config.apidefs[0],
+          corsConfiguration,
           endpointConfig: {
             endpoint_type: 'http',
             production_endpoints: {
@@ -945,7 +946,7 @@ describe('wso2apim-3.2.0', () => {
       });
 
       const response = await checkApiDefIsUpdated(wso2APIM, 'xxx', 'alias', config.apidefs[0]);
-      expect(response).toBeFalsy();
+      expect(response).toBeTruthy();
     });
   });
 });
