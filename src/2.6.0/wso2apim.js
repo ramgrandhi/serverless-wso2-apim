@@ -15,6 +15,7 @@ const qs = require('qs');
 const FormData = require('form-data');
 const fs = require('fs');
 const utils = require('../utils/utils');
+const isEqual = require('lodash.isequal');
 
 // Register a new client
 async function registerClient(wso2APIM) {
@@ -609,7 +610,7 @@ async function upsertSwaggerSpec(wso2APIM, accessToken, apiId, swaggerSpec) {
     data.append('apiDefinition', JSON.stringify(swaggerSpec));
 
     return axios.put(url, data, config)
-      .then((_) => undefined); // eat the http response, not needed outside of this api layer
+      .then(() => undefined); // eat the http response, not needed outside of this api layer
   }
   catch (err) {
     utils.renderError(err);
@@ -617,6 +618,60 @@ async function upsertSwaggerSpec(wso2APIM, accessToken, apiId, swaggerSpec) {
   }
 }
 
+/**
+ * Retrieves the API Definition saved at the WSO2 platform
+ *
+ * @param {*} wso2APIM
+ * @param {string} accessToken
+ * @param {string} apiId
+ * @returns {*}
+ */
+async function getApiDef(wso2APIM, accessToken, apiId) {
+  const url = `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/apis/${apiId}`;
+
+  try {
+    const result = await axios.get(url, {
+      headers: {
+        'Authorization': 'Bearer ' + accessToken
+      },
+      httpsAgent: new https.Agent({
+        rejectUnauthorized: false
+      })
+    });
+
+    return result.data;
+  } catch (err) {
+    utils.renderError(err);
+    throw err;
+  }
+}
+
+/**
+ * Check if the API def is up to date
+ * Returns `true` when the data is up to date
+ *
+ * @param {*} wso2APIM
+ * @param {string} accessToken
+ * @param {string} apiId
+ * @param {Object} apiDef
+ * @returns {Promise<boolean>}
+ */
+async function checkApiDefIsUpdated(wso2APIM, accessToken, apiId, apiDef) {
+  const newApiDef = constructAPIDef(wso2APIM.user, wso2APIM.gatewayEnv, apiDef, apiId);
+  const currentApiDef = await getApiDef(wso2APIM, accessToken, apiId);
+
+  // ? When no cors configuration is set, it applies the default one from wso2
+  const hasCorsConfiguration = !!newApiDef.corsConfiguration;
+
+  const equivalenceCheckMatrix = [
+    // ? endpointConfig is a string in this version, so it should always match each other directly
+    newApiDef.endpointConfig === currentApiDef.endpointConfig,
+    ...hasCorsConfiguration ? [isEqual(newApiDef.corsConfiguration, currentApiDef.corsConfiguration)] : [],
+  ];
+
+  // TODO: We should test for any intersection data between api definition and swagger specs
+  return equivalenceCheckMatrix.every(Boolean);
+}
 
 module.exports = {
   registerClient,
@@ -634,4 +689,6 @@ module.exports = {
   removeAPIDef,
   listInvokableAPIUrl,
   upsertSwaggerSpec,
+  getApiDef,
+  checkApiDefIsUpdated,
 };

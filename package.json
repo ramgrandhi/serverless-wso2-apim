@@ -11,6 +11,7 @@
     "test:e2e": "jest e2e --verbose",
     "test:e2e:destroy": "yarn stop:wso2-2.6.0 && yarn stop:wso2-3.2.0 && yarn stop:localstack",
     "test": "yarn test:unit",
+    "test:watch": "yarn test --watch",
     "start:wso2-2.6.0": "docker run --name api-manager-260 -p 127.0.0.1:8260:8243 -p 127.0.0.1:9260:9443 --rm wso2/wso2am:2.6.0",
     "start:wso2-3.2.0": "docker run --name api-manager-320 -p 127.0.0.1:8320:8243 -p 127.0.0.1:9320:9443 --rm wso2/wso2am:3.2.0",
     "start:localstack": "docker run --name localstack -p 127.0.0.1:4566:4566 -p 127.0.0.1:4571:4571 --rm localstack/localstack:1.4",
@@ -42,36 +43,35 @@
     "serverless"
   ],
   "devDependencies": {
-    "axios": "^1.6.3",
     "babel-eslint": "^10.1.0",
     "chalk": "^4.1.0",
     "codecov": "^3.8.1",
     "concurrently": "^6.0.0",
     "eslint": "^7.20.0",
     "eslint-plugin-jest": "^24.1.5",
-    "form-data": "^4.0.0",
-    "fs": "^0.0.2",
     "https": "^1.0.0",
     "jest": "^26.6.3",
-    "qs": "^6.11.2",
     "release": "^6.3.0",
     "serverless": "^1.75.1",
     "serverless-deployment-bucket": "^1.4.1",
-    "serverless-localstack": "^0.4.30",
-    "split-ca": "^1.0.1"
+    "serverless-localstack": "^0.4.30"
   },
   "dependencies": {
     "axios": "^1.6.3",
     "form-data": "^4.0.0",
     "fs": "^0.0.2",
     "https": "^1.0.0",
-    "semver": "^7.5.2",
+    "lodash.isequal": "^4.5.0",
     "qs": "^6.11.2",
+    "semver": "^7.5.2",
     "split-ca": "^1.0.1",
     "swagger-parser": "^10.0.3"
   },
   "jest": {
     "coverageDirectory": "./coverage/",
-    "collectCoverage": true
+    "collectCoverage": true,
+    "watchPathIgnorePatterns": [
+      "<rootDir>/jest.json"
+    ]
   }
 }

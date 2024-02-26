@@ -15,6 +15,7 @@ const qs = require('qs');
 const FormData = require('form-data');
 const fs = require('fs');
 const utils = require('../utils/utils');
+const isEqual = require('lodash.isequal');
 
 // Parse your swagger online @ https://apitools.dev/swagger-parser/online/
 const parser = require('swagger-parser');
@@ -227,7 +228,8 @@ async function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
       visibility: apiDef.subscriberVisibility || apiDef.visibility,
       endpointConfig: {
         production_endpoints: {
-          url: backendBaseUrl            },
+          url: backendBaseUrl
+        },
         sandbox_endpoints: {
           url: backendBaseUrl
         },
@@ -769,7 +771,7 @@ async function removeClientCert(wso2APIM, accessToken, certAlias, apiId) {
  * @param {*} swaggerSpec
  * @returns
  */
- async function upsertSwaggerSpec(wso2APIM, accessToken, apiId, swaggerSpec) {
+async function upsertSwaggerSpec(wso2APIM, accessToken, apiId, swaggerSpec) {
   try {
     const url = `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/apis/${apiId}/swagger`;
     const config = {
@@ -786,8 +788,9 @@ async function removeClientCert(wso2APIM, accessToken, certAlias, apiId) {
     data.append('apiDefinition', JSON.stringify(swaggerSpec));
 
     return axios.put(url, data, config)
-      .then((_) => undefined).catch((err) => {
+      .then(() => undefined).catch((err) => {
         utils.renderError(err);
+        throw err;
       }); // eat the http response, not needed outside of this api layer
   }
   catch (err) {
@@ -796,6 +799,61 @@ async function removeClientCert(wso2APIM, accessToken, certAlias, apiId) {
   }
 }
 
+/**
+ * Retrieves the API Definition saved at the WSO2 platform
+ *
+ * @param {*} wso2APIM
+ * @param {string} accessToken
+ * @param {string} apiId
+ * @returns {*}
+ */
+async function getApiDef(wso2APIM, accessToken, apiId) {
+  const url = `https://${wso2APIM.host}:${wso2APIM.port}/api/am/publisher/${wso2APIM.versionSlug}/apis/${apiId}`;
+
+  try {
+    const result = await axios.get(url, {
+      headers: {
+        'Authorization': 'Bearer ' + accessToken
+      },
+      httpsAgent: new https.Agent({
+        rejectUnauthorized: false
+      })
+    });
+
+    return result.data;
+  } catch (err) {
+    utils.renderError(err);
+    throw err;
+  }
+}
+
+/**
+ * Check if the API def is up to date
+ * Returns `true` when the data is up to date
+ *
+ * @param {*} wso2APIM
+ * @param {string} accessToken
+ * @param {string} apiId
+ * @param {Object} apiDef
+ * @returns {Promise<boolean>}
+ */
+async function checkApiDefIsUpdated(wso2APIM, accessToken, apiId, apiDef) {
+  const [newApiDef, currentApiDef] = await Promise.all([
+    constructAPIDef(wso2APIM.user, wso2APIM.gatewayEnv, apiDef, apiId),
+    getApiDef(wso2APIM, accessToken, apiId)
+  ]);
+
+  // ? When no cors configuration is set, it applies the default one from wso2
+  const hasCorsConfiguration = !!newApiDef.corsConfiguration;
+
+  const equivalenceCheckMatrix = [
+    isEqual(newApiDef.endpointConfig, currentApiDef.endpointConfig),
+    ...hasCorsConfiguration ? [isEqual(newApiDef.corsConfiguration, currentApiDef.corsConfiguration)] : [],
+  ];
+
+  // TODO: We should test for any intersection data between api definition and swagger specs
+  return equivalenceCheckMatrix.every(Boolean);
+}
 
 module.exports = {
   registerClient,
@@ -817,4 +875,6 @@ module.exports = {
   removeAPIDef,
   listInvokableAPIUrl,
   upsertSwaggerSpec,
+  getApiDef,
+  checkApiDefIsUpdated,
 };

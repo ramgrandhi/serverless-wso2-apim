@@ -35,7 +35,6 @@ function resolveCfImportValue(provider, name, params = {}) {
     return null;
   });
 }
-  
 
 module.exports = {
   renderError,
