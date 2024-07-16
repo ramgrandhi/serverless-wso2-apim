@@ -208,16 +208,11 @@ function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
       tags: [...apiDef.tags, 'serverless-wso2-apim'],
       tiers: ['Unlimited'],
       maxTps: {
-        sandbox: (apiDef.maxTps) ? apiDef.maxTps : undefined,
         production: (apiDef.maxTps) ? apiDef.maxTps : undefined
       },
       visibility: apiDef.subscriberVisibility || apiDef.visibility,
       endpointConfig: JSON.stringify({
         production_endpoints: {
-          url: backendBaseUrl,
-          config: null
-        },
-        sandbox_endpoints: {
           url: backendBaseUrl,
           config: null
         },
