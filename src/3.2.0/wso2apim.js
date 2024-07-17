@@ -227,9 +227,7 @@ async function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
       visibility: apiDef.subscriberVisibility || apiDef.visibility,
       endpointConfig: {
         production_endpoints: {
-          url: backendBaseUrl            },
-        sandbox_endpoints: {
-          url: backendBaseUrl
+          url: backendBaseUrl            
         },
         endpoint_type: (apiDef.backend.endpointType) ? apiDef.backend.endpointType : 'http'
       },
