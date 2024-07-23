@@ -202,9 +202,10 @@ async function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
     }
     if (apiDef.securityScheme && apiDef.securityScheme.oauth2 && apiDef.securityScheme.oauth2.enabled === true) {
       securityScheme.push("oauth2");
-      securityScheme.push("oauth_basic_auth_api_key_mandatory");
-    } else {
-      securityScheme.push("oauth2");
+      if (apiDef.securityScheme.oauth2.mandatory) {
+        securityScheme.push("oauth_basic_auth_api_key_mandatory");
+      }
+      
     }
     const wso2ApiDefinition = {
       id: apiId,
