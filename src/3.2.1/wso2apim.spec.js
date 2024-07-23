@@ -59,6 +59,7 @@ const wso2APIM = {
           enabled: true,
           clientCert: "file://xxx.cer",
         },
+        oauth2: { enabled: true, keyManager: ["Resident Key Manager"] },
       },
       tags: ["awesomeness", "myawesomeapi"],
       maxTps: 999,
@@ -90,7 +91,7 @@ const wso2APIM = {
 
 const apiId = "123456789";
 
-describe("wso2apim-3.2.0", () => {
+describe("wso2apim-3.2.1", () => {
   describe("registerClient()", () => {
     it("should handle a successful response", async () => {
       axios.post.mockImplementationOnce(() =>
