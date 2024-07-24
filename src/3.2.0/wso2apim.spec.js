@@ -58,7 +58,8 @@ const wso2APIM = {
         mutualssl: {
           enabled: true,
           clientCert: 'file://xxx.cer'
-        }
+        },
+        oauth2: { enabled: true, keyManager: ["Resident Key Manager"] }
       },
       tags: [ 'awesomeness', 'myawesomeapi'],
       maxTps: 999,

@@ -200,10 +200,12 @@ async function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
       securityScheme.push('mutualssl');
       securityScheme.push('mutualssl_mandatory');
     }
-    if(apiDef.securityScheme && apiDef.securityScheme.oauth2 && apiDef.securityScheme.oauth2.enabled === false) {
-      //do nothing
-    } else {
-      securityScheme.push('oauth2');
+    if (apiDef.securityScheme && apiDef.securityScheme.oauth2 && apiDef.securityScheme.oauth2.enabled === true) {
+      securityScheme.push("oauth2");
+      if (apiDef.securityScheme.oauth2.mandatory) {
+        securityScheme.push("oauth_basic_auth_api_key_mandatory");
+      }
+      
     }
     const wso2ApiDefinition = {
       id: apiId,
@@ -237,6 +239,7 @@ async function constructAPIDef(user, gatewayEnv, apiDef, apiId) {
       mediationPolicies: mediationPolicies,
       additionalProperties: ((apiDef.apiProperties) && (Object.keys(apiDef.apiProperties).length > 0)) ? apiDef.apiProperties : undefined,
       subscriptionAvailability: 'CURRENT_TENANT',
+      keyManagers: apiDef.securityScheme?.oauth2?.keyManager,
       subscriptionAvailableTenants: [],
       businessInformation: apiDef.businessInformation ? {
         businessOwnerEmail: apiDef.businessInformation.businessOwnerEmail,
