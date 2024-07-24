@@ -32,6 +32,7 @@ custom:
             clientCert: 'file://cert.cer'
           oauth2:
             enabled: true
+            mandatory: true
             keyManager:
               - 'Resident Key Manager'
         backend:
