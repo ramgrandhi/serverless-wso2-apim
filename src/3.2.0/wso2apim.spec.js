@@ -59,7 +59,9 @@ const wso2APIM = {
           enabled: true,
           clientCert: 'file://xxx.cer'
         },
-        oauth2: { enabled: true, keyManager: ["Resident Key Manager"] }
+        oauth2: { enabled: true, keyManager: ["Resident Key Manager"] },
+        apiKey: { enabled: true },
+        basicAuth: { enabled: true }
       },
       tags: [ 'awesomeness', 'myawesomeapi'],
       maxTps: 999,
@@ -783,4 +785,59 @@ describe('wso2apim-3.2.0', () => {
     });
   });
 
+  describe('security schemas', () => {
+    it('all provided', async () => {
+      const apiDef = await constructAPIDef(
+        wso2APIM.user,
+        wso2APIM.gatewayEnv,
+        wso2APIM.apidefs[0]
+      );
+
+      expect(apiDef.securityScheme).toEqual(['mutualssl', 'mutualssl_mandatory', 'oauth2', 'api_key', 'basic_auth']);
+    });
+
+    it('apiKey provided', async () => {
+      const config = {
+        ...wso2APIM,
+        apidefs: [
+          {
+            ...wso2APIM.apidefs[0],
+            securityScheme: {
+              apiKey: { enabled: true },
+            }
+          },
+        ],
+      };
+
+      const apiDef = await constructAPIDef(
+        config.user,
+        config.gatewayEnv,
+        config.apidefs[0]
+      );
+
+      expect(apiDef.securityScheme).toEqual(['api_key']);
+    });
+
+    it('basicAuth provided', async () => {
+      const config = {
+        ...wso2APIM,
+        apidefs: [
+          {
+            ...wso2APIM.apidefs[0],
+            securityScheme: {
+              basicAuth: { enabled: true },
+            }
+          },
+        ],
+      };
+
+      const apiDef = await constructAPIDef(
+        config.user,
+        config.gatewayEnv,
+        config.apidefs[0]
+      );
+
+      expect(apiDef.securityScheme).toEqual(['basic_auth']);
+    });
+  });
 });

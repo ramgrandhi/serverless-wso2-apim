@@ -240,7 +240,9 @@ class Serverless_WSO2_APIM {
         ((semver.lt(this.cache.wso2apimVersion, '3.2.0') && (wso2APIM.apidefs.every(def => typeof def.securityScheme === 'undefined'))) || 
         (semver.gte(this.cache.wso2apimVersion, '3.2.0') && (wso2APIM.apidefs.every(def => typeof def.securityScheme === 'undefined' || 
         (def.securityScheme && def.securityScheme.mutualssl && def.securityScheme.mutualssl.enabled && def.securityScheme.mutualssl.clientCert) || 
-        (def.securityScheme && def.securityScheme.oauth2 && typeof def.securityScheme.oauth2.enabled === 'boolean'))
+        (def.securityScheme && def.securityScheme.oauth2 && typeof def.securityScheme.oauth2.enabled === 'boolean') ||
+        (def.securityScheme && def.securityScheme.apiKey && typeof def.securityScheme.apiKey.enabled === 'boolean') ||
+        (def.securityScheme && def.securityScheme.basicAuth && typeof def.securityScheme.basicAuth.enabled === 'boolean'))
         )))
       ];
       const messagesArraySpecific = [
