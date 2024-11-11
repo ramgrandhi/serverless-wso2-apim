@@ -29,8 +29,10 @@ jobs:
           node --version
 
           yarn test:unit
-      - name: Collect coverage
-        run: ./node_modules/codecov/bin/codecov
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   E2E:
     runs-on: ubuntu-latest
